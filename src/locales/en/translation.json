@@ -60,5 +60,6 @@
     "calculation": "Calculation",
     "employee": "Employee",
     "costCenter": "CostCenter",
-    "setting": "Setting"
+    "setting": "Setting",
+    "dashboard": "Dashboard"
 }
