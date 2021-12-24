@@ -12,7 +12,8 @@ import {
   Select,
   Modal,
   Drawer,
-  Divider
+  Divider,
+  message
 } from "antd";
 import {
   CalculatorOutlined,
@@ -36,9 +37,9 @@ const { Option } = Select;
 
 
 function Calculate() {
-  
-  const {t} = useTranslation();
-  
+
+  const { t } = useTranslation();
+
   const expandedRowRender = ({ children }) => {
     const columns = [
       { title: 'Component Name', dataIndex: 'name', key: 'name' },
@@ -65,7 +66,7 @@ function Calculate() {
     {
       title: t(`fullName`),
       dataIndex: "name",
-      render: (text, row) => {return row.key? <a onClick={() => openDraver(row)}>{row.name} </a> :<p>{row.name}</p> },
+      render: (text, row) => { return row.key ? <a onClick={() => openDraver(row)}>{row.name} </a> : <p>{row.name}</p> },
     },
     {
       title: t(`calculateDate`),
@@ -144,8 +145,16 @@ function Calculate() {
 
     console.log("result calculation---", result.data);
 
-    search();
-    setIsModalVisible(false);
+    if (result.data.isSuccess) {
+      search();
+      setIsModalVisible(false);
+      message.success('This is a success message');
+    }
+    else {
+      message.error('This is an error message');
+    }
+
+
   };
 
   const handleCancel = () => {
@@ -219,8 +228,8 @@ function Calculate() {
             onChange={handleChangeInput}
             value={filter?.firstName}
             name="firstName"
-            
-            placeholder = {t(`placeholderFirstName`)}
+
+            placeholder={t(`placeholderFirstName`)}
           />
         </Col>
         <Col span={4}>
@@ -229,13 +238,13 @@ function Calculate() {
             value={filter.lastName}
             name="lastName"
             // placeholder="lastName"
-            placeholder = {t(`placeholderLastName`)}
+            placeholder={t(`placeholderLastName`)}
           />
         </Col>
         <Col span={4}>
           <Select
             // defaultValue="აირჩიეთ"
-            placeholder = {t(`placeholderChoose`)}
+            placeholder={t(`placeholderChoose`)}
             style={{ width: '100%' }}
             value={filter.departmentId}
           >
@@ -248,7 +257,7 @@ function Calculate() {
           <DatePicker
             onChange={onChangeCalculationPeriod}
             picker="month"
-            placeholder ={t(`placeholderSelectMonth`)}
+            placeholder={t(`placeholderSelectMonth`)}
           />
         </Col>
 
@@ -296,10 +305,10 @@ function Calculate() {
             <Col span={8}>
             </Col>
             <Col span={8}>
-              <DatePicker  
-              onChange={onChangeCalculationDate}
-              placeholder ={t(`placeholderSelectMonth`)}
-               />
+              <DatePicker
+                onChange={onChangeCalculationDate}
+                placeholder={t(`placeholderSelectMonth`)}
+              />
             </Col>
             <Col span={8}>
             </Col>

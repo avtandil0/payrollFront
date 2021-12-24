@@ -47,7 +47,7 @@ function MyDrawer({ visibleDrawer, setVisibleDrawer, drawerId }) {
       title: 'componentName',
       dataIndex: 'componentName',
       key: 'componentName',
-      render: text => <a>{text}</a>,
+      render: text => <p>{text}</p>,
     },
     {
       title: 'costCenterCode',
@@ -137,7 +137,7 @@ function MyDrawer({ visibleDrawer, setVisibleDrawer, drawerId }) {
           <Col span={12}>
             <DescriptionItem title={t(`bankAccountNumber`)} content={employee.bankAccountNumber} />
           </Col>
-          <Col span={12}>m
+          <Col span={12}>
             <DescriptionItem title={t(`departmentName`)} content={employee.departmentName} />
           </Col>
         </Row>

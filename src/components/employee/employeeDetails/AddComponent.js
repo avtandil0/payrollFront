@@ -253,7 +253,7 @@ function AddComponent({ employee, setEmployee }) {
     }
     const fetchComponents = async () => {
         // setTableLoading(true);
-        const result = await axios(constants.API_PREFIX + "/api/Component");
+        const result = await axios(constants.API_PREFIX + "/api/Component/getAllActive");
 
         setComponents(result.data)
         // setTableLoading(false);

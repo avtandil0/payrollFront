@@ -59,6 +59,7 @@
     "paymentDays": "გადახდის დღეები",
     "calculation": "კალკულაცია",
     "employee": "თანამშრომელი",
-    "costCenter": "CostCenter"
+    "costCenter": "CostCenter",
+    "setting": "კონფიგურაცია"
 
 } 

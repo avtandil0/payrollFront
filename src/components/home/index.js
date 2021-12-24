@@ -33,6 +33,7 @@ import AccountsReportChart from '../accountsReportChart/index';
 import EmployeeDetails from '../employee/employeeDetails';
 import EmployeeByDepartment from '../department/employeeByDepartment';
 import Calculate from '../calculate';
+import Dashboard from '../dashboard';
 import { useTranslation } from "react-i18next";
 
 
@@ -101,6 +102,9 @@ function Home() {
     if (location.pathname == '/payroll/calculate') {
       setActiveUrl(['8']);
     }
+    if (location.pathname == '/payroll/dashboard') {
+      setActiveUrl(['9']);
+    }
 
   }, []);
 
@@ -108,68 +112,33 @@ function Home() {
     setCollapsed(!collapsed)
   };
 
-  const clickcomponent = () => {
-    setActiveUrl(['1'])
-    history.push(`${HOME_PAGE}/component`);
+  
+  const ClickGoPage = (e, name) =>{
+    console.log("ClickGoPage",  e.key, name)
+    // setActiveUrl({name: e.key})
+    setActiveUrl([e.key])
+    history.push(`${HOME_PAGE}/${name}`);
   }
 
-  const clickCoefficient = () => {
-    setActiveUrl(['2'])
-    history.push(`${HOME_PAGE}/coefficient`);
-  }
-
-  // const clickAccountPlan = () => {
-  //   setActiveUrl(['4'])
-  //   history.push(`${HOME_PAGE}/accountPlan`);
-  // }
-
-  const clickEmployee = () => {
-    setActiveUrl(['3'])
-    history.push(`${HOME_PAGE}/employee`);
-  }
-  const clickProject = () => {
-    setActiveUrl(['4'])
-    history.push(`${HOME_PAGE}/project`);
-  }
-  const clickCostCenter = () => {
-    setActiveUrl(['5'])
-    history.push(`${HOME_PAGE}/costCenter`);
-  }
-  const clickAccountsReportChart = () => {
-    setActiveUrl(['6'])
-    history.push(`${HOME_PAGE}/accountsReportChart`);
-  }
-
-  const clickDepartment = () => {
-    setActiveUrl(['7'])
-    history.push(`${HOME_PAGE}/department`);
-  }
-
-  const clickCalculate = () => {
-    setActiveUrl(['8'])
-    history.push(`${HOME_PAGE}/calculate`);
-  }
-
-  function handleChange(value) {
-    console.log(`selected ${value}`);
-    i18n.changeLanguage(value)
+  const handleChange = ({key}) => {
+    i18n.changeLanguage(key)
   }
 
   const languageMenu = (
-    <Menu>
-      <Menu.Item>
+    <Menu onClick={handleChange}>
+      <Menu.Item key="ge">
         <Space>
-          <img width={25} height={20} src={GE} /> <span>Gergian</span>
+          <img width={25} height={20} alt='GE' src={GE} /> <span>Georgian</span>
         </Space>
       </Menu.Item>
-      <Menu.Item  >
+      <Menu.Item key="en" >
         <Space>
-          <img width={25} height={20} src={EN} /> <span>English</span>
+          <img width={25} height={20} alt='EN' src={EN} /> <span>English</span>
         </Space>
       </Menu.Item>
-      <Menu.Item>
+      <Menu.Item key="ru">
         <Space>
-          <img width={25} height={20} src={RU} /> <span>Russian</span>
+          <img width={25} height={20} alt='RU' src={RU} /> <span>Russian</span>
         </Space>
       </Menu.Item>
     </Menu>
@@ -212,34 +181,37 @@ function Home() {
           {/* <img alt="aaa" style={{width:'100%', height: 'auto'}} src={Logo} /> */}
 
         </div>
-        <Menu selectedKeys={activeUrl} theme="light" mode="inline"   >
-          <Menu.Item key="8" icon={<CalculatorOutlined />} onClick={clickCalculate}>
+        <Menu selectedKeys={activeUrl} theme="light" mode="inline" >
+        <Menu.Item key="9" icon={<DatabaseOutlined />} title="dashboard" onClick={(e) =>ClickGoPage(e, "dashboard")}>
+              {/* {t(`dashboard`)} */}dashboard
+            </Menu.Item>
+          <Menu.Item key="8" icon={<CalculatorOutlined />} onClick={(e) =>ClickGoPage(e, "calculate")}>
             {t(`calculation`)}
           </Menu.Item>
-          <Menu.Item key="1" icon={<FundOutlined />} onClick={clickcomponent}>
+          <Menu.Item key="1" icon={<FundOutlined />} name="component" onClick={(e) =>ClickGoPage(e, "component")}>
             {t(`component`)}
           </Menu.Item>
-          <Menu.Item key="2" icon={<FunctionOutlined />} onClick={clickCoefficient} >
+          <Menu.Item key="2" icon={<FunctionOutlined />} onClick={(e) =>ClickGoPage(e, "coefficient")}>
             {t(`coefficient`)}
           </Menu.Item>
           {/* <Menu.Item key="4" icon={<AccountBookOutlined />} onClick={clickAccountPlan}>
           accountPlan
           </Menu.Item> */}
-          <Menu.Item key="3" icon={<UsergroupAddOutlined />} onClick={clickEmployee}>
+          <Menu.Item key="3" icon={<UsergroupAddOutlined />} onClick={(e) =>ClickGoPage(e, "employee")}>
             {t(`employee`)}
           </Menu.Item>
 
-          <SubMenu key="sub1" title="Setting" icon={<SettingOutlined />}>
-            <Menu.Item key="4" icon={<ProjectOutlined />} onClick={clickProject}>
+          <SubMenu key="sub1" title={t(`setting`)} icon={<SettingOutlined />}>
+            <Menu.Item key="4" icon={<ProjectOutlined />} onClick={(e) =>ClickGoPage(e, "project")}>
               {t(`project`)}
             </Menu.Item>
-            <Menu.Item key="5" icon={<StrikethroughOutlined />} onClick={clickCostCenter}>
+            <Menu.Item key="5" icon={<StrikethroughOutlined />} onClick={(e) =>ClickGoPage(e, "costCenter")}>
               {t(`costCenter`)}
             </Menu.Item>
-            <Menu.Item key="6" icon={<DiffOutlined />} onClick={clickAccountsReportChart}>
+            <Menu.Item key="6" icon={<DiffOutlined />} onClick={(e) =>ClickGoPage(e, "accountsReportChart")}>
               accountsReportChart
             </Menu.Item>
-            <Menu.Item key="7" icon={<DatabaseOutlined />} onClick={clickDepartment}>
+            <Menu.Item key="7" icon={<DatabaseOutlined />} onClick={(e) =>ClickGoPage(e, "department")}>
               {t(`department`)}
             </Menu.Item>
 
@@ -279,7 +251,7 @@ function Home() {
               <Dropdown overlay={userMenu}>
                 <div style={{ cursor: 'pointer' }}>
                   <Space>
-                    <Avatar size={32} icon={<UserOutlined />} overlay={languageMenu} />
+                    <Avatar size={32} icon={<UserOutlined />}/>
                     <span>Avtandil</span>
                   </Space>
                 </div>
@@ -313,7 +285,7 @@ function Home() {
 
           <Switch>
             <Route exact path="/">
-              <Redirect to={`${HOME_PAGE}/component`} />
+              <Redirect to={`${HOME_PAGE}/dashboard`} />
             </Route>
             <Route path={`${HOME_PAGE}/component`}>
               <Component />
@@ -351,6 +323,9 @@ function Home() {
             </Route>
             <Route path={`${HOME_PAGE}/employeeByDepartment/:id`}>
               <EmployeeByDepartment />
+            </Route>
+            <Route path={`${HOME_PAGE}/dashboard`}>
+              <Dashboard />
             </Route>
           </Switch>
 
