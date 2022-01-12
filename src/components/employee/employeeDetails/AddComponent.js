@@ -70,12 +70,12 @@ function AddComponent({ employee, setEmployee }) {
         // {
         //     title: 'startDate',
         //     dataIndex: 'startDate',
-        //     render: text => <p>{moment(text).format('LLL')}</p>,
+        //     render: text => <p>{moment(text).format('YYYY-MM-DD')}</p>,
         // },
         // {
         //     title: 'endDate',
         //     dataIndex: 'endDate',
-        //     render: text => <p>{moment(text).format('LLL')}</p>,
+        //     render: text => <p>{moment(text).format('YYYY-MM-DD')}</p>,
         // },
         {
             title: t(`scheme`),
@@ -117,8 +117,8 @@ function AddComponent({ employee, setEmployee }) {
         projectCode: "",
         costCenterCode: "",
         // days: "",
-        startDate: moment('2021/09/01', 'YYYY/MM/DD'),
-        endDate: moment('2022/09/01', 'YYYY/MM/DD'),
+        startDate: null,
+        endDate: null,
         scheme: "",
         // amount: null,
         currency: "",
@@ -255,6 +255,7 @@ function AddComponent({ employee, setEmployee }) {
         // setTableLoading(true);
         const result = await axios(constants.API_PREFIX + "/api/Component/getAllActive");
 
+        console.log('fetchComponents',result)
         setComponents(result.data)
         // setTableLoading(false);
     }
@@ -349,7 +350,7 @@ function AddComponent({ employee, setEmployee }) {
                             </Select>
                         </Col>
                         <Col className="gutter-row" span={8}>
-                            <span > {t(`scheme`)}: </span>
+                            {/* <span > {t(`scheme`)}: </span>
                             <Select
                                 defaultValue="აირჩიეთ"
                                 style={{ width: 200, marginTop: 5 }}
@@ -362,6 +363,17 @@ function AddComponent({ employee, setEmployee }) {
                                 }
 
 
+                            </Select> */}
+                            <span > {t(`currency`)}: </span>
+                            <Select
+                                defaultValue="აირჩიეთ"
+                                value={employeeComponent.currency}
+                                style={{ width: 200, marginTop: 5 }}
+                                onChange={(value) => handleChangeEmployeeComponentSelect(value, 'currency')}
+                            >
+                                <Option value="GEL">GEL</Option>
+                                <Option value="USD">USD</Option>
+                                <Option value="EUR">EUR</Option>
                             </Select>
                         </Col>
 
@@ -386,7 +398,7 @@ function AddComponent({ employee, setEmployee }) {
                             <Input type="number" style={{ marginTop: 5 }} value={employeeComponent.amount} name="amount" onChange={e => handleChangeEmployeeComponent(e)} placeholder="თანხა" />
                         </Col>
                         <Col className="gutter-row" span={8}>
-                            <span > {t(`currency`)}: </span>
+                            {/* <span > {t(`currency`)}: </span>
                             <Select
                                 defaultValue="აირჩიეთ"
                                 value={employeeComponent.currency}
@@ -396,23 +408,27 @@ function AddComponent({ employee, setEmployee }) {
                                 <Option value="GEL">GEL</Option>
                                 <Option value="USD">USD</Option>
                                 <Option value="EUR">EUR</Option>
-                            </Select>
+                            </Select> */}
+                             <span >{t(`paymentByCash`)}: </span> <br />
+                            <Checkbox value={employeeComponent.paidByCash} onChange={(e) => onChangeBoolean(e, 'paidByCash')}>Checkbox</Checkbox>
                         </Col>
                         <Col className="gutter-row" span={8}>
                             <span > {t(`multiplePayment`)}: </span>
                             <Checkbox style={{ marginTop: 5 }} value={employeeComponent.paidMultiple} onChange={(e) => onChangeBoolean(e, 'paidMultiple')}>Checkbox</Checkbox>
                         </Col>
                         <Col className="gutter-row" span={8}>
-                            <span >{t(`paymentByCash`)}: </span> <br />
-                            <Checkbox value={employeeComponent.paidByCash} onChange={(e) => onChangeBoolean(e, 'paidByCash')}>Checkbox</Checkbox>
+                            {/* <span >{t(`paymentByCash`)}: </span> <br />
+                            <Checkbox value={employeeComponent.paidByCash} onChange={(e) => onChangeBoolean(e, 'paidByCash')}>Checkbox</Checkbox> */}
                         </Col>
                         <Col className="gutter-row" span={8}>
                             <span >{t(`start`)}: </span> <br />
-                            <DatePicker value={moment(employeeComponent.startDate, 'YYYY/MM/DD')} style={{ marginTop: 5 }} defaultValue={moment('2021/09/01', 'YYYY/MM/DD')} onChange={(value) => handleChangeEmployeeComponentSelect(value, 'startDate')} />
+                            <DatePicker value={employeeComponent.startDate? moment.utc(employeeComponent.startDate, 'YYYY/MM/DD'): null} style={{ marginTop: 5 }} 
+                            onChange={(value) => handleChangeEmployeeComponentSelect(value, 'startDate')} />
                         </Col>
                         <Col className="gutter-row" span={8}>
                             <span >{t(`finish`)}: </span> <br />
-                            <DatePicker value={moment(employeeComponent.endDate, 'YYYY/MM/DD')} style={{ marginTop: 5 }} defaultValue={moment('2022/01/01', 'YYYY/MM/DD')} onChange={(value) => handleChangeEmployeeComponentSelect(value, 'endDate')} />
+                            <DatePicker value={employeeComponent.endDate? moment.utc(employeeComponent.endDate, 'YYYY/MM/DD'): null} style={{ marginTop: 5 }} 
+                             onChange={(value) => handleChangeEmployeeComponentSelect(value, 'endDate')} />
                         </Col>
 
                     </Row>

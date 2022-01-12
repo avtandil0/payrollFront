@@ -64,17 +64,17 @@ function Component() {
         {
             title: t(`start`),
             dataIndex: 'startDate',
-            render: text => <p>{moment(text).format('LLL')}</p>,
+            render: text => <p>{moment.utc(text).format('YYYY-MM-DD')}</p>,
         },
         {
             title: t(`finish`),
             dataIndex: 'endDate',
-            render: text => <p>{moment(text).format('LLL')}</p>,
+            render: text => <p>{moment(text).format('YYYY-MM-DD')}</p>,
         },
         {
             title: t(`dateOfCreation`),
             dataIndex: 'dateCreated',
-            render: text => <p>{moment(text).format('LLL')}</p>,
+            render: text => <p>{moment(text).format('YYYY-MM-DD')}</p>,
         },
     ];
 
@@ -148,10 +148,10 @@ function Component() {
             console.log("resultPost", result)
             if (result.data.isSuccess) {
                 fetchData();
-                message.success('This is a success message');
+                message.success(result.data.message);
             }
             else {
-                message.error('This is an error message');
+                message.error(result.data.message);
             }
         }
         else {
@@ -159,27 +159,34 @@ function Component() {
             console.log("result1", result1)
             if (result1.data.isSuccess) {
                 fetchData();
-                message.success('This is a success message');
+                message.success(result1.data.message);
             }
             else {
-                message.error('This is an error message');
+                message.error(result1.data.message);
             }
         }
-        // setAccountsReportChart({
-        //     code: "",
-        //     description: "",
-        //     accountsReportChartTypeId: null
-        // })
+        
+        setComponent({
+            name: "",
+            coefficientId: null,
+            creditAccountId: null,
+            debitAccountId: null,
+            startDate: null,
+            endDate: null,
+        })
     };
 
     const handleCancel = () => {
         setIsEdiT(false);
         setIsModalVisible(false);
-        // setAccountsReportChart({
-        //     code: "",
-        //     description: "",
-        //     accountsReportChartTypeId: null
-        // })
+        setComponent({
+            name: "",
+            coefficientId: null,
+            creditAccountId: null,
+            debitAccountId: null,
+            startDate: null,
+            endDate: null,
+        })
     };
 
     const handleChange = (e) => {
@@ -344,7 +351,9 @@ function Component() {
                         >
                             <Space>
                                 <Space direction="vertical">
-                                    <DatePicker defaultValue={moment('2015/01/01', 'YYYY/MM/DD')} onChange={(value) => handleChangeSelect(value,'startDate')} />
+                                    <DatePicker  
+                                            value={component?.startDate? moment.utc(component?.startDate, 'YYYY/MM/DD'): null} 
+                                            onChange={(value) => handleChangeSelect(value,'startDate')} />
                                 </Space>
                             </Space>
 
@@ -360,7 +369,9 @@ function Component() {
                         >
                             <Space>
                                 <Space direction="vertical">
-                                <DatePicker defaultValue={moment('2015/01/01', 'YYYY/MM/DD')} onChange={(value) => handleChangeSelect(value,'endDate')} />
+                                <DatePicker 
+                                     value={component?.endDate? moment.utc(component?.endDate, 'YYYY/MM/DD'): null} 
+                                      onChange={(value) => handleChangeSelect(value,'endDate')} />
                                 </Space>
                             </Space>
 

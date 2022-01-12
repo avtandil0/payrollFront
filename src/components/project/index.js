@@ -54,7 +54,7 @@ function Project() {
     {
       title: t(`dateOfCreation`),
       dataIndex: 'dateCreated',
-      render: text => <p>{moment(text).format('LLL')}</p>,
+      render: text => <p>{moment(text).format('YYYY-MM-DD')}</p>,
     },
   ];
 
@@ -97,10 +97,10 @@ function Project() {
       console.log("result", result)
       if (result.data.isSuccess) {
         fetchData();
-        message.success('This is a success message');
+        message.success(result.data.message);
       }
       else {
-        message.error('This is an error message');
+        message.error(result.data.message);
       }
     }
     else {
@@ -108,10 +108,10 @@ function Project() {
       console.log("result1", result1)
       if (result1.data.isSuccess) {
         fetchData();
-        message.success('This is a success message');
+        message.success(result1.data.message);
       }
       else {
-        message.error('This is an error message');
+        message.error(result1.data.message);
       }
     }
     setProject({

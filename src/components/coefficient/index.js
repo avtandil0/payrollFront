@@ -168,6 +168,26 @@ function Coefficient() {
       }
     }
 
+    setCoefficient({
+      name: "",
+      description: "",
+      sgross: 1.0,
+      snet: 1.0,
+      spaid: 1.0,
+      sincomeTax: 1.0,
+      spension: 1.0,
+      stax1: 1.0,
+      stax2: 1.0,
+      pgross: 1.0,
+      pnet: 1.0,
+      ppaid: 1.0,
+      pincomeTax: 1.0,
+      ppension: 1.0,
+      ptax1: 1.0,
+      ptax2: 1.0,
+  
+    })
+
 
   };
 
@@ -180,7 +200,8 @@ function Coefficient() {
     // console.log('aaaaaaaaaa')
     // setCoefficient({ ...coefficient, [e.target.name]: e.target.value })
     // setCoefficient({ ...coefficient, [e.target.name]: (e.target.name == "name" || e.target.name=="description")? e.target.value : parseFloat(e.target.value) })
-    setCoefficient({ ...coefficient, [e.target.name]: (e.target.name == "name" || e.target.name == "description") ? e.target.value : (isNaN(e.target.value) ? e.target.value : parseFloat(e.target.value)) })
+    // setCoefficient({ ...coefficient, [e.target.name]: (e.target.name == "name" || e.target.name == "description") ? e.target.value : (isNaN(e.target.value) ? e.target.value : parseFloat(e.target.value)) })
+    setCoefficient({ ...coefficient, [e.target.name]: e.target.value})
 
   }
 

@@ -186,7 +186,7 @@ function Calculate() {
         paid: c.paid,
         incomeTax: c.incomeTax,
         pensionTax: c.pensionTax,
-        calculationDate: moment(c.calculationDate).format('LLL'),
+        calculationDate: moment(c.calculationDate).format('YYYY-MM-DD'),
         name: c.employeeComponent?.componentName,
         remainingGraceAmount: c.remainingGraceAmount,
       }))

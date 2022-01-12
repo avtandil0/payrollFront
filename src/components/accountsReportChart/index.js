@@ -62,7 +62,7 @@ function AccountsReportChart() {
         {
             title: t(`dateOfCreation`),
             dataIndex: 'dateCreated',
-            render: text => <p>{moment(text).format('LLL')}</p>,
+            render: text => <p>{moment(text).format('YYYY-MM-DD')}</p>,
         },
     ];
 

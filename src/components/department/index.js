@@ -64,7 +64,7 @@ function Department() {
     {
       title: t(`dateOfCreation`),
       dataIndex: 'dateCreated',
-      render: text => <p>{moment(text).format('LLL')}</p>,
+      render: text => <p>{moment(text).format('YYYY-MM-DD')}</p>,
     },
   ];
 
@@ -107,10 +107,10 @@ function Department() {
       console.log("resultPost", result);
       if (result.data.isSuccess) {
         fetchData();
-        message.success('This is a success message');
+        message.success(result.data.message);
       }
       else {
-        message.error('This is an error message');
+        message.error(result.data.message);
       }
     }
     else {
@@ -119,10 +119,10 @@ function Department() {
       console.log("result", result1);
       if (result1.data.isSuccess) {
         fetchData();
-        message.success('This is a success message');
+        message.success(result1.data.message);
       }
       else {
-        message.error('This is an error message');
+        message.error(result1.data.message);
       }
     }
     setDepartment({
