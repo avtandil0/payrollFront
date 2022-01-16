@@ -61,5 +61,8 @@
     "employee": "Employee",
     "costCenter": "CostCenter",
     "setting": "Setting",
-    "dashboard": "Dashboard"
+    "dashboard": "Dashboard",
+    "status": "Status",
+    "active": "Active",
+    "passive": "Passive"
 }

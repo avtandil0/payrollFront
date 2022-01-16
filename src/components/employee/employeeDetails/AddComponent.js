@@ -350,7 +350,7 @@ function AddComponent({ employee, setEmployee }) {
                             </Select>
                         </Col>
                         <Col className="gutter-row" span={8}>
-                            {/* <span > {t(`scheme`)}: </span>
+                            <span > {t(`scheme`)}: </span>
                             <Select
                                 defaultValue="აირჩიეთ"
                                 style={{ width: 200, marginTop: 5 }}
@@ -363,7 +363,7 @@ function AddComponent({ employee, setEmployee }) {
                                 }
 
 
-                            </Select> */}
+                            </Select>
                             <span > {t(`currency`)}: </span>
                             <Select
                                 defaultValue="აირჩიეთ"

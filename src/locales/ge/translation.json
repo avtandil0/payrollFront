@@ -61,5 +61,8 @@
     "employee": "თანამშრომელი",
     "costCenter": "CostCenter",
     "setting": "კონფიგურაცია",
-    "dashboard": "მთავარი"
+    "dashboard": "მთავარი",
+    "status": "სტატუსი",
+    "active": "აქტიური",
+    "passive": "პასიური"
 }

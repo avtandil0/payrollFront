@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 
 import 'antd/dist/antd.css';
-import { Table, Divider, Select, Modal, Button, message, Form, Input, Space, Popconfirm, Tooltip, DatePicker } from 'antd';
+import { Table, Divider, Select, Modal, Button, message, Form, Input, Space, Popconfirm, Tooltip, DatePicker, Tag } from 'antd';
 import { PlusCircleOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import axios from "axios";
 import constants from '../../constant'
 import { useTranslation } from "react-i18next";
-
+import './index.css'
 const { Option } = Select;
 
 
@@ -45,6 +45,15 @@ function Component() {
                 </div>
         },
         {
+            title: t(`status`),
+            dataIndex: 'status',
+            render: (status, row) => (<span>
+                <Tag color={row.status.value == 1 ? 'green' : 'volcano'} >
+                    {row.status.value == 1 ? t(`active`) : t(`passive`)}
+                </Tag>
+            </span>),
+        },
+        {
             title: t(`placeholderFirstName`),
             dataIndex: 'name',
             render: text => <a>{text}</a>,
@@ -64,12 +73,29 @@ function Component() {
         {
             title: t(`start`),
             dataIndex: 'startDate',
-            render: text => <p>{moment.utc(text).format('YYYY-MM-DD')}</p>,
+            render: (startDate, row) => (<span>
+                {row.status.fieldNames && row.status.fieldNames.includes('StartDate') ?
+                    <Tag color={'volcano'} >
+                        {moment(startDate).format('YYYY-MM-DD')}
+                    </Tag>
+                    :
+                     moment(startDate).format('YYYY-MM-DD') 
+                }
+
+            </span>),
         },
         {
             title: t(`finish`),
             dataIndex: 'endDate',
-            render: text => <p>{moment(text).format('YYYY-MM-DD')}</p>,
+            render: (endDate, row) => (<span>
+               {row.status.fieldNames && row.status.fieldNames.includes('EndDate') ?
+                    <Tag color={'volcano'} >
+                        {moment(endDate).format('YYYY-MM-DD')}
+                    </Tag>
+                    :
+                     moment(endDate).format('YYYY-MM-DD') 
+                }
+            </span>),
         },
         {
             title: t(`dateOfCreation`),
@@ -99,7 +125,7 @@ function Component() {
 
     const fetchData = async () => {
         setTableLoading(true);
-        const result = await axios(constants.API_PREFIX+"/api/Component");
+        const result = await axios(constants.API_PREFIX + "/api/Component");
         console.log("result", result.data);
 
         setDataSaveArray(result.data)
@@ -110,7 +136,7 @@ function Component() {
 
     const fetchAaccountsReportCharts = async () => {
         // setTableLoading(true);
-        const result = await axios(constants.API_PREFIX+"/api/AccountsReportChart");
+        const result = await axios(constants.API_PREFIX + "/api/AccountsReportChart");
         setAccountsReportCharts(result.data)
         // setTableLoading(false);
     }
@@ -118,7 +144,7 @@ function Component() {
 
     const fetchCoefficients = async () => {
         // setTableLoading(true);
-        const result = await axios(constants.API_PREFIX+"/api/Coefficient");
+        const result = await axios(constants.API_PREFIX + "/api/Coefficient");
 
         console.log('result Coifficient---', result.data)
         setCoefficients(result.data)
@@ -142,9 +168,9 @@ function Component() {
     const handleOk = async () => {
         setIsModalVisible(false);
         setIsEdiT(false);
-        console.log("component",component)
+        console.log("component", component)
         if (!isEdiT) {
-            const result = await axios.post(constants.API_PREFIX+"/api/Component", component);
+            const result = await axios.post(constants.API_PREFIX + "/api/Component", component);
             console.log("resultPost", result)
             if (result.data.isSuccess) {
                 fetchData();
@@ -155,7 +181,7 @@ function Component() {
             }
         }
         else {
-            const result1 = await axios.put(constants.API_PREFIX+"/api/Component", component);
+            const result1 = await axios.put(constants.API_PREFIX + "/api/Component", component);
             console.log("result1", result1)
             if (result1.data.isSuccess) {
                 fetchData();
@@ -165,7 +191,7 @@ function Component() {
                 message.error(result1.data.message);
             }
         }
-        
+
         setComponent({
             name: "",
             coefficientId: null,
@@ -196,7 +222,7 @@ function Component() {
 
     const confirm = async (record) => {
         console.log("record", record)
-        const result = await axios.delete(constants.API_PREFIX+"/api/Component", { data: record });
+        const result = await axios.delete(constants.API_PREFIX + "/api/Component", { data: record });
         console.log('result', result)
         if (result.data.isSuccess) {
             message.success(result.data.message);
@@ -223,13 +249,13 @@ function Component() {
 
     function onChange(date, dateString) {
         console.log(date, dateString);
-      }
+    }
 
 
     return (
         <div>
             <Button type="primary" onClick={showModal} icon={<PlusCircleOutlined />}>
-            {t(`add`)}
+                {t(`add`)}
             </Button>
             <Modal
                 loading={buttonLoading}
@@ -266,7 +292,7 @@ function Component() {
                             <Select
                                 defaultValue="აირჩიეთ"
                                 style={{ width: 120 }}
-                                onChange={(value) => handleChangeSelect(value,'coefficientId')}
+                                onChange={(value) => handleChangeSelect(value, 'coefficientId')}
                                 value={component.coefficientId}
                                 style={{
                                     display: 'inline-block',
@@ -295,7 +321,7 @@ function Component() {
                             <Select
                                 defaultValue="აირჩიეთ"
                                 style={{ width: 120 }}
-                                onChange={(value) => handleChangeSelect(value,'creditAccountId')}
+                                onChange={(value) => handleChangeSelect(value, 'creditAccountId')}
                                 value={component.creditAccountId}
                                 style={{
                                     display: 'inline-block',
@@ -322,7 +348,7 @@ function Component() {
                             <Select
                                 defaultValue="აირჩიეთ"
                                 style={{ width: 120 }}
-                                onChange={(value) => handleChangeSelect(value,'debitAccountId')}
+                                onChange={(value) => handleChangeSelect(value, 'debitAccountId')}
                                 value={component.debitAccountId}
                                 style={{
                                     display: 'inline-block',
@@ -351,9 +377,9 @@ function Component() {
                         >
                             <Space>
                                 <Space direction="vertical">
-                                    <DatePicker  
-                                            value={component?.startDate? moment.utc(component?.startDate, 'YYYY/MM/DD'): null} 
-                                            onChange={(value) => handleChangeSelect(value,'startDate')} />
+                                    <DatePicker
+                                        value={component?.startDate ? moment.utc(component?.startDate, 'YYYY/MM/DD') : null}
+                                        onChange={(value) => handleChangeSelect(value, 'startDate')} />
                                 </Space>
                             </Space>
 
@@ -369,9 +395,9 @@ function Component() {
                         >
                             <Space>
                                 <Space direction="vertical">
-                                <DatePicker 
-                                     value={component?.endDate? moment.utc(component?.endDate, 'YYYY/MM/DD'): null} 
-                                      onChange={(value) => handleChangeSelect(value,'endDate')} />
+                                    <DatePicker
+                                        value={component?.endDate ? moment.utc(component?.endDate, 'YYYY/MM/DD') : null}
+                                        onChange={(value) => handleChangeSelect(value, 'endDate')} />
                                 </Space>
                             </Space>
 
