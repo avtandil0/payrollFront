@@ -27,6 +27,7 @@ function Coefficient() {
 
 
   const { t } = useTranslation();
+  const [tableLoading, setTableLoading] = useState(false);
 
   const columns = [
     // {
@@ -131,11 +132,11 @@ function Coefficient() {
   };
 
   const fetchData = async () => {
-    // setTableLoading(true);
+    setTableLoading(true);
     const result = await axios(constants.API_PREFIX + "/api/coefficient");
 
     setDataSaveArray(result.data)
-    // setTableLoading(false);
+    setTableLoading(false);
   }
 
   useEffect(() => {
@@ -302,6 +303,7 @@ function Coefficient() {
       <Divider />
 
       <Table
+        loading={tableLoading}
         columns={columns}
         dataSource={dataSaveArray}
       />

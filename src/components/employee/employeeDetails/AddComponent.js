@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Form, Input, Row, Col, Select, Button, Modal, Table, DatePicker, Checkbox, message, Space, Popconfirm, Tooltip } from 'antd';
+import { Card, Form, Input, Row, Col, Select, Button, Modal, Table, DatePicker, Checkbox, Tag, Space, Popconfirm, Tooltip } from 'antd';
 import { PlusCircleOutlined, DeleteOutlined, EditOutlined, CheckOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import axios from "axios";
 import moment from 'moment';
@@ -46,6 +46,15 @@ function AddComponent({ employee, setEmployee }) {
                 </div>
         },
 
+        {
+            title: t(`status`),
+            dataIndex: 'status',
+            render: (status, row) => (<span>
+                <Tag color={row.status.value == 1 ? 'green' : 'volcano'} >
+                    {row.status.value == 1 ? t(`active`) : t(`passive`)}
+                </Tag>
+            </span>),
+        },
 
         {
             title: t(`projectCode`),
@@ -67,16 +76,7 @@ function AddComponent({ employee, setEmployee }) {
             dataIndex: 'payment',
             render: (item, row) => <p>{getPayment(row)}</p>,
         },
-        // {
-        //     title: 'startDate',
-        //     dataIndex: 'startDate',
-        //     render: text => <p>{moment(text).format('YYYY-MM-DD')}</p>,
-        // },
-        // {
-        //     title: 'endDate',
-        //     dataIndex: 'endDate',
-        //     render: text => <p>{moment(text).format('YYYY-MM-DD')}</p>,
-        // },
+        
         {
             title: t(`scheme`),
             dataIndex: 'scheme',
@@ -99,6 +99,33 @@ function AddComponent({ employee, setEmployee }) {
             title: t(`paymentByCash`),
             dataIndex: 'paidByCash',
             render: (item, row) => <p>{item ? <CheckOutlined /> : '   '}</p>,
+        },
+        {
+            title: t(`start`),
+            dataIndex: 'startDate',
+            render: (startDate, row) => (<p style={{width: 100}}>
+                {row.status.fieldNames && row.status.fieldNames.includes('StartDate') ?
+                    <Tag color={'volcano'} >
+                        {moment(startDate).format('YYYY-MM-DD')}
+                    </Tag>
+                    :
+                     moment(startDate).format('YYYY-MM-DD') 
+                }
+
+            </p>),
+        },
+        {
+            title: t(`finish`),
+            dataIndex: 'endDate',
+            render: (endDate, row) => (<p style={{width: 100}}>
+                {row.status.fieldNames && row.status.fieldNames.includes('EndDate') ?
+                     <Tag color={'volcano'} >
+                         {moment(endDate).format('YYYY-MM-DD')}
+                     </Tag>
+                     :
+                      moment(endDate).format('YYYY-MM-DD') 
+                 }
+             </p>),
         },
     ];
 
