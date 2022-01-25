@@ -9,7 +9,8 @@ import {
     Button,
     message,
     Upload,
-    Modal
+    Modal,
+    Skeleton
 } from "antd";
 import {
     PlusCircleOutlined,
@@ -320,7 +321,7 @@ function EmployeeDetails() {
     const uploadButton = (
         <div>
             {loading ? <LoadingOutlined /> : <PlusOutlined />}
-            <div style={{ marginTop: 8 }}>Upload</div>
+            <span style={{marginLeft: 15}} >Upload</span>
         </div>
     );
 
@@ -361,32 +362,24 @@ function EmployeeDetails() {
 
     return (
         <div>
-            {/* <Upload
-                    listType="picture-card"
 
-            >
+            {/* <Skeleton.Image  active={true}/>
+            <Skeleton.Avatar active={true} size={150} shape={'square'} /> */}
 
-                {imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
-            </Upload> */}
-            {/* <Button icon={<UploadOutlined />}>Click to Upload</Button> */}
-
-            {/* <Upload
-                onPreview={handlePreview}
-                listType="picture-card"
-                fileList={fileList}
-                onChange={handleChangeFileList}
-            >
-                {imageUrl ? (
-                    <img src={imageUrl} alt="avatar" style={{ width: "100%" }} />
-                ) : (
-                    uploadButton
-                )}
-            </Upload> */}
 
             <Upload
                 onPreview={handlePreview}
                 listType="picture-card"
                 fileList={selectedFileList}
+                defaultFileList={[
+                    {
+                      uid: '1',
+                      name: '123.png',
+                      status: 'done',
+                      response: 'Server Error 500', // custom error message to show
+                      url: 'https://t3.ftcdn.net/jpg/02/09/37/00/360_F_209370065_JLXhrc5inEmGl52SyvSPeVB23hB6IjrR.jpg',
+                    },
+                  ]}
                 customRequest={ ({ file, onSuccess }) => {
                     setTimeout(() => {
                       onSuccess("ok");
