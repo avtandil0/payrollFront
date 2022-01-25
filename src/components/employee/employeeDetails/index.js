@@ -26,6 +26,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useHistory } from "react-router-dom";
 import AddComponent from "./AddComponent";
 import { useTranslation } from "react-i18next";
+import { HOME_PAGE } from '../../../constant';
 
 
 const { Option } = Select;
@@ -169,8 +170,62 @@ function EmployeeDetails() {
         setEmployee(newObj);
     };
 
+    const [selectedFile, setSelectedFile] = useState();
+    const [selectedFileList, setSelectedFileList] = useState();
+
+    const handleChangeAvatar = info => {
+        const nextState = {};
+        switch (info.file.status) {
+          case "uploading":
+            nextState.selectedFileList = [info.file];
+            break;
+          case "done":
+            nextState.selectedFile = info.file;
+            nextState.selectedFileList = [info.file];
+            break;
+
+          default:
+            // error or removed
+            nextState.selectedFile = null;
+            nextState.selectedFileList = [];
+        }
+        // this.setState(() => nextState);
+        setSelectedFile(nextState.selectedFile)
+        setSelectedFileList(nextState.selectedFileList)
+      };
+
     const handleSaveEmployee = async () => {
-        console.log("avto",previewImage);
+        console.log("avto",selectedFile, selectedFileList);
+        // setEmployee({...employee, avatar:selectedFile })
+
+        // const headers = {
+        //     'Content-Type': 'multipart/form-data',
+        //   }
+
+        //   let e = {
+        //       name:'',
+        //       file: selectedFile
+        //   }
+
+        //   var bodyFormData = new FormData();
+         
+
+        //   Object.keys(employee).forEach(key => bodyFormData.append(key, employee[key]));
+        //   bodyFormData.append('avatar', selectedFile.originFileObj); 
+
+        
+        // console.log('bodyFormData', bodyFormData)
+        // let tt = await axios(
+        //     {
+        //         method: "post",
+        //         url: constants.API_PREFIX + "/api/Employee",
+        //         data: bodyFormData,
+        //         headers: { "Content-Type": "multipart/form-data" },
+        //       }
+
+        // );
+
+        // return;
         let result;
         if (!isEdiT) {
             result = await axios.post(
@@ -185,9 +240,11 @@ function EmployeeDetails() {
         }
         console.log("result7788 ", result);
 
-        if (result.data.isSuccess) {
+        if (result.data.id) {
             // fetchData();
-            message.success(result.data.message);
+            message.success("წარმატებით დასრულდა");
+            setIsEdiT(true);
+            history.push(`${HOME_PAGE}/Employee/Edit/${result.data.id}`);
         } else {
             message.error(result.data.message);
         }
@@ -252,11 +309,29 @@ function EmployeeDetails() {
             </Upload> */}
             {/* <Button icon={<UploadOutlined />}>Click to Upload</Button> */}
 
-            <Upload
+            {/* <Upload
                 onPreview={handlePreview}
                 listType="picture-card"
                 fileList={fileList}
                 onChange={handleChangeFileList}
+            >
+                {imageUrl ? (
+                    <img src={imageUrl} alt="avatar" style={{ width: "100%" }} />
+                ) : (
+                    uploadButton
+                )}
+            </Upload> */}
+
+            <Upload
+                onPreview={handlePreview}
+                listType="picture-card"
+                fileList={selectedFileList}
+                customRequest={ ({ file, onSuccess }) => {
+                    setTimeout(() => {
+                      onSuccess("ok");
+                    }, 0);
+                  }}
+                onChange={handleChangeAvatar}
             >
                 {imageUrl ? (
                     <img src={imageUrl} alt="avatar" style={{ width: "100%" }} />
