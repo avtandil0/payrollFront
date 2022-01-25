@@ -7,7 +7,7 @@ import constants from '../../constant'
 import { HOME_PAGE } from '../../constant';
 import { useTranslation } from "react-i18next";
 
-function EmployeeTable({ employeeArray, fetchData, showDelete }) {
+function EmployeeTable({ loading,employeeArray, fetchData, showDelete }) {
 
   const { t } = useTranslation();
 
@@ -116,9 +116,10 @@ function EmployeeTable({ employeeArray, fetchData, showDelete }) {
     return (
         <div>
             <Table
+                loading={loading}
                 columns={columns}
                 dataSource={employeeArray}
-                
+
             />
         </div>
     );

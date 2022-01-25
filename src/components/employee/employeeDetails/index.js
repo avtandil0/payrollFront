@@ -48,12 +48,14 @@ function EmployeeDetails() {
     // };
 
     const [isEdiT, setIsEdiT] = useState(false);
+    const [currentId, setCurrentId] = useState(null);
     const [schemes, setSchemes] = useState([]);
     const [employeeGraceTypes, setEmployeeGraceTypes] = useState([]);
     const [employeeGraceTypesAmount, setEmployeeGraceTypesAmount] = useState("");
     const [employeeTypes, setEmployeeTypes] = useState([]);
     const [departments, setDepartments] = useState([]);
     const [previewVisible, setPreviewVisible] = useState(false);
+    const [saveloading, setSaveloading] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [previewTitle, setPreviewTitle] = useState('');
 
@@ -122,12 +124,28 @@ function EmployeeDetails() {
         console.log("result fetchEmployeeById11111", result.data);
 
         setEmployee(result.data);
+        var blob = new Blob([result.data.avatar], {type: "application/octet-stream"});
+        var srcBase64 = "data:image/jpeg;base64," + btoa(atob(result.data.avatar));
+
+        if(!result.data.avatar){
+            setSelectedFileList([])
+            return;
+        }
+        setSelectedFileList([{
+            uid: '-1',
+            name: 'image.png',
+            status: 'done',
+            url: srcBase64,
+          }])
+
         // setTableLoading(false);
     };
 
     useEffect(() => {
+        console.log('----------------------------------')
         if (id) {
             setIsEdiT(true);
+            setCurrentId(id)
             fetchEmployeeById(id);
         }
         //     fetchProjects();
@@ -139,6 +157,14 @@ function EmployeeDetails() {
         fetchEmployeeTypes();
         fetchEmployeeGraceTypes();
     }, []);
+
+    useEffect(() => {
+        console.log('------------',currentId)
+        if (currentId) {
+            setIsEdiT(true);
+            fetchEmployeeById(currentId);
+        }
+    }, [currentId]);
 
     const handleChange = (e) => {
         // console.log(e.target.name, e.target.value);
@@ -207,13 +233,13 @@ function EmployeeDetails() {
         //       file: selectedFile
         //   }
 
-        //   var bodyFormData = new FormData();
-         
+          var bodyFormData = new FormData();
+
 
         //   Object.keys(employee).forEach(key => bodyFormData.append(key, employee[key]));
-        //   bodyFormData.append('avatar', selectedFile.originFileObj); 
+        //   bodyFormData.append('avatar', selectedFile.originFileObj);
 
-        
+
         // console.log('bodyFormData', bodyFormData)
         // let tt = await axios(
         //     {
@@ -227,6 +253,7 @@ function EmployeeDetails() {
 
         // return;
         let result;
+        setSaveloading(true);
         if (!isEdiT) {
             result = await axios.post(
                 constants.API_PREFIX + "/api/Employee",
@@ -238,23 +265,57 @@ function EmployeeDetails() {
                 employee
             );
         }
+
+       if(result.data.id || result.data.isSuccess){
+        // if(selectedFile?.originFileObj){
+            console.log('selectedFile.originFileObj',currentId,selectedFile?.originFileObj)
+            bodyFormData.append('file', selectedFile?.originFileObj);
+            bodyFormData.append('userId', currentId? currentId: result.data.id);
+
+            console.log('bodyFormData', bodyFormData)
+
+            let avatarResult = await axios(
+                {
+                    method: "post",
+                    url: constants.API_PREFIX + "/api/Employee/uploadAvatar",
+                    data: bodyFormData,
+                    headers: { "Content-Type": "multipart/form-data" },
+                }
+
+            );
+
+            console.log('avatarResult',avatarResult)
+        // }
+       }
+
+
+        setSaveloading(false)
         console.log("result7788 ", result);
 
         if (result.data.id) {
+            console.log('4444444444')
             // fetchData();
             message.success("წარმატებით დასრულდა");
             setIsEdiT(true);
+            setCurrentId(result.data.id)
             history.push(`${HOME_PAGE}/Employee/Edit/${result.data.id}`);
         } else {
-            message.error(result.data.message);
+            console.log('55555555555')
+            if(result.data.isSuccess){
+                message.success("წარმატებით დასრულდა");
+            }
+            else{
+                message.success(result.data.message);
+            }
         }
     };
 
     const goBack = () => {
-        history.goBack();
+        history.push(`${HOME_PAGE}/Employee/`);
     };
 
-    const { loading, imageUrl } = useState("");
+    const { loading, setLoading } = useState("");
+    const { imageUrl, setImageUrl } = useState(null);
 
     const uploadButton = (
         <div>
@@ -333,11 +394,13 @@ function EmployeeDetails() {
                   }}
                 onChange={handleChangeAvatar}
             >
-                {imageUrl ? (
+                {/* {imageUrl ? (
                     <img src={imageUrl} alt="avatar" style={{ width: "100%" }} />
                 ) : (
                     uploadButton
-                )}
+                )} */}
+
+                {uploadButton}
             </Upload>
 
             <Modal
@@ -535,6 +598,7 @@ function EmployeeDetails() {
             <AddComponent employee={employee} setEmployee={setEmployee} />
             <br />
             <Button
+                loading={saveloading}
                 type="primary"
                 onClick={handleSaveEmployee}
                 icon={<PlusCircleOutlined />}

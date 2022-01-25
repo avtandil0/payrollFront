@@ -19,6 +19,7 @@ function Employee() {
 
   const [dataSaveArray, setDataSaveArray] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   let history = useHistory();
 
@@ -26,13 +27,13 @@ function Employee() {
     history.push(`${HOME_PAGE}/Employee/Add`);
   };
 
-  
+
   const fetchData = async () => {
-    // setTableLoading(true);
+    setLoading(true);
     const result = await axios(constants.API_PREFIX + "/api/Employee");
     console.log("result1", result);
     setDataSaveArray(result.data)
-    // setTableLoading(false);
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -58,7 +59,7 @@ function Employee() {
       <br />
       <ImportEmployee  isModalVisible={isModalVisible} setIsModalVisible={setIsModalVisible} fetchData={fetchData} />
 
-      <EmployeeTable showDelete={true}  employeeArray={dataSaveArray} fetchData={fetchData}/>
+      <EmployeeTable loading={loading} showDelete={true}  employeeArray={dataSaveArray} fetchData={fetchData}/>
 
     </div>
   );
