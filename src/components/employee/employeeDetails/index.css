@@ -1,13 +1,14 @@
 .ant-upload-list-picture-card{
     display: flex;
     flex-direction: column;
-    align-content: flex-end;
+    justify-content: flex-end;
     height: 350px;
 }
 
 .ant-upload-list-picture-card-container{
     width: 250px;
     height: 250px;
+    border-radius: 30px;
 }
 
 .ant-upload.ant-upload-select-picture-card{
