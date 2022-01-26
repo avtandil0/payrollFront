@@ -126,15 +126,23 @@ function EmployeeDetails() {
     var srcBase64 = "data:image/jpeg;base64," + btoa(atob(result.data.avatar));
 
     if (!result.data.avatar) {
+      console.log("No Avatar");
       setSelectedFileList([]);
       return;
     }
+    console.log("Has Avatar ");
+    setSelectedFile({
+      uid: "-1",
+      name: `${result.data.firstName} ${result.data.lastName}`,
+      status: "done",
+      thumbUrl: srcBase64,
+    });
     setSelectedFileList([
       {
         uid: "-1",
-        name: "image.png",
+        name: `${result.data.firstName} ${result.data.lastName}`,
         status: "done",
-        url: srcBase64,
+        thumbUrl: srcBase64,
       },
     ]);
 
@@ -146,16 +154,16 @@ function EmployeeDetails() {
     if (id) {
       setIsEdiT(true);
       setCurrentId(id);
-      fetchEmployeeById(id);
+      //   fetchEmployeeById(id);
     }
     //     fetchProjects();
-    //     fetchCostCenters();
-    fetchDepartments();
-    //     fetchComponents();
-    fetchSchemes();
-    //     fetchPaymentDaysTypes();
-    fetchEmployeeTypes();
-    fetchEmployeeGraceTypes();
+    // //     fetchCostCenters();
+    // fetchDepartments();
+    // //     fetchComponents();
+    // fetchSchemes();
+    // //     fetchPaymentDaysTypes();
+    // fetchEmployeeTypes();
+    // fetchEmployeeGraceTypes();
   }, []);
 
   useEffect(() => {
@@ -164,6 +172,11 @@ function EmployeeDetails() {
       setIsEdiT(true);
       fetchEmployeeById(currentId);
     }
+
+    fetchDepartments();
+    fetchSchemes();
+    fetchEmployeeTypes();
+    fetchEmployeeGraceTypes();
   }, [currentId]);
 
   const handleChange = (e) => {
@@ -220,36 +233,19 @@ function EmployeeDetails() {
     setSelectedFileList(nextState.selectedFileList);
   };
 
+  const base64ToFile = async (base64) => {
+    console.log("base64base64base64", base64);
+    const res = await fetch(base64);
+    const blob = await res.blob();
+    let avatar = new File([blob], "fileName", { type: "image/png" });
+    return avatar;
+  };
+
   const handleSaveEmployee = async () => {
     console.log("avto", selectedFile, selectedFileList);
-    // setEmployee({...employee, avatar:selectedFile })
-
-    // const headers = {
-    //     'Content-Type': 'multipart/form-data',
-    //   }
-
-    //   let e = {
-    //       name:'',
-    //       file: selectedFile
-    //   }
 
     var bodyFormData = new FormData();
 
-    //   Object.keys(employee).forEach(key => bodyFormData.append(key, employee[key]));
-    //   bodyFormData.append('avatar', selectedFile.originFileObj);
-
-    // console.log('bodyFormData', bodyFormData)
-    // let tt = await axios(
-    //     {
-    //         method: "post",
-    //         url: constants.API_PREFIX + "/api/Employee",
-    //         data: bodyFormData,
-    //         headers: { "Content-Type": "multipart/form-data" },
-    //       }
-
-    // );
-
-    // return;
     let result;
     setSaveloading(true);
     if (!isEdiT) {
@@ -266,12 +262,18 @@ function EmployeeDetails() {
 
     if (result.data.id || result.data.isSuccess) {
       // if(selectedFile?.originFileObj){
-      console.log(
-        "selectedFile.originFileObj",
-        currentId,
-        selectedFile?.originFileObj
-      );
-      bodyFormData.append("file", selectedFile?.originFileObj);
+      console.log("selectedFile.originFileObj", currentId, selectedFile);
+
+      let avatarFile = null;
+
+      if (selectedFile?.thumbUrl) {
+        console.log("selectedFile?.thumbUrl", selectedFile?.thumbUrl);
+        avatarFile = await base64ToFile(selectedFile?.thumbUrl);
+      }
+
+      console.log("avatarFileavatarFile", avatarFile);
+      bodyFormData.append("file", avatarFile);
+      //   bodyFormData.append("file", selectedFile?.originFileObj);
       bodyFormData.append("userId", currentId ? currentId : result.data.id);
 
       console.log("bodyFormData", bodyFormData);
@@ -335,23 +337,23 @@ function EmployeeDetails() {
     setFileList(fileList);
   };
 
-  function getBase64(file) {
+  async function getBase64(file) {
+    let f = await base64ToFile(file)
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(f);
       reader.onload = () => resolve(reader.result);
       reader.onerror = (error) => reject(error);
     });
   }
 
   const handlePreview = async (file) => {
-    console.log("file", file);
     if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
+      file.preview = await getBase64(file);
     }
 
     setPreviewVisible(true);
-    setPreviewImage(file.url || file.preview);
+    setPreviewImage(file.thumbUrl || file.preview);
     setPreviewTitle(
       file.name || file.url.substring(file.url.lastIndexOf("/") + 1)
     );
@@ -363,10 +365,8 @@ function EmployeeDetails() {
             <Skeleton.Avatar active={true} size={150} shape={'square'} /> */}
 
       <div style={{ display: "flex" }}>
-        <div>
-            <span>
-                {t(`photo`)}
-            </span>
+        <div >
+          <span>{t(`photo`)}</span>
           <Upload
             onPreview={handlePreview}
             listType="picture-card"
@@ -398,7 +398,7 @@ function EmployeeDetails() {
           <Form
             // name="product-form"
             // onFinish={handleSave}
-            style={{marginTop:7}}
+            style={{ marginTop: 7 }}
             layout={"vertical"}
           >
             <Form.Item label={t(`employeeTypes`)}>
@@ -575,7 +575,6 @@ function EmployeeDetails() {
                   />
                 </Form.Item>
               </Col>
-
             </Row>
           </Form>
         </div>
@@ -589,8 +588,6 @@ function EmployeeDetails() {
       >
         <img alt="example" style={{ width: "100%" }} src={previewImage} />
       </Modal>
-
-
 
       <AddComponent employee={employee} setEmployee={setEmployee} />
       <br />
