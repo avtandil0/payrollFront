@@ -64,5 +64,6 @@
     "dashboard": "Dashboard",
     "status": "Status",
     "active": "Active",
-    "passive": "Passive"
+    "passive": "Passive",
+    "photo":"Photo"
 }

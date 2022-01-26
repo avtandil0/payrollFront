@@ -1,8 +1,18 @@
+/* .ant-upload-list{
+    height: 300px;
+} */
+.ant-upload-picture-card-wrapper{
+   border: 1px solid #cccccc;
+   border-radius: 5px;
+   width: 252px;
+   margin-top: 5px;
+
+}
 .ant-upload-list-picture-card{
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    height: 350px;
+    height: 300px;
 }
 
 .ant-upload-list-picture-card-container{
@@ -14,4 +24,9 @@
 .ant-upload.ant-upload-select-picture-card{
     width: 250px;
     height: 40px;
+
+}
+
+.ant-upload-list-item-list-type-picture-card{
+    height: 250px;
 }
