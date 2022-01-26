@@ -60,7 +60,7 @@ function Coefficient() {
     {
       title: t(`placeholderFirstName`),
       dataIndex: 'name',
-      render: text => <a>{text}</a>,
+      render: text => <p>{text}</p>,
     },
     {
       title:  t(`description`),
@@ -69,37 +69,37 @@ function Coefficient() {
     {
       title: 'gross',
       dataIndex: 'sgross',
-      render: (text, row) => <a>{row.sgross}/{row.pgross}</a>,
+      render: (text, row) => <p>{row.sgross}/{row.pgross}</p>,
     },
     {
       title: 'net',
       dataIndex: 'snet',
-      render: (text, row) => <a>{row.snet}/{row.pnet}</a>,
+      render: (text, row) => <p>{row.snet}/{row.pnet}</p>,
     },
     {
       title: 'paid',
       dataIndex: 'spaid',
-      render: (text, row) => <a>{row.spaid}/{row.ppaid}</a>,
+      render: (text, row) => <p>{row.spaid}/{row.ppaid}</p>,
     },
     {
       title: 'incomeTax',
       dataIndex: 'sincomeTax',
-      render: (text, row) => <a>{row.sincomeTax}/{row.pincomeTax}</a>,
+      render: (text, row) => <p>{row.sincomeTax}/{row.pincomeTax}</p>,
     },
     {
       title: t(`pension`),
       dataIndex: 'spension',
-      render: (text, row) => <a>{row.spension}/{row.ppension}</a>,
+      render: (text, row) => <p>{row.spension}/{row.ppension}</p>,
     },
     {
       title: 'tax1',
       dataIndex: 'stax1',
-      render: (text, row) => <a>{row.stax1}/{row.ptax1}</a>,
+      render: (text, row) => <p>{row.stax1}/{row.ptax1}</p>,
     },
     {
       title: 'tax2',
       dataIndex: 'stax2',
-      render: (text, row) => <a>{row.stax2}/{row.ptax2}</a>,
+      render: (text, row) => <p>{row.stax2}/{row.ptax2}</p>,
     },
   ];
 
@@ -128,6 +128,25 @@ function Coefficient() {
   });
 
   const showModal = () => {
+    setCoefficient({
+      name: "",
+      description: "",
+      sgross: 1.0,
+      snet: 1.0,
+      spaid: 1.0,
+      sincomeTax: 1.0,
+      spension: 1.0,
+      stax1: 1.0,
+      stax2: 1.0,
+      pgross: 1.0,
+      pnet: 1.0,
+      ppaid: 1.0,
+      pincomeTax: 1.0,
+      ppension: 1.0,
+      ptax1: 1.0,
+      ptax2: 1.0,
+
+    })
     setIsModalVisible(true);
   };
 
@@ -186,7 +205,7 @@ function Coefficient() {
       ppension: 1.0,
       ptax1: 1.0,
       ptax2: 1.0,
-  
+
     })
 
 

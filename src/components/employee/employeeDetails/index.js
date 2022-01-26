@@ -398,7 +398,7 @@ function EmployeeDetails() {
           <Form
             // name="product-form"
             // onFinish={handleSave}
-            style={{ marginTop: 7 }}
+            style={{ marginTop: 5 }}
             layout={"vertical"}
           >
             <Form.Item label={t(`employeeTypes`)}>
