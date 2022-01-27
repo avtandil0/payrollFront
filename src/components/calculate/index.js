@@ -13,50 +13,46 @@ import {
   Modal,
   Drawer,
   Divider,
-  message
+  message,
 } from "antd";
 import {
   CalculatorOutlined,
   DeleteOutlined,
   EditOutlined,
   SearchOutlined,
+  FileExcelOutlined,
+  FileExcelFilled,
 } from "@ant-design/icons";
 import axios from "axios";
 import constants from "../../constant";
 import moment from "moment";
 import { sumBy } from "lodash";
-import "./index.css"
+import "./index.css";
 import MyDrawer from "./drawer";
 import { useTranslation, initReactI18next } from "react-i18next";
 
-
-
-
-
 const { Option } = Select;
 
-
 function Calculate() {
-
   const { t } = useTranslation();
 
   const expandedRowRender = ({ children }) => {
     const columns = [
-      { title: 'Component Name', dataIndex: 'name', key: 'name' },
-      { title: 'Gross', dataIndex: 'gross', key: 'gross' },
-      { title: 'Net', dataIndex: 'net', key: 'net' },
-      { title: 'Paid', dataIndex: 'paid', key: 'paid' },
-      { title: 'IncomeTax', dataIndex: 'incomeTax', key: 'incomeTax' },
-      { title: 'PensionTax', dataIndex: 'pensionTax', key: 'pensionTax' },
-      { title: 'RemainingGraceAmount', dataIndex: 'remainingGraceAmount', key: 'RemainingGraceAmount' },
-
+      { title: "Component Name", dataIndex: "name", key: "name" },
+      { title: "Gross", dataIndex: "gross", key: "gross" },
+      { title: "Net", dataIndex: "net", key: "net" },
+      { title: "Paid", dataIndex: "paid", key: "paid" },
+      { title: "IncomeTax", dataIndex: "incomeTax", key: "incomeTax" },
+      { title: "PensionTax", dataIndex: "pensionTax", key: "pensionTax" },
+      {
+        title: "RemainingGraceAmount",
+        dataIndex: "remainingGraceAmount",
+        key: "RemainingGraceAmount",
+      },
     ];
-
 
     return <Table columns={columns} dataSource={children} pagination={false} />;
   };
-
-
 
   const columns = [
     {
@@ -66,7 +62,13 @@ function Calculate() {
     {
       title: t(`fullName`),
       dataIndex: "name",
-      render: (text, row) => { return row.key ? <a onClick={() => openDraver(row)}>{row.name} </a> : <p>{row.name}</p> },
+      render: (text, row) => {
+        return row.key ? (
+          <a onClick={() => openDraver(row)}>{row.name} </a>
+        ) : (
+          <p>{row.name}</p>
+        );
+      },
     },
     {
       title: t(`calculateDate`),
@@ -112,7 +114,6 @@ function Calculate() {
       dataIndex: "TotalBalance",
       render: (text, row) => <p> </p>,
     },
-
   ];
 
   const [searchLoading, setSearchLoading] = useState(false);
@@ -123,7 +124,6 @@ function Calculate() {
   const [calculationDate, setCalculationDate] = useState(null);
   const [visibleDrawer, setVisibleDrawer] = useState(false);
   const [drawerId, setDrawerId] = useState("");
-
 
   const showCalculationModal = () => {
     setIsModalVisible(true);
@@ -140,21 +140,20 @@ function Calculate() {
   }, []);
 
   const handleOk = async () => {
-
-    const result = await axios.post(constants.API_PREFIX + `/api/Calculation/calculate/${calculationDate}`, filter);
+    const result = await axios.post(
+      constants.API_PREFIX + `/api/Calculation/calculate/${calculationDate}`,
+      filter
+    );
 
     console.log("result calculation---", result.data);
 
     if (result.data.isSuccess) {
       search();
       setIsModalVisible(false);
-      message.success('This is a success message');
+      message.success("This is a success message");
+    } else {
+      message.error("This is an error message");
     }
-    else {
-      message.error('This is an error message');
-    }
-
-
   };
 
   const handleCancel = () => {
@@ -171,26 +170,26 @@ function Calculate() {
     );
     console.log("result", result.data);
 
-    let mapedData = result.data.map(r => ({
+    let mapedData = result.data.map((r) => ({
       key: r.id,
-      gross: sumBy(r.calculations, r => r.gross),
-      net: sumBy(r.calculations, r => r.net),
-      paid: sumBy(r.calculations, r => r.paid),
-      incomeTax: sumBy(r.calculations, r => r.incomeTax),
-      pensionTax: sumBy(r.calculations, r => r.pensionTax),
+      gross: sumBy(r.calculations, (r) => r.gross),
+      net: sumBy(r.calculations, (r) => r.net),
+      paid: sumBy(r.calculations, (r) => r.paid),
+      incomeTax: sumBy(r.calculations, (r) => r.incomeTax),
+      pensionTax: sumBy(r.calculations, (r) => r.pensionTax),
       remainingGraceAmount: r.remainingGraceAmount,
       name: `${r.firstName} ${r.lastName}`,
-      children: r.calculations.map(c => ({
+      children: r.calculations.map((c) => ({
         gross: c.gross,
         net: c.net,
         paid: c.paid,
         incomeTax: c.incomeTax,
         pensionTax: c.pensionTax,
-        calculationDate: moment(c.calculationDate).format('YYYY-MM-DD'),
+        calculationDate: moment(c.calculationDate).format("YYYY-MM-DD"),
         name: c.employeeComponent?.componentName,
         remainingGraceAmount: c.remainingGraceAmount,
-      }))
-    }))
+      })),
+    }));
     setCalculations(mapedData);
     setSearchLoading(false);
   };
@@ -213,14 +212,38 @@ function Calculate() {
 
   const openDraver = (row) => {
     setVisibleDrawer(true);
-    console.log("openDraver", row)
+    console.log("openDraver", row);
     setDrawerId(row.key);
-  }
+  };
+
+  const handleClickExport = async () => {
+    console.log("aaa");
+
+    let response = await axios(
+      constants.API_PREFIX + `/api/Calculation/generateExcel`,
+      // { params: filter },
+      {
+        responseType: "blob",
+      }
+    );
+
+    console.log("-444444444", response);
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    var currentDate = new Date().toLocaleDateString();
+    link.setAttribute("download", "Export " + currentDate + ".xlsx"); //or any other extension
+    document.body.appendChild(link);
+    link.click();
+  };
 
   return (
     <div>
-
-      <MyDrawer visibleDrawer={visibleDrawer} setVisibleDrawer={setVisibleDrawer} drawerId={drawerId} />
+      <MyDrawer
+        visibleDrawer={visibleDrawer}
+        setVisibleDrawer={setVisibleDrawer}
+        drawerId={drawerId}
+      />
 
       <Row gutter={[16, 24]}>
         <Col span={4}>
@@ -228,7 +251,6 @@ function Calculate() {
             onChange={handleChangeInput}
             value={filter?.firstName}
             name="firstName"
-
             placeholder={t(`placeholderFirstName`)}
           />
         </Col>
@@ -245,7 +267,7 @@ function Calculate() {
           <Select
             // defaultValue="აირჩიეთ"
             placeholder={t(`placeholderChoose`)}
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
             value={filter.departmentId}
           >
             {departments.map((i) => (
@@ -271,18 +293,14 @@ function Calculate() {
             {t(`buttonSeach`)}
           </Button>
         </Col>
-
       </Row>
       <br />
       <Row gutter={[16, 24]}>
-        <Col span={4}>
-
-        </Col>
+        <Col span={4}></Col>
       </Row>
       <br />
       <br />
       <Space>
-
         <Button
           loading={searchLoading}
           onClick={showCalculationModal}
@@ -290,11 +308,13 @@ function Calculate() {
         >
           {t(`calculate`)}
         </Button>
+        <Button onClick={handleClickExport} icon={<FileExcelOutlined />}>
+          {t(`export`)}
+        </Button>
 
         <Modal
           // title="კალკულაცია"
           title={t(`calculate`)}
-
           visible={isModalVisible}
           onOk={handleOk}
           onCancel={handleCancel}
@@ -302,16 +322,14 @@ function Calculate() {
           cancelText={t(`cancelText`)}
         >
           <Row gutter={[16, 24]}>
-            <Col span={8}>
-            </Col>
+            <Col span={8}></Col>
             <Col span={8}>
               <DatePicker
                 onChange={onChangeCalculationDate}
                 placeholder={t(`placeholderSelectMonth`)}
               />
             </Col>
-            <Col span={8}>
-            </Col>
+            <Col span={8}></Col>
           </Row>
         </Modal>
       </Space>
@@ -319,7 +337,9 @@ function Calculate() {
       <br />
       <br />
 
-      <Table columns={columns} dataSource={calculations}
+      <Table
+        columns={columns}
+        dataSource={calculations}
         // expandable={{ expandedRowRender }}
         scroll={{ x: 200 }}
       />

@@ -56,7 +56,7 @@ function Component() {
         {
             title: t(`placeholderFirstName`),
             dataIndex: 'name',
-            render: text => <a>{text}</a>,
+            render: text => <p>{text}</p>,
         },
         {
             title: t(`coefficient`),
@@ -79,7 +79,7 @@ function Component() {
                         {moment(startDate).format('YYYY-MM-DD')}
                     </Tag>
                     :
-                     moment(startDate).format('YYYY-MM-DD') 
+                     moment(startDate).format('YYYY-MM-DD')
                 }
 
             </span>),
@@ -93,7 +93,7 @@ function Component() {
                         {moment(endDate).format('YYYY-MM-DD')}
                     </Tag>
                     :
-                     moment(endDate).format('YYYY-MM-DD') 
+                     moment(endDate).format('YYYY-MM-DD')
                 }
             </span>),
         },

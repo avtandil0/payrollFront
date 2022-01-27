@@ -65,5 +65,6 @@
     "status": "Status",
     "active": "Active",
     "passive": "Passive",
-    "photo":"Photo"
+    "photo":"Photo",
+    "export":"Export"
 }
