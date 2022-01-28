@@ -123,6 +123,7 @@ function Calculate() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [calculationDate, setCalculationDate] = useState(null);
   const [visibleDrawer, setVisibleDrawer] = useState(false);
+  const [excelLoading, setExcelLoading] = useState(false);
   const [drawerId, setDrawerId] = useState("");
 
   const showCalculationModal = () => {
@@ -217,14 +218,11 @@ function Calculate() {
   };
 
   const handleClickExport = async () => {
-    console.log("aaa");
+    setExcelLoading(true);
 
     let response = await axios(
       constants.API_PREFIX + `/api/Calculation/generateExcel`,
-      // { params: filter },
-      {
-        responseType: "blob",
-      }
+      { params: filter, responseType: "blob" }
     );
 
     console.log("-444444444", response);
@@ -235,6 +233,8 @@ function Calculate() {
     link.setAttribute("download", "Export " + currentDate + ".xlsx"); //or any other extension
     document.body.appendChild(link);
     link.click();
+
+    setExcelLoading(false);
   };
 
   return (
@@ -308,7 +308,11 @@ function Calculate() {
         >
           {t(`calculate`)}
         </Button>
-        <Button onClick={handleClickExport} icon={<FileExcelOutlined />}>
+        <Button
+          loading={excelLoading}
+          onClick={handleClickExport}
+          icon={<FileExcelOutlined />}
+        >
           {t(`export`)}
         </Button>
 

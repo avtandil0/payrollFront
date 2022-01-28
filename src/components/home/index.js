@@ -29,6 +29,7 @@ import {
   UnlockOutlined,
   LogoutOutlined,
   DashboardOutlined,
+  ImportOutlined
 } from "@ant-design/icons";
 
 import Component from "../component/index";
@@ -60,6 +61,7 @@ import { HOME_PAGE } from "../../constant";
 import GE from "../../assets/logos/ge.png"; // with import
 import EN from "../../assets/logos/en.png"; // with import
 import RU from "../../assets/logos/ru.png"; // with import
+import Import from "../import";
 
 const { Header, Sider, Content } = LayoutAnt;
 
@@ -108,6 +110,9 @@ function Home() {
     }
     if (location.pathname == "/payroll/dashboard") {
       setActiveUrl(["9"]);
+    }
+    if (location.pathname == "/payroll/import") {
+      setActiveUrl(["10"]);
     }
   }, []);
 
@@ -227,6 +232,14 @@ function Home() {
             onClick={(e) => ClickGoPage(e, "employee")}
           >
             {t(`employee`)}
+          </Menu.Item>
+
+          <Menu.Item
+            key="10"
+            icon={<ImportOutlined />}
+            onClick={(e) => ClickGoPage(e, "import")}
+          >
+            {t(`import`)}
           </Menu.Item>
 
           <SubMenu key="sub1" title={t(`setting`)} icon={<SettingOutlined />}>
@@ -372,6 +385,9 @@ function Home() {
             </Route>
             <Route path={`${HOME_PAGE}/dashboard`}>
               <Dashboard />
+            </Route>
+            <Route path={`${HOME_PAGE}/import`}>
+              <Import />
             </Route>
           </Switch>
         </Content>

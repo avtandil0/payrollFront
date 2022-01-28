@@ -66,5 +66,6 @@
     "active": "Active",
     "passive": "Passive",
     "photo":"Photo",
-    "export":"Export"
+    "export":"Export",
+    "uploadBankFile":"Upload Bank File"
 }
