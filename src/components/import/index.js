@@ -23,6 +23,7 @@ import {
   DeleteOutlined,
   EditOutlined,
   UploadOutlined,
+  ImportOutlined,
 } from "@ant-design/icons";
 
 import { OutTable, ExcelRenderer } from "react-excel-renderer";
@@ -312,7 +313,7 @@ function Import() {
 
   const uploadProps = {
     name: "file",
-    action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
+    // action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
     headers: {
       authorization: "authorization-text",
     },
@@ -351,16 +352,28 @@ function Import() {
 
   return (
     <div>
-      <Upload {...uploadProps} style={{ width: 300 }} onChange={fileHandler}>
-        <Button icon={<UploadOutlined />}>{t(`uploadBankFile`)}</Button>
-      </Upload>
+      <div style={{ display: "flex" }}>
+        <Upload
+          {...uploadProps}
+          onChange={fileHandler}
+          customRequest={({ file, onSuccess }) => {
+            setTimeout(() => {
+              onSuccess("ok");
+            }, 0);
+          }}
+        >
+          <Button icon={<UploadOutlined />}>{t(`uploadBankFile`)}</Button>
+        </Upload>
+      </div>
 
       {/* <input type="file" onChange={fileHandler} /> */}
       {file && (
         <>
           <Divider />
-
-          <div style={{ width: "98%", height: "800px", overflow: "scroll" }}>
+          <Button type="primary" icon={<ImportOutlined />}>
+            {t(`import`)}
+          </Button>
+          <div style={{ width: "98%", height: "800px", overflow: "scroll", marginTop: 15}}>
             <OutTable
               data={file.rows}
               columns={file.cols}
