@@ -350,6 +350,10 @@ function Import() {
     });
   };
 
+  const importFile = () => {
+    console.log(file)
+  }
+
   return (
     <div>
       <div style={{ display: "flex" }}>
@@ -370,10 +374,10 @@ function Import() {
       {file && (
         <>
           <Divider />
-          <Button type="primary" icon={<ImportOutlined />}>
+          <Button onClick={importFile} type="primary" icon={<ImportOutlined />}>
             {t(`import`)}
           </Button>
-          <div style={{ width: "98%", height: "800px", overflow: "scroll", marginTop: 15}}>
+          <div style={{ width: "98%", height: "750px", overflow: "scroll", marginTop: 15}}>
             <OutTable
               data={file.rows}
               columns={file.cols}
