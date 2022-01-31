@@ -67,5 +67,7 @@
     "passive": "პასიური",
     "photo":"ფოტო",
     "export":"ექსპორტი",
-    "uploadBankFile":"ბანკის ფაილის ატვირტვა"
+    "uploadBankFile":"ბანკის ფაილის ატვირტვა",
+    "chooseBankFile":"აირჩიეთ ბანკის ფაილი",
+    "upload": "ატვირთვა"
 }

@@ -17,6 +17,10 @@ import {
   DatePicker,
   Tag,
   Upload,
+  Steps,
+  Row,
+  Col,
+  Result
 } from "antd";
 import {
   PlusCircleOutlined,
@@ -24,15 +28,18 @@ import {
   EditOutlined,
   UploadOutlined,
   ImportOutlined,
+  CloudUploadOutlined,
 } from "@ant-design/icons";
 
 import { OutTable, ExcelRenderer } from "react-excel-renderer";
-
 import axios from "axios";
 import constants from "../../constant";
 import { useTranslation } from "react-i18next";
+import { groupBy } from "lodash";
 import "./index.css";
+
 const { Option } = Select;
+const { Step } = Steps;
 
 function Import() {
   const { t } = useTranslation();
@@ -186,6 +193,315 @@ function Import() {
     ],
   });
 
+  const [current, setCurrent] = React.useState(0);
+  const [components, setComponents] = useState([]);
+
+  useEffect(() => {
+    fetchComponents();
+  }, []);
+
+  const fetchComponents = async () => {
+    // setTableLoading(true);
+    const result = await axios(
+      constants.API_PREFIX + "/api/Component/getAllActive"
+    );
+
+    console.log("fetchComponents", result);
+    setComponents(result.data);
+    // setTableLoading(false);
+  };
+
+  const next = () => {
+    setCurrent(current + 1);
+  };
+
+  const prev = () => {
+    setCurrent(current - 1);
+  };
+
+  const uploadFile = () => {
+    console.log(file);
+    next();
+  };
+
+  const fileHandler = (e) => {
+    console.log("eeeee", e);
+    // let fileObj = e.target.files[0];
+    let fileObj = e.file.originFileObj;
+    // let fileObj = e.fileList[0] ? e.fileList[0].originFileObj : {};
+    console.log(fileObj);
+
+    //just pass the fileObj as parameter
+    ExcelRenderer(fileObj, (err, resp) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("filefilefilefilefilefile", file);
+        setFile({
+          cols: resp.cols,
+          rows: resp.rows,
+        });
+      }
+    });
+  };
+
+  const uploadProps = {
+    name: "file",
+    // action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
+    headers: {
+      authorization: "authorization-text",
+    },
+    onChange(info) {
+      if (info.file.status !== "uploading") {
+        console.log(info.file, info.fileList);
+      }
+      if (info.file.status === "done") {
+        message.success(`${info.file.name} file uploaded successfully`);
+      } else if (info.file.status === "error") {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    },
+  };
+
+  const uploadFileStep1 = () => {
+    return (
+      <>
+        <div style={{ display: "flex" }}>
+          <Upload
+            {...uploadProps}
+            onChange={fileHandler}
+            customRequest={({ file, onSuccess }) => {
+              setTimeout(() => {
+                onSuccess("ok");
+              }, 0);
+            }}
+          >
+            <Button style={{ marginLeft: 15 }} icon={<UploadOutlined />}>
+              {t(`chooseBankFile`)}
+            </Button>
+          </Upload>
+        </div>
+
+        {/* <input type="file" onChange={fileHandler} /> */}
+        {file && (
+          <>
+            {/* <Divider /> */}
+            <Button
+              style={{ marginTop: 30, marginLeft: 15 }}
+              onClick={uploadFile}
+              type="primary"
+              icon={<CloudUploadOutlined />}
+            >
+              {t(`upload`)}
+            </Button>
+            <div
+              style={{
+                width: "98%",
+                height: "650px",
+                overflow: "scroll",
+                marginTop: 15,
+                marginLeft: 15,
+              }}
+            >
+              <OutTable
+                data={file.rows}
+                columns={file.cols}
+                tableClassName="table"
+                tableHeaderRowClass="heading"
+              />
+            </div>
+          </>
+        )}
+      </>
+    );
+  };
+
+  const ProcessingFileStep2 = () => {
+    // console.log(8998, file.rows);
+    let groupd = groupBy(file.rows, (r) => r[19]);
+    // console.log(8998777777777, groupd.BONUS);
+
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+
+    const [chosenData, setChosenData] = useState([]);
+
+    const onSelectChange = (selectedRowKeys) => {
+      let selectedData = [];
+      selectedRowKeys.forEach((element) => {
+        console.log(
+          "[...groupedData[element].data]",
+          groupedData[element].data
+        );
+        selectedData = [...selectedData, ...groupedData[element].data];
+      });
+
+      setChosenData([...selectedData]);
+      setSelectedRowKeys(selectedRowKeys);
+    };
+
+    const rowSelection = {
+      selectedRowKeys,
+      onChange: onSelectChange,
+    };
+
+    const groupedColumns = [
+      {
+        title: "Name",
+        dataIndex: "name",
+      },
+      {
+        title: "Count",
+        dataIndex: "count",
+      },
+    ];
+
+    const columns = [
+      // {
+      //   title: "Date",
+      //   dataIndex: "date",
+      // },
+      {
+        title: "receiverAcoountNumber",
+        dataIndex: "receiverAcoountNumber",
+        render: (_, record) => <p>{record[16]}</p>,
+      },
+      {
+        title: "receiver",
+        dataIndex: "receiver",
+        render: (_, record) => <p>{record[14]}</p>,
+      },
+      {
+        title: "destination",
+        dataIndex: "destination",
+        render: (_, record) => <p>{record[19]}</p>,
+      },
+      {
+        title: "amount",
+        dataIndex: "amount",
+        render: (_, record) => <p>{record[21]}</p>,
+      },
+    ];
+
+    const groupedData = [];
+
+    // Object.entries(groupd).forEach(element => {
+    //   columns.push( {
+    //     title: element,
+    //     dataIndex: element,
+    //   })
+    // });
+
+    let i = 0;
+    for (const [key, value] of Object.entries(groupd)) {
+      groupedData.push({
+        key: i,
+        name: key,
+        count: value.length,
+        data: value,
+      });
+      i++;
+    }
+
+    console.log("groupedData", groupedData);
+
+    const importDataInDB = () => {
+      next();
+    };
+
+    return (
+      <>
+        <div style={{ backgroundColor: "white", height: 5 }}></div>
+        <Row>
+          <Col span={12}>
+            <Table
+              size="small"
+              rowSelection={rowSelection}
+              dataSource={groupedData}
+              columns={groupedColumns}
+            />
+          </Col>
+          <Col span={12}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100%",
+              }}
+            >
+              <div>
+                <div>
+                  <DatePicker />
+                  <Select
+                    defaultValue="აირჩიეთ"
+                    style={{ width: 150, marginLeft: 15 }}
+                  >
+                    {components.map((i) => (
+                      <Option value={i.id}>{i.name}</Option>
+                    ))}
+                  </Select>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginTop: 25,
+                  }}
+                >
+                  <Button
+                    onClick={importDataInDB}
+                    type="primary"
+                    icon={<CloudUploadOutlined />}
+                    size="large"
+                  >
+                    Process
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Col>
+        </Row>
+
+        <div style={{ backgroundColor: "white", height: 25 }}></div>
+        <Table size="small" dataSource={chosenData} columns={columns} />
+      </>
+    );
+  };
+
+  const FileImportResultStep3 = () => {
+    return (
+      <>
+        <Result
+          status="success"
+          title="Successfully Purchased Cloud Server ECS!"
+          subTitle="Order number: 2017182818828182881 Cloud server configuration takes 1-5 minutes, please wait."
+          extra={[
+            <Button type="primary" key="console">
+              Go Console
+            </Button>,
+            <Button key="buy">Buy Again</Button>,
+          ]}
+        />
+        ,
+      </>
+    );
+  };
+
+  const steps = [
+    {
+      title: "First",
+      content: uploadFileStep1(),
+    },
+    {
+      title: "Second",
+      content: ProcessingFileStep2(),
+    },
+    {
+      title: "Last",
+      content: FileImportResultStep3(),
+    },
+  ];
+
   const fetchData = async () => {
     setTableLoading(true);
     const result = await axios(constants.API_PREFIX + "/api/Component");
@@ -212,12 +528,6 @@ function Import() {
     setCoefficients(result.data);
     // setTableLoading(false);
   };
-
-  useEffect(() => {
-    fetchData();
-    fetchAaccountsReportCharts();
-    fetchCoefficients();
-  }, []);
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -311,82 +621,40 @@ function Import() {
     console.log(date, dateString);
   }
 
-  const uploadProps = {
-    name: "file",
-    // action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
-    headers: {
-      authorization: "authorization-text",
-    },
-    onChange(info) {
-      if (info.file.status !== "uploading") {
-        console.log(info.file, info.fileList);
-      }
-      if (info.file.status === "done") {
-        message.success(`${info.file.name} file uploaded successfully`);
-      } else if (info.file.status === "error") {
-        message.error(`${info.file.name} file upload failed.`);
-      }
-    },
-  };
-
-  const fileHandler = (e) => {
-    console.log("eeeee", e);
-    // let fileObj = e.target.files[0];
-    let fileObj = e.file.originFileObj;
-    // let fileObj = e.fileList[0] ? e.fileList[0].originFileObj : {};
-    console.log(fileObj);
-
-    //just pass the fileObj as parameter
-    ExcelRenderer(fileObj, (err, resp) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("filefilefilefilefilefile", file);
-        setFile({
-          cols: resp.cols,
-          rows: resp.rows,
-        });
-      }
-    });
-  };
-
-  const importFile = () => {
-    console.log(file)
-  }
-
   return (
     <div>
-      <div style={{ display: "flex" }}>
-        <Upload
-          {...uploadProps}
-          onChange={fileHandler}
-          customRequest={({ file, onSuccess }) => {
-            setTimeout(() => {
-              onSuccess("ok");
-            }, 0);
-          }}
-        >
-          <Button icon={<UploadOutlined />}>{t(`uploadBankFile`)}</Button>
-        </Upload>
-      </div>
+      <Steps current={current}>
+        {steps.map((item) => (
+          <Step key={item.title} title={item.title} />
+        ))}
+      </Steps>
+      {/* <Divider /> */}
+      {/* <br /> */}
 
-      {/* <input type="file" onChange={fileHandler} /> */}
-      {file && (
-        <>
-          <Divider />
-          <Button onClick={importFile} type="primary" icon={<ImportOutlined />}>
-            {t(`import`)}
+      {/* <div className="steps-action">
+        {current < steps.length - 1 && (
+          <Button type="primary" onClick={() => next()}>
+            Next
           </Button>
-          <div style={{ width: "98%", height: "750px", overflow: "scroll", marginTop: 15}}>
-            <OutTable
-              data={file.rows}
-              columns={file.cols}
-              tableClassName="table"
-              tableHeaderRowClass="heading"
-            />
-          </div>
-        </>
-      )}
+        )}
+        {current === steps.length - 1 && (
+          <Button
+            type="primary"
+            onClick={() => message.success("Processing complete!")}
+          >
+            Done
+          </Button>
+        )}
+        {current > 0 && (
+          <Button style={{ margin: "0 8px" }} onClick={() => prev()}>
+            Previous
+          </Button>
+        )}
+      </div> */}
+
+      <div className="steps-content">{steps[current].content}</div>
+
+      <br />
     </div>
   );
 }
