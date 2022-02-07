@@ -20,7 +20,7 @@ import {
   Steps,
   Row,
   Col,
-  Result
+  Result,
 } from "antd";
 import {
   PlusCircleOutlined,
@@ -317,6 +317,7 @@ function Import() {
   };
 
   const ProcessingFileStep2 = () => {
+    const { t } = useTranslation();
     // console.log(8998, file.rows);
     let groupd = groupBy(file.rows, (r) => r[19]);
     // console.log(8998777777777, groupd.BONUS);
@@ -405,6 +406,8 @@ function Import() {
     console.log("groupedData", groupedData);
 
     const importDataInDB = () => {
+      // const result = await axios(constants.API_PREFIX + "/api/Component");
+
       next();
     };
 
@@ -430,16 +433,27 @@ function Import() {
               }}
             >
               <div>
-                <div>
-                  <DatePicker />
-                  <Select
-                    defaultValue="აირჩიეთ"
-                    style={{ width: 150, marginLeft: 15 }}
-                  >
-                    {components.map((i) => (
-                      <Option value={i.id}>{i.name}</Option>
-                    ))}
-                  </Select>
+                <div style={{display: 'flex'}}>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <span> {t(`period`)} </span>
+                    <DatePicker picker="month" style={{marginTop: 5}}/>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", marginLeft: 15 }}>
+                    <span> {t(`paidDate`)} </span>
+                    <DatePicker style={{marginTop: 5}} />
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column",  marginLeft: 15 }}>
+                    <span> {t(`component`)} </span>
+                    <Select
+                      defaultValue="აირჩიეთ"
+                      style={{width: '149px', marginTop: 5}}
+                    >
+                      {components.map((i) => (
+                        <Option value={i.id}>{i.name}</Option>
+                      ))}
+                    </Select>
+                  </div>
                 </div>
                 <div
                   style={{

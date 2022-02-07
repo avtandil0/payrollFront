@@ -69,5 +69,7 @@
     "export":"Export",
     "uploadBankFile":"Upload Bank File",
     "chooseBankFile":"Choose Bank File",
-    "upload": "Upload"
+    "upload": "Upload",
+    "period": "Period",
+    "paidDate": "Date Of Paid"
 }
