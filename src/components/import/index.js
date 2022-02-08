@@ -35,7 +35,7 @@ import { OutTable, ExcelRenderer } from "react-excel-renderer";
 import axios from "axios";
 import constants from "../../constant";
 import { useTranslation } from "react-i18next";
-import { groupBy } from "lodash";
+import { groupBy, map } from "lodash";
 import "./index.css";
 
 const { Option } = Select;
@@ -325,6 +325,12 @@ function Import() {
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
     const [chosenData, setChosenData] = useState([]);
+    const [importData, setImportData] = useState({
+      period: null,
+      calculationDate: null,
+      componentId: null,
+      persons: []
+    });
 
     const onSelectChange = (selectedRowKeys) => {
       let selectedData = [];
@@ -405,11 +411,29 @@ function Import() {
 
     console.log("groupedData", groupedData);
 
-    const importDataInDB = () => {
+    const importDataInDB = async () => {
       // const result = await axios(constants.API_PREFIX + "/api/Component");
+      let impD ={
+        ...importData,
+        persons: map(chosenData, (r) => ({
+          'bankAccountNumber': r[16],
+          'BankName': r[18],
+          'destination': r[19],
+          'fullName': r[14],
+          'amount': r[3],
+        }) )
+      }
+      console.log('chosenData', chosenData,impD)
 
-      next();
+      const result = await axios.post(constants.API_PREFIX + "/api/Calculation/paid", impD);
+      console.log('result', result)
+      // next();
     };
+
+    const handleChangeForm = (value, name) => {
+      setImportData({ ...importData, [name]: value  });
+      console.log('------', value, name)
+    }
 
     return (
       <>
@@ -436,17 +460,18 @@ function Import() {
                 <div style={{display: 'flex'}}>
                   <div style={{ display: "flex", flexDirection: "column" }}>
                     <span> {t(`period`)} </span>
-                    <DatePicker picker="month" style={{marginTop: 5}}/>
+                    <DatePicker onChange={(e) => handleChangeForm(e, 'period')} picker="month" style={{marginTop: 5}}/>
                   </div>
 
                   <div style={{ display: "flex", flexDirection: "column", marginLeft: 15 }}>
                     <span> {t(`paidDate`)} </span>
-                    <DatePicker style={{marginTop: 5}} />
+                    <DatePicker onChange={(e) => handleChangeForm(e, 'calculationDate')} style={{marginTop: 5}} />
                   </div>
                   <div style={{ display: "flex", flexDirection: "column",  marginLeft: 15 }}>
                     <span> {t(`component`)} </span>
                     <Select
                       defaultValue="აირჩიეთ"
+                      onChange={(value) => handleChangeForm(value, 'componentId')}
                       style={{width: '149px', marginTop: 5}}
                     >
                       {components.map((i) => (
