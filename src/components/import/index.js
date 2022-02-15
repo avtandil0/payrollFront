@@ -36,6 +36,9 @@ import axios from "axios";
 import constants from "../../constant";
 import { useTranslation } from "react-i18next";
 import { groupBy, map } from "lodash";
+import UploadFileStep1 from './UploadFileStep1'
+import ProcessingFileStep2 from './ProcessingFileStep2'
+import FileImportResultStep3 from './FileImportResultStep3'
 import "./index.css";
 
 const { Option } = Select;
@@ -219,325 +222,334 @@ function Import() {
     setCurrent(current - 1);
   };
 
-  const uploadFile = () => {
-    console.log(file);
-    next();
-  };
+  // const uploadFile = () => {
+  //   console.log(file);
+  //   next();
+  // };
 
-  const fileHandler = (e) => {
-    console.log("eeeee", e);
-    // let fileObj = e.target.files[0];
-    let fileObj = e.file.originFileObj;
-    // let fileObj = e.fileList[0] ? e.fileList[0].originFileObj : {};
-    console.log(fileObj);
+  // const fileHandler = (e) => {
+  //   console.log("eeeee", e);
+  //   // let fileObj = e.target.files[0];
+  //   let fileObj = e.file.originFileObj;
+  //   // let fileObj = e.fileList[0] ? e.fileList[0].originFileObj : {};
+  //   console.log(fileObj);
 
-    //just pass the fileObj as parameter
-    ExcelRenderer(fileObj, (err, resp) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("filefilefilefilefilefile", file);
-        setFile({
-          cols: resp.cols,
-          rows: resp.rows,
-        });
-      }
-    });
-  };
+  //   //just pass the fileObj as parameter
+  //   ExcelRenderer(fileObj, (err, resp) => {
+  //     if (err) {
+  //       console.log(err);
+  //     } else {
+  //       console.log("filefilefilefilefilefile", file);
+  //       setFile({
+  //         cols: resp.cols,
+  //         rows: resp.rows,
+  //       });
+  //     }
+  //   });
+  // };
 
-  const uploadProps = {
-    name: "file",
-    // action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
-    headers: {
-      authorization: "authorization-text",
-    },
-    onChange(info) {
-      if (info.file.status !== "uploading") {
-        console.log(info.file, info.fileList);
-      }
-      if (info.file.status === "done") {
-        message.success(`${info.file.name} file uploaded successfully`);
-      } else if (info.file.status === "error") {
-        message.error(`${info.file.name} file upload failed.`);
-      }
-    },
-  };
+  // const uploadProps = {
+  //   name: "file",
+  //   // action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
+  //   headers: {
+  //     authorization: "authorization-text",
+  //   },
+  //   onChange(info) {
+  //     if (info.file.status !== "uploading") {
+  //       console.log(info.file, info.fileList);
+  //     }
+  //     if (info.file.status === "done") {
+  //       message.success(`${info.file.name} file uploaded successfully`);
+  //     } else if (info.file.status === "error") {
+  //       message.error(`${info.file.name} file upload failed.`);
+  //     }
+  //   },
+  // };
 
-  const uploadFileStep1 = () => {
-    return (
-      <>
-        <div style={{ display: "flex" }}>
-          <Upload
-            {...uploadProps}
-            onChange={fileHandler}
-            customRequest={({ file, onSuccess }) => {
-              setTimeout(() => {
-                onSuccess("ok");
-              }, 0);
-            }}
-          >
-            <Button style={{ marginLeft: 15 }} icon={<UploadOutlined />}>
-              {t(`chooseBankFile`)}
-            </Button>
-          </Upload>
-        </div>
+  // const UploadFileStep1 = () => {
+  //   const [fileIsUploaded, setFileIsUploaded] = useState(false);
+  //   console.log('filefilefile123333',file)
+  //   return (
+  //     <>
+  //       <div style={{ display: "flex" }}>
+  //         <Upload
+  //           {...uploadProps}
+  //           onChange={fileHandler}
+  //           customRequest={({ file, onSuccess }) => {
+  //             setTimeout(() => {
+  //               setFileIsUploaded(true);
+  //               onSuccess("ok");
+  //             }, 0);
+  //           }}
+  //         >
+  //           <Button style={{ marginLeft: 15 }} icon={<UploadOutlined />}>
+  //             {t(`chooseBankFile`)}
+  //           </Button>
+  //         </Upload>
+  //       </div>
 
-        {/* <input type="file" onChange={fileHandler} /> */}
-        {file && (
-          <>
-            {/* <Divider /> */}
-            <Button
-              style={{ marginTop: 30, marginLeft: 15 }}
-              onClick={uploadFile}
-              type="primary"
-              icon={<CloudUploadOutlined />}
-            >
-              {t(`upload`)}
-            </Button>
-            <div
-              style={{
-                width: "98%",
-                height: "650px",
-                overflow: "scroll",
-                marginTop: 15,
-                marginLeft: 15,
-              }}
-            >
-              <OutTable
-                data={file.rows}
-                columns={file.cols}
-                tableClassName="table"
-                tableHeaderRowClass="heading"
-              />
-            </div>
-          </>
-        )}
-      </>
-    );
-  };
+  //       {/* <input type="file" onChange={fileHandler} /> */}
 
-  const ProcessingFileStep2 = () => {
-    const { t } = useTranslation();
-    // console.log(8998, file.rows);
-    let groupd = groupBy(file.rows, (r) => r[19]);
-    // console.log(8998777777777, groupd.BONUS);
+  //       {file && (
+  //         <>
+  //           {/* <Divider /> */}
+  //           <Button
+  //             style={{ marginTop: 30, marginLeft: 15 }}
+  //             onClick={uploadFile}
+  //             type="primary"
+  //             icon={<CloudUploadOutlined />}
+  //             disabled={!fileIsUploaded}
+  //           >
+  //             {t(`upload`)}
+  //           </Button>
+  //           <div
+  //             style={{
+  //               width: "98%",
+  //               height: "650px",
+  //               overflow: "scroll",
+  //               marginTop: 15,
+  //               marginLeft: 15,
+  //             }}
+  //           >
+  //             <OutTable
+  //               data={file.rows}
+  //               columns={file.cols}
+  //               tableClassName="table"
+  //               tableHeaderRowClass="heading"
+  //             />
+  //           </div>
+  //         </>
+  //       )}
+  //     </>
+  //   );
+  // };
 
-    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  // const ProcessingFileStep2 = () => {
+  //   const { t } = useTranslation();
+  //   console.log(8998111111, file.rows);
+  //   let groupd = groupBy(file.rows, (r) => r[19]);
+  //   // console.log(8998777777777, groupd.BONUS);
 
-    const [chosenData, setChosenData] = useState([]);
-    const [importData, setImportData] = useState({
-      period: null,
-      calculationDate: null,
-      componentId: null,
-      persons: []
-    });
+  //   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  //   const [importDataInDBLoading, setImportDataInDBLoading] = useState(false);
 
-    const onSelectChange = (selectedRowKeys) => {
-      let selectedData = [];
-      selectedRowKeys.forEach((element) => {
-        console.log(
-          "[...groupedData[element].data]",
-          groupedData[element].data
-        );
-        selectedData = [...selectedData, ...groupedData[element].data];
-      });
+  //   const [chosenData, setChosenData] = useState([]);
+  //   const [importData, setImportData] = useState({
+  //     period: null,
+  //     calculationDate: null,
+  //     componentId: null,
+  //     persons: []
+  //   });
 
-      setChosenData([...selectedData]);
-      setSelectedRowKeys(selectedRowKeys);
-    };
+  //   const onSelectChange = (selectedRowKeys) => {
+  //     let selectedData = [];
+  //     selectedRowKeys.forEach((element) => {
+  //       console.log(
+  //         "[...groupedData[element].data]",
+  //         groupedData[element].data
+  //       );
+  //       selectedData = [...selectedData, ...groupedData[element].data];
+  //     });
 
-    const rowSelection = {
-      selectedRowKeys,
-      onChange: onSelectChange,
-    };
+  //     setChosenData([...selectedData]);
+  //     setSelectedRowKeys(selectedRowKeys);
+  //   };
 
-    const groupedColumns = [
-      {
-        title: "Name",
-        dataIndex: "name",
-      },
-      {
-        title: "Count",
-        dataIndex: "count",
-      },
-    ];
+  //   const rowSelection = {
+  //     selectedRowKeys,
+  //     onChange: onSelectChange,
+  //   };
 
-    const columns = [
-      // {
-      //   title: "Date",
-      //   dataIndex: "date",
-      // },
-      {
-        title: "receiverAcoountNumber",
-        dataIndex: "receiverAcoountNumber",
-        render: (_, record) => <p>{record[16]}</p>,
-      },
-      {
-        title: "receiver",
-        dataIndex: "receiver",
-        render: (_, record) => <p>{record[14]}</p>,
-      },
-      {
-        title: "destination",
-        dataIndex: "destination",
-        render: (_, record) => <p>{record[19]}</p>,
-      },
-      {
-        title: "amount",
-        dataIndex: "amount",
-        render: (_, record) => <p>{record[21]}</p>,
-      },
-    ];
+  //   const groupedColumns = [
+  //     {
+  //       title: "Name",
+  //       dataIndex: "name",
+  //     },
+  //     {
+  //       title: "Count",
+  //       dataIndex: "count",
+  //     },
+  //   ];
 
-    const groupedData = [];
+  //   const columns = [
+  //     // {
+  //     //   title: "Date",
+  //     //   dataIndex: "date",
+  //     // },
+  //     {
+  //       title: "receiverAcoountNumber",
+  //       dataIndex: "receiverAcoountNumber",
+  //       render: (_, record) => <p>{record[16]}</p>,
+  //     },
+  //     {
+  //       title: "receiver",
+  //       dataIndex: "receiver",
+  //       render: (_, record) => <p>{record[14]}</p>,
+  //     },
+  //     {
+  //       title: "destination",
+  //       dataIndex: "destination",
+  //       render: (_, record) => <p>{record[19]}</p>,
+  //     },
+  //     {
+  //       title: "amount",
+  //       dataIndex: "amount",
+  //       render: (_, record) => <p>{record[21]}</p>,
+  //     },
+  //   ];
 
-    // Object.entries(groupd).forEach(element => {
-    //   columns.push( {
-    //     title: element,
-    //     dataIndex: element,
-    //   })
-    // });
+  //   const groupedData = [];
 
-    let i = 0;
-    for (const [key, value] of Object.entries(groupd)) {
-      groupedData.push({
-        key: i,
-        name: key,
-        count: value.length,
-        data: value,
-      });
-      i++;
-    }
+  //   // Object.entries(groupd).forEach(element => {
+  //   //   columns.push( {
+  //   //     title: element,
+  //   //     dataIndex: element,
+  //   //   })
+  //   // });
 
-    console.log("groupedData", groupedData);
+  //   let i = 0;
+  //   for (const [key, value] of Object.entries(groupd)) {
+  //     groupedData.push({
+  //       key: i,
+  //       name: key,
+  //       count: value.length,
+  //       data: value,
+  //     });
+  //     i++;
+  //   }
 
-    const importDataInDB = async () => {
-      // const result = await axios(constants.API_PREFIX + "/api/Component");
-      let impD ={
-        ...importData,
-        persons: map(chosenData, (r) => ({
-          'bankAccountNumber': r[16],
-          'BankName': r[18],
-          'destination': r[19],
-          'fullName': r[14],
-          'amount': r[3],
-        }) )
-      }
-      console.log('chosenData', chosenData,impD)
+  //   console.log("groupedData", groupedData);
 
-      const result = await axios.post(constants.API_PREFIX + "/api/Calculation/paid", impD);
-      console.log('result', result)
-      // next();
-    };
+  //   const importDataInDB = async () => {
+  //     // const result = await axios(constants.API_PREFIX + "/api/Component");
+  //     let impD ={
+  //       ...importData,
+  //       persons: map(chosenData, (r) => ({
+  //         'bankAccountNumber': r[16],
+  //         'BankName': r[18],
+  //         'destination': r[19],
+  //         'fullName': r[14],
+  //         'amount': r[3],
+  //       }) )
+  //     }
+  //     console.log('chosenData', chosenData,impD)
 
-    const handleChangeForm = (value, name) => {
-      setImportData({ ...importData, [name]: value  });
-      console.log('------', value, name)
-    }
+  //     setImportDataInDBLoading(true)
+  //     const result = await axios.post(constants.API_PREFIX + "/api/Calculation/paid", impD);
+  //     setImportDataInDBLoading(false)
+  //     console.log('result', result)
+  //     next();
+  //   };
 
-    return (
-      <>
-        <div style={{ backgroundColor: "white", height: 5 }}></div>
-        <Row>
-          <Col span={12}>
-            <Table
-              size="small"
-              rowSelection={rowSelection}
-              dataSource={groupedData}
-              columns={groupedColumns}
-            />
-          </Col>
-          <Col span={12}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "100%",
-              }}
-            >
-              <div>
-                <div style={{display: 'flex'}}>
-                  <div style={{ display: "flex", flexDirection: "column" }}>
-                    <span> {t(`period`)} </span>
-                    <DatePicker onChange={(e) => handleChangeForm(e, 'period')} picker="month" style={{marginTop: 5}}/>
-                  </div>
+  //   const handleChangeForm = (value, name) => {
+  //     setImportData({ ...importData, [name]: value  });
+  //     console.log('------', value, name)
+  //   }
 
-                  <div style={{ display: "flex", flexDirection: "column", marginLeft: 15 }}>
-                    <span> {t(`paidDate`)} </span>
-                    <DatePicker onChange={(e) => handleChangeForm(e, 'calculationDate')} style={{marginTop: 5}} />
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column",  marginLeft: 15 }}>
-                    <span> {t(`component`)} </span>
-                    <Select
-                      defaultValue="აირჩიეთ"
-                      onChange={(value) => handleChangeForm(value, 'componentId')}
-                      style={{width: '149px', marginTop: 5}}
-                    >
-                      {components.map((i) => (
-                        <Option value={i.id}>{i.name}</Option>
-                      ))}
-                    </Select>
-                  </div>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    marginTop: 25,
-                  }}
-                >
-                  <Button
-                    onClick={importDataInDB}
-                    type="primary"
-                    icon={<CloudUploadOutlined />}
-                    size="large"
-                  >
-                    Process
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </Col>
-        </Row>
+  //   return (
+  //     <>
+  //       <div style={{ backgroundColor: "white", height: 5 }}></div>
+  //       <Row>
+  //         <Col span={12}>
+  //           <Table
+  //             size="small"
+  //             rowSelection={rowSelection}
+  //             dataSource={groupedData}
+  //             columns={groupedColumns}
+  //           />
+  //         </Col>
+  //         <Col span={12}>
+  //           <div
+  //             style={{
+  //               display: "flex",
+  //               justifyContent: "center",
+  //               alignItems: "center",
+  //               height: "100%",
+  //             }}
+  //           >
+  //             <div>
+  //               <div style={{display: 'flex'}}>
+  //                 <div style={{ display: "flex", flexDirection: "column" }}>
+  //                   <span> {t(`period`)} </span>
+  //                   <DatePicker onChange={(e) => handleChangeForm(e, 'period')} picker="month" style={{marginTop: 5}}/>
+  //                 </div>
 
-        <div style={{ backgroundColor: "white", height: 25 }}></div>
-        <Table size="small" dataSource={chosenData} columns={columns} />
-      </>
-    );
-  };
+  //                 <div style={{ display: "flex", flexDirection: "column", marginLeft: 15 }}>
+  //                   <span> {t(`paidDate`)} </span>
+  //                   <DatePicker onChange={(e) => handleChangeForm(e, 'calculationDate')} style={{marginTop: 5}} />
+  //                 </div>
+  //                 <div style={{ display: "flex", flexDirection: "column",  marginLeft: 15 }}>
+  //                   <span> {t(`component`)} </span>
+  //                   <Select
+  //                     defaultValue="აირჩიეთ"
+  //                     onChange={(value) => handleChangeForm(value, 'componentId')}
+  //                     style={{width: '149px', marginTop: 5}}
+  //                   >
+  //                     {components.map((i) => (
+  //                       <Option value={i.id}>{i.name}</Option>
+  //                     ))}
+  //                   </Select>
+  //                 </div>
+  //               </div>
+  //               <div
+  //                 style={{
+  //                   display: "flex",
+  //                   justifyContent: "center",
+  //                   marginTop: 25,
+  //                 }}
+  //               >
+  //                 <Button
+  //                   onClick={importDataInDB}
+  //                   loading={importDataInDBLoading}
+  //                   type="primary"
+  //                   icon={<CloudUploadOutlined />}
+  //                   size="large"
+  //                 >
+  //                   Process
+  //                 </Button>
+  //               </div>
+  //             </div>
+  //           </div>
+  //         </Col>
+  //       </Row>
 
-  const FileImportResultStep3 = () => {
-    return (
-      <>
-        <Result
-          status="success"
-          title="Successfully Purchased Cloud Server ECS!"
-          subTitle="Order number: 2017182818828182881 Cloud server configuration takes 1-5 minutes, please wait."
-          extra={[
-            <Button type="primary" key="console">
-              Go Console
-            </Button>,
-            <Button key="buy">Buy Again</Button>,
-          ]}
-        />
-        ,
-      </>
-    );
-  };
+  //       <div style={{ backgroundColor: "white", height: 25 }}></div>
+  //       <Table size="small" dataSource={chosenData} columns={columns} />
+  //     </>
+  //   );
+  // };
+
+  // const FileImportResultStep3 = () => {
+  //   return (
+  //     <>
+  //       <Result
+  //         status="success"
+  //         title="Successfully Purchased Cloud Server ECS!"
+  //         subTitle="Order number: 2017182818828182881 Cloud server configuration takes 1-5 minutes, please wait."
+  //         extra={[
+  //           <Button type="primary" key="console">
+  //             Go Console
+  //           </Button>,
+  //           <Button key="buy">Buy Again</Button>,
+  //         ]}
+  //       />
+  //       ,
+  //     </>
+  //   );
+  // };
 
   const steps = [
     {
       title: "First",
-      content: uploadFileStep1(),
+      content: <UploadFileStep1 next={next} file={file} setFile={setFile} />,
     },
     {
       title: "Second",
-      content: ProcessingFileStep2(),
+      content: <ProcessingFileStep2 next={next} file={file} setFile={setFile} />,
     },
     {
       title: "Last",
-      content: FileImportResultStep3(),
+      content: <FileImportResultStep3 />,
     },
   ];
 
