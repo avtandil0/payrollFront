@@ -44,9 +44,7 @@ const { Step } = Steps;
 
 function ProcessingFileStep2({ next, file, setFile }) {
   const { t } = useTranslation();
-  console.log(8998111111, file.rows);
   let groupd = groupBy(file.rows, (r) => r[19]);
-  // console.log(8998777777777, groupd.BONUS);
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [importDataInDBLoading, setImportDataInDBLoading] = useState(false);
@@ -54,28 +52,23 @@ function ProcessingFileStep2({ next, file, setFile }) {
 
   const [chosenData, setChosenData] = useState([]);
   const [importData, setImportData] = useState({
-    period: null,
-    calculationDate: null,
+    paidPeriod: null,
+    paidDate: null,
     componentId: null,
     persons: [],
   });
-
 
   useEffect(() => {
     fetchComponents();
   }, []);
 
   const fetchComponents = async () => {
-    // setTableLoading(true);
     const result = await axios(
       constants.API_PREFIX + "/api/Component/getAllActive"
     );
 
-    console.log("fetchComponents", result);
     setComponents(result.data);
-    // setTableLoading(false);
   };
-
 
   const onSelectChange = (selectedRowKeys) => {
     let selectedData = [];
@@ -133,13 +126,6 @@ function ProcessingFileStep2({ next, file, setFile }) {
 
   const groupedData = [];
 
-  // Object.entries(groupd).forEach(element => {
-  //   columns.push( {
-  //     title: element,
-  //     dataIndex: element,
-  //   })
-  // });
-
   let i = 0;
   for (const [key, value] of Object.entries(groupd)) {
     groupedData.push({
@@ -154,7 +140,6 @@ function ProcessingFileStep2({ next, file, setFile }) {
   console.log("groupedData", groupedData);
 
   const importDataInDB = async () => {
-    // const result = await axios(constants.API_PREFIX + "/api/Component");
     let impD = {
       ...importData,
       persons: map(chosenData, (r) => ({
@@ -168,11 +153,16 @@ function ProcessingFileStep2({ next, file, setFile }) {
     console.log("chosenData", chosenData, impD);
 
     setImportDataInDBLoading(true);
-    const result = await axios.post(
-      constants.API_PREFIX + "/api/Calculation/paid",
-      impD
-    );
-    setImportDataInDBLoading(false);
+    try {
+      var result = await axios.post(
+        constants.API_PREFIX + "/api/Calculation/paid",
+        impD
+      );
+    } catch (e) {
+      setImportDataInDBLoading(false);
+      return;
+    }
+
     console.log("result", result);
     next();
   };
@@ -208,7 +198,7 @@ function ProcessingFileStep2({ next, file, setFile }) {
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   <span> {t(`period`)} </span>
                   <DatePicker
-                    onChange={(e) => handleChangeForm(e, "period")}
+                    onChange={(e) => handleChangeForm(e, "paidPeriod")}
                     picker="month"
                     style={{ marginTop: 5 }}
                   />
@@ -223,7 +213,7 @@ function ProcessingFileStep2({ next, file, setFile }) {
                 >
                   <span> {t(`paidDate`)} </span>
                   <DatePicker
-                    onChange={(e) => handleChangeForm(e, "calculationDate")}
+                    onChange={(e) => handleChangeForm(e, "paidDate")}
                     style={{ marginTop: 5 }}
                   />
                 </div>
