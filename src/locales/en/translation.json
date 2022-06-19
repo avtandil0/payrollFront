@@ -71,5 +71,11 @@
     "chooseBankFile":"Choose Bank File",
     "upload": "Upload",
     "period": "Period",
-    "paidDate": "Date Of Paid"
+    "paidDate": "Date Of Paid",
+    "users": "Users",
+    "user": "User",
+    "firstName": "Firstame",
+    "lastName": "Lastname",
+    "userName": "Username",
+    "role": "Role"
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useContext } from "react";
 
 import "antd/dist/antd.css";
 import {
@@ -14,12 +14,17 @@ import { useTranslation } from "react-i18next";
 import UploadFileStep1 from './UploadFileStep1'
 import ProcessingFileStep2 from './ProcessingFileStep2'
 import FileImportResultStep3 from './FileImportResultStep3'
+import { UserContext } from "../../appContext";
+
 import "./index.css";
 
 const { Option } = Select;
 const { Step } = Steps;
 
 function Import() {
+
+  const { user } = useContext(UserContext);
+
   const { t } = useTranslation();
 
 

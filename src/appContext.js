@@ -7,6 +7,7 @@ export const UserContext = createContext();
 // This context provider is passed to any component requiring the context
 export const AppProvider = ({ children }) => {
   const [globalDepartments, setglobalDepartments] = useState([]);
+  const [user, setUser] = useState([]);
 
   const fetchDepartments = async () => {
     // setTableLoading(true);
@@ -17,8 +18,12 @@ export const AppProvider = ({ children }) => {
     // setTableLoading(false);
   }
 
-  
+
   useEffect(() => {
+    let usString = localStorage.getItem("payrollAppUser");
+    let us = JSON.parse(usString);
+    setUser(us);
+
     fetchDepartments();
   }, []);
 
@@ -27,7 +32,8 @@ export const AppProvider = ({ children }) => {
     <UserContext.Provider
       value={{
         globalDepartments,
-        setglobalDepartments
+        setglobalDepartments,
+        user
       }}
     >
       {children}

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
+import { Table, Radio, Divider } from "antd";
 import moment from "moment";
 
 import "antd/dist/antd.css";
@@ -10,8 +11,6 @@ import {
   Input,
   Space,
   Popconfirm,
-  Table,
-  Divider,
   Tooltip,
 } from "antd";
 import {
@@ -22,11 +21,12 @@ import {
 import axios from "axios";
 import constants from "../../constant";
 import { useTranslation } from "react-i18next";
-import { UserContext } from "../../appContext";
 
-function Project() {
-  const { user } = useContext(UserContext);
+import { Select } from "antd";
 
+const { Option } = Select;
+
+function Users() {
   const { t } = useTranslation();
 
   const columns = [
@@ -63,14 +63,22 @@ function Project() {
       ),
     },
     {
-      title: t(`code`),
-      dataIndex: "code",
-      render: (text) => <a>{text}</a>,
+      title: t(`userName`),
+      dataIndex: "userName",
     },
     {
-      title: t(`description`),
-      dataIndex: "description",
+      title: t(`firstName`),
+      dataIndex: "firstName",
     },
+    {
+      title: t(`lastName`),
+      dataIndex: "lastName",
+    },
+    // {
+    //   title: t(`role`),
+    //   dataIndex: "role",
+    // },
+
     {
       title: t(`dateOfCreation`),
       dataIndex: "dateCreated",
@@ -79,10 +87,21 @@ function Project() {
   ];
 
   const [dataSaveArray, setDataSaveArray] = useState([]);
-  const [project, setProject] = useState({
+  const [roles, setRoles] = useState([]);
+  const [costCenter, setCostCenter] = useState({
     code: "",
     description: "",
   });
+  const [user, setUser] = useState({
+    userName: "",
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
+    address: "",
+    email: "",
+    role: "",
+  });
+
   const [tableLoading, setTableLoading] = useState(false);
   const [isEdiT, setIsEdiT] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
@@ -90,14 +109,25 @@ function Project() {
 
   const fetchData = async () => {
     setTableLoading(true);
-    const result = await axios(constants.API_PREFIX + "/api/Project");
+    let token = localStorage.getItem("payrollAppLogintoken");
+    axios.defaults.headers.common = {'Authorization': `Bearer ${token}`}
+    const result = await axios(constants.API_PREFIX + "/api/Account/getAllUser");
     console.log("result", result.data);
 
     setDataSaveArray(result.data);
     setTableLoading(false);
   };
 
+  const fetchRoles = async () => {
+    const result = await axios(
+      constants.API_PREFIX + "/api/Common/UserClaimTypes"
+    );
+    console.log("result", result);
+    setRoles(result.data);
+  };
+
   useEffect(() => {
+    fetchRoles();
     fetchData();
   }, []);
 
@@ -108,11 +138,11 @@ function Project() {
   const handleOk = async () => {
     setIsModalVisible(false);
     setIsEdiT(false);
-    console.log("project", project);
+    console.log("user", user);
     if (!isEdiT) {
       const result = await axios.post(
-        constants.API_PREFIX + "/api/Project",
-        project
+        constants.API_PREFIX + "/api/Account/registerUser",
+        user
       );
       console.log("result", result);
       if (result.data.isSuccess) {
@@ -122,9 +152,9 @@ function Project() {
         message.error(result.data.message);
       }
     } else {
-      const result1 = await axios.put(
-        constants.API_PREFIX + "/api/Project",
-        project
+      const result1 = await axios.post(
+        constants.API_PREFIX + "/api/Account/update",
+        user
       );
       console.log("result1", result1);
       if (result1.data.isSuccess) {
@@ -134,7 +164,7 @@ function Project() {
         message.error(result1.data.message);
       }
     }
-    setProject({
+    setCostCenter({
       code: "",
       description: "",
     });
@@ -143,7 +173,7 @@ function Project() {
   const handleCancel = () => {
     setIsEdiT(false);
     setIsModalVisible(false);
-    setProject({
+    setCostCenter({
       code: "",
       description: "",
     });
@@ -151,14 +181,19 @@ function Project() {
 
   const handleChange = (e) => {
     // console.log('handleChange', e.target);
-    setProject({ ...project, [e.target.name]: e.target.value });
+    setUser({ ...user, [e.target.name]: e.target.value });
+  };
+
+  const handleChangeSelect = (id) => {
+    setUser({ ...user, ["role"]: id});
   };
 
   const confirm = async (record) => {
     console.log("record", record);
-    const result = await axios.delete(constants.API_PREFIX + "/api/Project", {
-      data: record,
-    });
+    const result = await axios.delete(
+      constants.API_PREFIX + "/api/CostCenter",
+      { data: record }
+    );
     console.log("result", result);
     if (result.data.isSuccess) {
       message.success(result.data.message);
@@ -171,55 +206,44 @@ function Project() {
   const clickEdit = (record) => {
     setIsEdiT(true);
     console.log("clickEdit", record);
-    setProject(record);
+    setUser({...record, role: record.userClaimTypes[0] });
     setIsModalVisible(true);
   };
 
   return (
     <div>
-      {!user.roles.analyst ? (
-        <Button
-          type="primary"
-          onClick={showModal}
-          icon={<PlusCircleOutlined />}
-        >
-          {t(`add`)}
-        </Button>
-      ) : (
-        ""
-      )}
-
+      <Button type="primary" onClick={showModal} icon={<PlusCircleOutlined />}>
+        {t(`add`)}
+      </Button>
       <Modal
         loading={buttonLoading}
         okText={!isEdiT ? "დამატება" : "შენახვა"}
         cancelText={t(`cancelText`)}
-        title={t(`project`)}
+        title={t(`user`)}
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
-        // width={1000}
+        width={700}
       >
         <Form>
           <Form.Item>
             <Form.Item
-              label={t(`code`)}
+              label={t(`userName`)}
               rules={[{ required: true }]}
               style={{ display: "inline-block", width: "calc(50% - 8px)" }}
             >
               <Input
-                value={project.code}
+                value={user.userName}
                 type="text"
-                name="code"
+                name="userName"
                 onChange={(e) => handleChange(e)}
-                placeholder={t(`code`)}
+                placeholder={t(`userName`)}
+                disabled={isEdiT}
               />
             </Form.Item>
 
-            {/* </Form.Item>
-
-          <Form.Item style={{ marginBottom: 0 }}> */}
             <Form.Item
-              label={t(`description`)}
+              label={t(`firstName`)}
               rules={[{ required: true }]}
               style={{
                 display: "inline-block",
@@ -228,12 +252,76 @@ function Project() {
               }}
             >
               <Input
-                value={project.description}
+                value={user.firstName}
                 type="text"
-                name="description"
+                name="firstName"
                 onChange={(e) => handleChange(e)}
-                placeholder={t(`description`)}
+                placeholder={t(`firstName`)}
               />
+            </Form.Item>
+            <Form.Item
+              label={t(`lastName`)}
+              rules={[{ required: true }]}
+              style={{ display: "inline-block", width: "calc(50% - 8px)" }}
+            >
+              <Input
+                value={user.lastName}
+                type="text"
+                name="lastName"
+                onChange={(e) => handleChange(e)}
+                placeholder={t(`lastName`)}
+              />
+            </Form.Item>
+
+            <Form.Item
+              label={t(`phoneNumber`)}
+              rules={[{ required: true }]}
+              style={{
+                display: "inline-block",
+                width: "calc(50% - 8px)",
+                marginLeft: "10px",
+              }}
+            >
+              <Input
+                value={user.phoneNumber}
+                type="text"
+                name="phoneNumber"
+                onChange={(e) => handleChange(e)}
+                placeholder={t(`phoneNumber`)}
+              />
+            </Form.Item>
+            <Form.Item
+              label={t(`address`)}
+              rules={[{ required: true }]}
+              style={{ display: "inline-block", width: "calc(50% - 8px)" }}
+            >
+              <Input
+                value={user.address}
+                type="text"
+                name="address"
+                onChange={(e) => handleChange(e)}
+                placeholder={t(`address`)}
+              />
+            </Form.Item>
+
+            <Form.Item
+              label={t(`role`)}
+              rules={[{ required: true }]}
+              style={{
+                display: "inline-block",
+                width: "calc(50% - 8px)",
+                marginLeft: "10px",
+              }}
+            >
+              <Select
+                value={user.role}
+                style={{ width: 320 }}
+                onChange={handleChangeSelect}
+              >
+                {roles.map((r) => {
+                  return <Option value={r.id} key={r.id}>{r.name}</Option>;
+                })}
+              </Select>
             </Form.Item>
           </Form.Item>
         </Form>
@@ -250,4 +338,4 @@ function Project() {
   );
 }
 
-export default Project;
+export default Users;

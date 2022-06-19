@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Table,
   Button,
@@ -30,10 +30,11 @@ import { sumBy } from "lodash";
 import "./index.css";
 import MyDrawer from "./drawer";
 import { useTranslation, initReactI18next } from "react-i18next";
-
+import { UserContext } from "../../appContext";
 const { Option } = Select;
 
 function Calculate() {
+  const { user } = useContext(UserContext);
   const { t } = useTranslation();
 
   const expandedRowRender = ({ children }) => {
@@ -137,6 +138,7 @@ function Calculate() {
   };
 
   useEffect(() => {
+    console.log("user from context ", user);
     fetchDepartments();
   }, []);
 
@@ -301,20 +303,26 @@ function Calculate() {
       <br />
       <br />
       <Space>
-        <Button
-          loading={searchLoading}
-          onClick={showCalculationModal}
-          icon={<CalculatorOutlined />}
-        >
-          {t(`calculate`)}
-        </Button>
-        <Button
-          loading={excelLoading}
-          onClick={handleClickExport}
-          icon={<FileExcelOutlined />}
-        >
-          {t(`export`)}
-        </Button>
+        {!user.roles.analyst ? (
+          <>
+            <Button
+              loading={searchLoading}
+              onClick={showCalculationModal}
+              icon={<CalculatorOutlined />}
+            >
+              {t(`calculate`)}
+            </Button>
+            <Button
+              loading={excelLoading}
+              onClick={handleClickExport}
+              icon={<FileExcelOutlined />}
+            >
+              {t(`export`)}
+            </Button>
+          </>
+        ) : (
+          ""
+        )}
 
         <Modal
           // title="კალკულაცია"

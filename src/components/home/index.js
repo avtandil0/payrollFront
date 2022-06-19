@@ -23,13 +23,14 @@ import {
   StrikethroughOutlined,
   SettingOutlined,
   DiffOutlined,
+  UserAddOutlined,
   UsergroupAddOutlined,
   GlobalOutlined,
   UserOutlined,
   UnlockOutlined,
   LogoutOutlined,
   DashboardOutlined,
-  ImportOutlined
+  ImportOutlined,
 } from "@ant-design/icons";
 
 import Component from "../component/index";
@@ -44,6 +45,9 @@ import EmployeeDetails from "../employee/employeeDetails";
 import EmployeeByDepartment from "../department/employeeByDepartment";
 import Calculate from "../calculate";
 import Dashboard from "../dashboard";
+import Import from "../import";
+import Users from "../users";
+
 import { useTranslation } from "react-i18next";
 
 import {
@@ -55,13 +59,14 @@ import {
   useRouteMatch,
   useLocation,
 } from "react-router-dom";
-
+import axios from 'axios'
 import { useHistory } from "react-router-dom";
 import { HOME_PAGE } from "../../constant";
+import constants from '../../constant'
+
 import GE from "../../assets/logos/ge.png"; // with import
 import EN from "../../assets/logos/en.png"; // with import
 import RU from "../../assets/logos/ru.png"; // with import
-import Import from "../import";
 
 const { Header, Sider, Content } = LayoutAnt;
 
@@ -76,10 +81,15 @@ function Home() {
 
   const [collapsed, setCollapsed] = useState(false);
   const [activeUrl, setActiveUrl] = useState([]);
+  const [user, setUser] = useState({});
 
   const { t, i18n } = useTranslation();
 
   useEffect(() => {
+    let usString = localStorage.getItem("payrollAppUser");
+    let us = JSON.parse(usString);
+    setUser(us);
+
     if (location.pathname == "/payroll/component") {
       setActiveUrl(["1"]);
     }
@@ -114,6 +124,9 @@ function Home() {
     if (location.pathname == "/payroll/import") {
       setActiveUrl(["10"]);
     }
+    if (location.pathname == "/payroll/users") {
+      setActiveUrl(["11"]);
+    }
   }, []);
 
   const toggle = () => {
@@ -129,6 +142,17 @@ function Home() {
 
   const handleChange = ({ key }) => {
     i18n.changeLanguage(key);
+  };
+
+  const logOut = async () => {
+    let token = localStorage.getItem("payrollAppLogintoken");
+    axios.defaults.headers.common = {'Authorization': `Bearer ${token}`}
+    const result = await axios.post(constants.API_PREFIX+"/api/Account/logout")
+    console.log('resultresultresult',result)
+    localStorage.removeItem("payrollAppLogintoken");
+    localStorage.removeItem("payrollAppUser");
+    // history.push(`${HOME_PAGE}`); ???
+    window.location.reload();
   };
 
   const languageMenu = (
@@ -165,7 +189,7 @@ function Home() {
         </Space>
       </Menu.Item>
       <Menu.Divider />
-      <Menu.Item>
+      <Menu.Item onClick={logOut}>
         <Space>
           <LogoutOutlined />
           Log Out
@@ -228,7 +252,7 @@ function Home() {
           </Menu.Item> */}
           <Menu.Item
             key="3"
-            icon={<UsergroupAddOutlined />}
+            icon={<UserAddOutlined />}
             onClick={(e) => ClickGoPage(e, "employee")}
           >
             {t(`employee`)}
@@ -241,6 +265,18 @@ function Home() {
           >
             {t(`import`)}
           </Menu.Item>
+
+          {user?.roles?.admin ? (
+            <Menu.Item
+              key="11"
+              icon={<UsergroupAddOutlined />}
+              onClick={(e) => ClickGoPage(e, "users")}
+            >
+              {t(`users`)}
+            </Menu.Item>
+          ) : (
+            ""
+          )}
 
           <SubMenu key="sub1" title={t(`setting`)} icon={<SettingOutlined />}>
             <Menu.Item
@@ -309,12 +345,12 @@ function Home() {
                   <div style={{ cursor: "pointer" }}>
                     <Space>
                       <Avatar size={32} icon={<UserOutlined />} />
-                      <span>Avtandil</span>
+                      <span>{user.firstName}</span>
                     </Space>
                   </div>
                 </Dropdown>
               </div>
-              <div style={{marginTop: 5, marginLeft: 15}}>
+              <div style={{ marginTop: 5, marginLeft: 15 }}>
                 {" "}
                 <Dropdown overlay={languageMenu}>
                   <div onClick={(e) => e.preventDefault()}>
@@ -388,6 +424,9 @@ function Home() {
             </Route>
             <Route path={`${HOME_PAGE}/import`}>
               <Import />
+            </Route>
+            <Route path={`${HOME_PAGE}/users`}>
+              <Users />
             </Route>
           </Switch>
         </Content>

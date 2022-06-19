@@ -1,55 +1,57 @@
-import React, { useState } from 'react';
-import { Table, Divider, Modal, Button, Form, Input, Select } from 'antd';
+import React, { useState, useContext } from "react";
+import { Table, Divider, Modal, Button, Form, Input, Select } from "antd";
 
-import 'antd/dist/antd.css';
-import { PlusCircleOutlined } from '@ant-design/icons';
+import "antd/dist/antd.css";
+import { PlusCircleOutlined } from "@ant-design/icons";
+import { UserContext } from "../../appContext";
 
 const { Option } = Select;
 
 const columns = [
   {
-    title: 'id',
-    dataIndex: 'id',
+    title: "id",
+    dataIndex: "id",
   },
   {
-    title: 'კოდი',
-    dataIndex: 'name',
-    render: text => <a>{text}</a>,
+    title: "კოდი",
+    dataIndex: "name",
+    render: (text) => <a>{text}</a>,
   },
   {
-    title: 'აღწერა',
-    dataIndex: 'project',
+    title: "აღწერა",
+    dataIndex: "project",
   },
   {
-    title: 'ტიპი',
-    dataIndex: 'coefficient',
+    title: "ტიპი",
+    dataIndex: "coefficient",
   },
 ];
 
 function AccountPlan() {
-  const [saveDepartmentName, setSaveDepartmentName] = useState('');
+  const { user } = useContext(UserContext);
+
+  const [saveDepartmentName, setSaveDepartmentName] = useState("");
   const [description, setDescription] = useState("");
   const [dataSaveArray, setDataSaveArray] = useState([
     {
-      key: '1',
+      key: "1",
       id: 1,
-      name: 'ავანსი',
+      name: "ავანსი",
       project: 32,
-      dateStart: '20/02/20',
-      dateEnd: '20/02/21',
+      dateStart: "20/02/20",
+      dateEnd: "20/02/21",
       coefficient: 100,
     },
     {
-      key: '2',
+      key: "2",
       id: 2,
-      name: 'ხელფასი',
+      name: "ხელფასი",
       project: 42,
-      dateStart: '20/02/20',
-      dateEnd: '20/02/21',
+      dateStart: "20/02/20",
+      dateEnd: "20/02/21",
       coefficient: 200,
     },
   ]);
-
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -61,7 +63,7 @@ function AccountPlan() {
 
   const handleOk = () => {
     setIsModalVisible(false);
-    console.log(saveDepartmentName, ' ', dataSaveArray);
+    console.log(saveDepartmentName, " ", dataSaveArray);
     var newDepartment = {
       key: dataSaveArray.length + 1,
       id: dataSaveArray.length + 1,
@@ -73,7 +75,7 @@ function AccountPlan() {
     };
     var c = [...dataSaveArray, newDepartment];
     setDataSaveArray([...dataSaveArray, newDepartment]);
-    console.log('ccc', c);
+    console.log("ccc", c);
   };
 
   const handleCancel = () => {
@@ -81,13 +83,12 @@ function AccountPlan() {
   };
 
   function inputChange(e) {
-    console.log('inputChange', e.target.value);
+    console.log("inputChange", e.target.value);
     setSaveDepartmentName(e.target.value);
   }
 
-
   function inputDescription(e) {
-    console.log('inputDescription', e.target.value);
+    console.log("inputDescription", e.target.value);
     setDescription(e.target.value);
   }
 
@@ -96,34 +97,42 @@ function AccountPlan() {
   }
   return (
     <div>
-      <Button type="primary" onClick={showModal} icon={<PlusCircleOutlined />}>
-        დამატება
-      </Button>
+      {!user.roles.analyst ? (
+        <Button
+          type="primary"
+          onClick={showModal}
+          icon={<PlusCircleOutlined />}
+        >
+          დამატება
+        </Button>
+      ) : (
+        ""
+      )}
+
       <Modal
         title="ანგარიშთა გეგმის ანგარიში"
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
-      // width={1000}
+        // width={1000}
       >
         <Form>
           <Form.Item style={{ marginBottom: 0 }}>
-            <Form.Item onChange={e => inputChange(e)}
+            <Form.Item
+              onChange={(e) => inputChange(e)}
               label="კოდი"
               rules={[{ required: true }]}
-              style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}
+              style={{ display: "inline-block", width: "calc(50% - 8px)" }}
             >
               <Input placeholder="კოდი" />
-
-
             </Form.Item>
 
             <Form.Item
               label="ტიპი"
               style={{
-                display: 'inline-block',
-                width: 'calc(50% - 8px)',
-                margin: '-20 8px',
+                display: "inline-block",
+                width: "calc(50% - 8px)",
+                margin: "-20 8px",
               }}
             >
               <Select
@@ -131,9 +140,9 @@ function AccountPlan() {
                 style={{ width: 120 }}
                 onChange={handleChange}
                 style={{
-                  display: 'inline-block',
-                  width: 'calc(50% - 8px)',
-                  margin: '-20 8px',
+                  display: "inline-block",
+                  width: "calc(50% - 8px)",
+                  margin: "-20 8px",
                 }}
               >
                 <Option value="asi">საბალანსო</Option>
@@ -143,10 +152,8 @@ function AccountPlan() {
             </Form.Item>
           </Form.Item>
 
-
-
           <Form.Item style={{ marginBottom: 0 }}>
-            {/* <Form.Item 
+            {/* <Form.Item
               label="აღწერა"
               rules={[{ required: true }]}
               style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}
@@ -154,10 +161,12 @@ function AccountPlan() {
               <Input placeholder="აღწერა" />
             </Form.Item> */}
 
-            <TextArea placeholder="აღწერა..." onChange={e => inputDescription(e)} rows={4} />
+            <TextArea
+              placeholder="აღწერა..."
+              onChange={(e) => inputDescription(e)}
+              rows={4}
+            />
           </Form.Item>
-
-
         </Form>
       </Modal>
 

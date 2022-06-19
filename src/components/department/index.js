@@ -1,34 +1,46 @@
-import React, { useState, useEffect } from 'react';
-import moment from 'moment';
+import React, { useState, useEffect, useContext } from "react";
+import moment from "moment";
 
-import 'antd/dist/antd.css';
-import { Modal, Button, Form, Input, Table, Divider, Popconfirm, message, Space, Tooltip } from 'antd';
-import { PlusCircleOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import axios from "axios";
-import constants from '../../constant'
+import "antd/dist/antd.css";
 import {
-  Link
-} from "react-router-dom"
+  Modal,
+  Button,
+  Form,
+  Input,
+  Table,
+  Divider,
+  Popconfirm,
+  message,
+  Space,
+  Tooltip,
+} from "antd";
+import {
+  PlusCircleOutlined,
+  DeleteOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
+import axios from "axios";
+import constants from "../../constant";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-
+import { UserContext } from "../../appContext";
 
 function Department() {
   // const {globalDepartments} = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
   const { t } = useTranslation();
 
-
   const [department, setDepartment] = useState({
-    name: ""
+    name: "",
   });
   const [isEdiT, setIsEdiT] = useState(false);
-
 
   const columns = [
     {
       title: t(`actions`),
-      dataIndex: 'actions',
-      render: (text, record) =>
+      dataIndex: "actions",
+      render: (text, record) => (
         <div>
           <Space>
             <Popconfirm
@@ -43,10 +55,15 @@ function Department() {
             </Popconfirm>
 
             <Tooltip placement="bottom" title="რედაქტირება">
-              <Button onClick={() => clickEdit(record)} type="primary" icon={<EditOutlined />} />
+              <Button
+                onClick={() => clickEdit(record)}
+                type="primary"
+                icon={<EditOutlined />}
+              />
             </Tooltip>
           </Space>
         </div>
+      ),
     },
     // {
     //   title: 'id',
@@ -54,21 +71,21 @@ function Department() {
     // },
     {
       title: t(`placeholderFirstName`),
-      dataIndex: 'name',
+      dataIndex: "name",
     },
     {
       title: t(`quantity`),
-      dataIndex: 'employeeCount',
-      render: (text, record) =><Link to={`EmployeeByDepartment/${record.id}`}>{text}</Link>
+      dataIndex: "employeeCount",
+      render: (text, record) => (
+        <Link to={`EmployeeByDepartment/${record.id}`}>{text}</Link>
+      ),
     },
     {
       title: t(`dateOfCreation`),
-      dataIndex: 'dateCreated',
-      render: text => <p>{moment(text).format('YYYY-MM-DD')}</p>,
+      dataIndex: "dateCreated",
+      render: (text) => <p>{moment(text).format("YYYY-MM-DD")}</p>,
     },
   ];
-
-
 
   const [dataSaveArray, setDataSaveArray] = useState([]);
 
@@ -76,103 +93,109 @@ function Department() {
   const [tableLoading, setTableLoading] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
 
-
   const fetchData = async () => {
     setTableLoading(true);
-    const result = await axios(constants.API_PREFIX+"/api/Department");
+    const result = await axios(constants.API_PREFIX + "/api/Department");
     console.log("resultDepartment", result);
-    setDataSaveArray(result.data)
+    setDataSaveArray(result.data);
     setTableLoading(false);
-  }
+  };
 
   useEffect(() => {
     fetchData();
     // console.log("globalDepartments", globalDepartments)
   }, []);
 
-
-
-
   const showModal = () => {
     setIsModalVisible(true);
   };
-  console.log('showModal', !isEdiT)
+  console.log("showModal", !isEdiT);
 
   const handleOk = async () => {
     setIsEdiT(false);
     setIsModalVisible(false);
     console.log("resultPost1", department);
     if (!isEdiT) {
-      const result = await axios.post(constants.API_PREFIX+"/api/Department", department);
+      const result = await axios.post(
+        constants.API_PREFIX + "/api/Department",
+        department
+      );
       console.log("resultPost", result);
       if (result.data.isSuccess) {
         fetchData();
         message.success(result.data.message);
-      }
-      else {
+      } else {
         message.error(result.data.message);
       }
-    }
-    else {
-
-      const result1 = await axios.put(constants.API_PREFIX+"/api/Department", department);
+    } else {
+      const result1 = await axios.put(
+        constants.API_PREFIX + "/api/Department",
+        department
+      );
       console.log("result", result1);
       if (result1.data.isSuccess) {
         fetchData();
         message.success(result1.data.message);
-      }
-      else {
+      } else {
         message.error(result1.data.message);
       }
     }
     setDepartment({
-      name: ""
-    })
-
+      name: "",
+    });
   };
 
   const handleCancel = () => {
     setIsEdiT(false);
     setIsModalVisible(false);
     setDepartment({
-      name: ""
-    })
+      name: "",
+    });
   };
 
   const handleChange = (e) => {
-    console.log('handleChange', e.target.name, department);
+    console.log("handleChange", e.target.name, department);
     setDepartment({ ...department, [e.target.name]: e.target.value });
-  }
-  
+  };
+
   const confirm = async (record) => {
-    console.log("record", record)
-    const result = await axios.delete(constants.API_PREFIX+"/api/Department", { data: record });
-    console.log('result', result)
+    console.log("record", record);
+    const result = await axios.delete(
+      constants.API_PREFIX + "/api/Department",
+      { data: record }
+    );
+    console.log("result", result);
     if (result.data.isSuccess) {
       message.success(result.data.message);
       fetchData();
-    }
-    else {
+    } else {
       message.error(result.data.message);
     }
-  }
+  };
 
   const clickEdit = (record) => {
     setIsEdiT(true);
-    console.log("clickEdit", record)
+    console.log("clickEdit", record);
     setDepartment(record);
     setIsModalVisible(true);
-
-  }
-
+  };
 
   return (
     <div>
       {/* <h2>{`department ${globalDepartments} again!`}</h2> */}
 
-      <Button type="primary" onClick={showModal} icon={<PlusCircleOutlined />}>
-      {t(`add`)}
-      </Button>
+      {!user.roles.analyst ? (
+        <Button
+          type="primary"
+          onClick={showModal}
+          icon={<PlusCircleOutlined />}
+        >
+          {t(`add`)}
+        </Button>
+      ) : (
+        ""
+      )}
+
       <Modal
         loading={buttonLoading}
         okText={!isEdiT ? "დამატება" : "შენახვა"}
@@ -188,11 +211,16 @@ function Department() {
             rules={[
               {
                 required: true,
-                message: 'Please input your username!',
+                message: "Please input your username!",
               },
             ]}
           >
-            <Input value={department.name} type="text" name="name" onChange={(e) => handleChange(e)} />
+            <Input
+              value={department.name}
+              type="text"
+              name="name"
+              onChange={(e) => handleChange(e)}
+            />
           </Form.Item>
         </Form>
       </Modal>
