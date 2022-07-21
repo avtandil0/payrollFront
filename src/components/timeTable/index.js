@@ -14,6 +14,7 @@ import {
   Space,
   Popconfirm,
   Tooltip,
+  Card,
 } from "antd";
 import {
   PlusCircleOutlined,
@@ -24,7 +25,10 @@ import axios from "axios";
 import constants from "../../constant";
 import { useTranslation } from "react-i18next";
 import { UserContext } from "../../appContext";
-import './index.css'
+import "./index.css";
+import { MONTHS, WEEKDAYS } from "../../constant";
+import Meta from "antd/lib/card/Meta";
+import TextArea from "antd/lib/input/TextArea";
 const { Option } = Select;
 
 const getDays = (year, month) => {
@@ -34,68 +38,141 @@ const getDays = (year, month) => {
 function TimeTable() {
   const { user } = useContext(UserContext);
 
-  const [month, setMonth] = useState([{
-    name: 'Jan',
-    index: 1,
-    days: getDays(2022, 1)
-  }, {
-    name: 'Feb',
-    index: 2,
-    days: getDays(2022, 2)
-  }, {
-    name: 'Marth',
-    index: 3,
-    days: getDays(2022, 3)
-  }, {
-    name: 'Apr',
-    index: 4,
-    days: getDays(2022, 4)
-  }])
+  const [year, setYear] = useState(2022);
+  const [months, setMonths] = useState([
+    ...MONTHS.map((r) => {
+      return { name: r.text, index: r.value, days: getDays(year, r.value) };
+    }),
+  ]);
+
+  const [years, setYears] = useState([2018, 2019, 2020, 2021, 2022]);
+  const [selectedDate, setSelectedDate] = useState({
+    name: "788",
+    day: 1,
+    month: 1,
+    year: 1990,
+  });
+
+  const selectedDateText = () => {
+    let weekDay = new Date(
+      `${selectedDate.year}-${selectedDate.month}-${selectedDate.day}`
+    ).getDay();
+    console.log("WEEKDAYSWEEKDAYS", weekDay, WEEKDAYS);
+    let weekDayText = WEEKDAYS.find((r) => r.value + 1 === weekDay).text;
+    return `${selectedDate.day}-${selectedDate.month}-${selectedDate.year} -- ${weekDayText}`;
+  };
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
   const { t } = useTranslation();
 
+  useEffect(() => {}, []);
 
-  useEffect(() => {
+  const selectDay = (d, m) => {
+    setSelectedDate({
+      name: d,
+      day: d,
+      month: m,
+      year: year,
+    });
+    showModal();
+  };
 
-
-  }, []);
-
-  const tbody = (numrows) => {
-    console.log('number', numrows)
-    let arr = []
-    for (let i = 1; i <= numrows; i++) {
-      arr.push(i)
+  const tbody = (data) => {
+    let arr = [];
+    for (let i = 1; i <= data.days; i++) {
+      arr.push(i);
     }
-    console.log('arr', arr)
-    arr.map(r => <td>{r}</td>)
-  }
+    return arr.map((r) => (
+      <td>
+        {" "}
+        <div
+          style={{ cursor: "pointer" }}
+          onClick={() => selectDay(r, data.index)}
+        >
+          {r}
+        </div>
+        {/* <Card hoverable >
+          <Meta title={r} description={r} />
+          {r}
+        </Card> */}
+      </td>
+    ));
+  };
 
-  const numbers = [1, 2, 3, 4, 5];
-  const listItems = numbers.map((number) =>
-    <li>{number}</li>
-  );
+  const handleChange = (value) => {
+    console.log(`selected ${value}`);
+  };
+
+  const renderTable = (y) => {
+    return MONTHS.map((r) => {
+      return { name: r.text, index: r.value, days: getDays(y, r.value) };
+    });
+  };
+
+  const handleChangeYear = (value) => {
+    console.log(`selected ${value}`);
+    setYear(value);
+    let data = renderTable(value);
+    setMonths(data);
+  };
+
   return (
     <div>
-      <h2>HTML Table</h2>
+      <Modal
+        title={selectedDateText()}
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        <div style={{ display: "flex", gap: 20, marginBottom: 15 }}>
+          <Input placeholder="Basic usage" />
+          <Input placeholder="Basic usage" />
+        </div>
 
-      {month.map(r =>  <tr>
-        <ul>{listItems}</ul>
+        <TextArea
+          placeholder="Controlled autosize"
+          autoSize={{ minRows: 3, maxRows: 5 }}
+        />
+      </Modal>
 
-          </tr>
-        )}
-      
+      <h2>Time Table</h2>
 
+      <Select style={{ width: 120 }} onChange={handleChangeYear} value={year}>
+        {years?.map((r) => (
+          <Option value={r}>{r}</Option>
+        ))}
+      </Select>
+      <Select style={{ width: 120, marginLeft: 20 }} onChange={handleChange}>
+        {MONTHS?.map((r) => (
+          <Option value={r.value}>{r.text}</Option>
+        ))}
+      </Select>
+      <br />
+      <br />
+
+      <br />
       <table>
         <tr>
           <th>Month</th>
         </tr>
-        {month.map(r =>  <tr>
+        {months.map((r) => (
+          <tr>
             <td>{r.name}</td>
-            {tbody(r.days)}
-
-
+            {tbody(r)}
           </tr>
-        )}
-
+        ))}
       </table>
     </div>
   );
