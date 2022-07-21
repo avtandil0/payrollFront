@@ -31,6 +31,7 @@ import {
   LogoutOutlined,
   DashboardOutlined,
   ImportOutlined,
+  CalendarOutlined
 } from "@ant-design/icons";
 
 import Component from "../component/index";
@@ -47,6 +48,7 @@ import Calculate from "../calculate";
 import Dashboard from "../dashboard";
 import Import from "../import";
 import Users from "../users";
+import TimeTable from "../timeTable";
 
 import { useTranslation } from "react-i18next";
 
@@ -126,6 +128,9 @@ function Home() {
     }
     if (location.pathname == "/payroll/users") {
       setActiveUrl(["11"]);
+    }
+    if (location.pathname == "/payroll/timeTable") {
+      setActiveUrl(["12"]);
     }
   }, []);
 
@@ -266,6 +271,14 @@ function Home() {
             {t(`import`)}
           </Menu.Item>
 
+          <Menu.Item
+            key="12"
+            icon={<CalendarOutlined />}
+            onClick={(e) => ClickGoPage(e, "timeTable")}
+          >
+            {t(`timeTable`)}
+          </Menu.Item>
+
           {user?.roles?.admin ? (
             <Menu.Item
               key="11"
@@ -345,7 +358,7 @@ function Home() {
                   <div style={{ cursor: "pointer" }}>
                     <Space>
                       <Avatar size={32} icon={<UserOutlined />} />
-                      <span>{user.firstName}</span>
+                      <span>{user?.firstName}</span>
                     </Space>
                   </div>
                 </Dropdown>
@@ -424,6 +437,9 @@ function Home() {
             </Route>
             <Route path={`${HOME_PAGE}/import`}>
               <Import />
+            </Route>
+            <Route path={`${HOME_PAGE}/timeTable`}>
+              <TimeTable />
             </Route>
             <Route path={`${HOME_PAGE}/users`}>
               <Users />
