@@ -17,7 +17,12 @@ import {
   CloseCircleOutlined,
   LoadingOutlined,
   PlusOutlined,
+  PicLeftOutlined,
+  FieldTimeOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
+import { Tabs } from "antd";
+
 import axios from "axios";
 import moment from "moment";
 import constants from "../../../constant";
@@ -28,6 +33,9 @@ import { useHistory } from "react-router-dom";
 import AddComponent from "./AddComponent";
 import { useTranslation } from "react-i18next";
 import { HOME_PAGE } from "../../../constant";
+import WorkingHours from './WorkingHours'
+
+const { TabPane } = Tabs;
 
 const { Option } = Select;
 
@@ -78,6 +86,10 @@ function EmployeeDetails() {
     console.log("result setSchemes---", result.data);
     setSchemes(result.data);
     // setTableLoading(false);
+  };
+
+  const onChange = (key) => {
+    console.log(key);
   };
 
   const fetchEmployeeGraceTypes = async () => {
@@ -338,7 +350,7 @@ function EmployeeDetails() {
   };
 
   async function getBase64(file) {
-    let f = await base64ToFile(file)
+    let f = await base64ToFile(file);
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(f);
@@ -365,36 +377,237 @@ function EmployeeDetails() {
             <Skeleton.Avatar active={true} size={150} shape={'square'} /> */}
 
       <div style={{ display: "flex" }}>
-        <div >
+        <div>
           <span>{t(`photo`)}</span>
-          <Upload
-            onPreview={handlePreview}
-            listType="picture-card"
-            fileList={selectedFileList}
-            // defaultFileList={[
-            //     {
-            //       uid: '1',
-            //       name: '123.png',
-            //       status: 'done',
-            //       response: 'Server Error 500', // custom error message to show
-            //       url: 'https://t3.ftcdn.net/jpg/02/09/37/00/360_F_209370065_JLXhrc5inEmGl52SyvSPeVB23hB6IjrR.jpg',
-            //     },
-            //   ]}
-            customRequest={({ file, onSuccess }) => {
-              setTimeout(() => {
-                onSuccess("ok");
-              }, 0);
-            }}
-            onChange={handleChangeAvatar}
-          >
-            {/* {imageUrl ? (
+          <div style={{ display: "flex", gap: 32 }}>
+            <div>
+              <Upload
+                onPreview={handlePreview}
+                listType="picture-card"
+                fileList={selectedFileList}
+                // defaultFileList={[
+                //     {
+                //       uid: '1',
+                //       name: '123.png',
+                //       status: 'done',
+                //       response: 'Server Error 500', // custom error message to show
+                //       url: 'https://t3.ftcdn.net/jpg/02/09/37/00/360_F_209370065_JLXhrc5inEmGl52SyvSPeVB23hB6IjrR.jpg',
+                //     },
+                //   ]}
+                customRequest={({ file, onSuccess }) => {
+                  setTimeout(() => {
+                    onSuccess("ok");
+                  }, 0);
+                }}
+                onChange={handleChangeAvatar}
+              >
+                {/* {imageUrl ? (
                     <img src={imageUrl} alt="avatar" style={{ width: "100%" }} />
                 ) : (
                     uploadButton
                 )} */}
 
-            {uploadButton}
-          </Upload>
+                {uploadButton}
+              </Upload>
+            </div>
+            <div>
+              <Tabs defaultActiveKey="1" onChange={onChange}>
+                <TabPane
+                  tab={
+                    <span>
+                      <UserOutlined />
+                      Personal
+                    </span>
+                  }
+                  key="1"
+                >
+                  <div style={{ marginLeft: 5, width: "100%" }}>
+                    <Form
+                      wrapperCol={{ span: 22 }}
+                      // name="product-form"
+                      // onFinish={handleSave}
+                      layout={"vertical"}
+                    >
+                      <Row>
+                        <Col span={8}>
+                          <Form.Item
+                            label={t(`placeholderFirstName`)}
+                            rules={requiredFieldRule}
+                          >
+                            <Input
+                              disabled={employee.resId != null}
+                              value={employee.firstName}
+                              name="firstName"
+                              onChange={(e) => handleChange(e)}
+                            />
+                          </Form.Item>
+                          <Form.Item label={t(`placeholderLastName`)}>
+                            <Input
+                              disabled={employee.resId != null}
+                              value={employee.lastName}
+                              name="lastName"
+                              onChange={(e) => handleChange(e)}
+                            />
+                          </Form.Item>
+                          <Form.Item label="ResId">
+                            <Input
+                              disabled
+                              value={employee.resId}
+                              name="resId"
+                              onChange={(e) => handleChange(e)}
+                            />
+                          </Form.Item>
+                          <Form.Item label="landIso">
+                            <Input
+                              disabled={employee.resId != null}
+                              value={employee.landIso}
+                              name="landIso"
+                              onChange={(e) => handleChange(e)}
+                            />
+                          </Form.Item>
+                          <Form.Item label={t(`employeeGraceGroup`)}>
+                            <Select
+                              disabled={employee.resId != null}
+                              defaultValue="აირჩიეთ"
+                              onChange={(value) =>
+                                handleChangeSelect(value, "employeeGraceTypeId")
+                              }
+                              value={employee.employeeGraceTypeId}
+                            >
+                              {employeeGraceTypes.map((i) => (
+                                <Option value={i.id}>{i.name}</Option>
+                              ))}
+                            </Select>
+                          </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                          <Form.Item label={t(`mobilePhone`)}>
+                            <Input
+                              disabled={employee.resId != null}
+                              value={employee.mobilePhone}
+                              name="mobilePhone"
+                              onChange={(e) => handleChange(e)}
+                            />
+                          </Form.Item>
+                          <Form.Item label={t(`email`)}>
+                            <Input
+                              disabled={employee.resId != null}
+                              value={employee.email}
+                              name="email"
+                              onChange={(e) => handleChange(e)}
+                            />
+                          </Form.Item>
+                          <Form.Item label={t(`personalNumber`)}>
+                            <Input
+                              disabled={employee.resId != null}
+                              value={employee.personalNumber}
+                              name="personalNumber"
+                              onChange={(e) => handleChange(e)}
+                            />
+                          </Form.Item>
+                          <Form.Item label={t(`departmentName`)}>
+                            <Select
+                              disabled={employee.resId != null}
+                              defaultValue="აირჩიეთ"
+                              onChange={(value) =>
+                                handleChangeSelect(value, "departmentId")
+                              }
+                              value={employee.departmentId}
+                            >
+                              {departments.map((i) => (
+                                <Option value={i.id}>{i.name}</Option>
+                              ))}
+                            </Select>
+                          </Form.Item>
+                          <Form.Item label={t(`graceAmount`)}>
+                            <Input
+                              disabled={employee.resId != null}
+                              type="number"
+                              value={employee.graceAmount}
+                              name="graceAmount"
+                              onChange={(e) => handleChange(e)}
+                            />
+                          </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                          <Form.Item label={t(`address`)}>
+                            <Input
+                              disabled={employee.resId != null}
+                              value={employee.address}
+                              name="address"
+                              onChange={(e) => handleChange(e)}
+                            />
+                          </Form.Item>
+                          <Form.Item label={t(`bankAccountNumber`)}>
+                            <Input
+                              disabled={employee.resId != null}
+                              value={employee.bankAccountNumber}
+                              name="bankAccountNumber"
+                              onChange={(e) => handleChange(e)}
+                            />
+                          </Form.Item>
+                          <Form.Item label={t(`scheme`)}>
+                            <Select
+                              disabled={employee.resId != null}
+                              defaultValue="აირჩიეთ"
+                              onChange={(value) =>
+                                handleChangeSelect(value, "schemeTypeId")
+                              }
+                              value={employee.schemeTypeId}
+                            >
+                              {schemes.map((i) => (
+                                <Option value={i.id}>{i.name}</Option>
+                              ))}
+                            </Select>
+                          </Form.Item>
+                          <Form.Item label={t(`position`)}>
+                            <Input
+                              disabled={employee.resId != null}
+                              value={employee.position}
+                              name="position"
+                              onChange={(e) => handleChange(e)}
+                            />
+                          </Form.Item>
+                          <Form.Item label={t(`remainingGraceAmount`)}>
+                            <Input
+                              disabled
+                              type="number"
+                              value={employee.remainingGraceAmount}
+                              name="remainingGraceAmount"
+                              onChange={(e) => handleChange(e)}
+                            />
+                          </Form.Item>
+                        </Col>
+                      </Row>
+                    </Form>
+                  </div>
+                </TabPane>
+                <TabPane
+                  tab={
+                    <span>
+                      <FieldTimeOutlined />
+                      TimeTable
+                    </span>
+                  }
+                  key="2"
+                >
+                 <WorkingHours />
+                </TabPane>
+                <TabPane
+                  tab={
+                    <span>
+                      <PicLeftOutlined />
+                      Other
+                    </span>
+                  }
+                  key="3"
+                >
+                  Content of Tab Pane 3
+                </TabPane>
+              </Tabs>
+            </div>
+          </div>
+
           <Form
             // name="product-form"
             // onFinish={handleSave}
@@ -415,167 +628,6 @@ function EmployeeDetails() {
                 ))}
               </Select>
             </Form.Item>
-          </Form>
-        </div>
-
-        <div style={{ marginLeft: 20, width: "100%" }}>
-          <Form
-            wrapperCol={{ span: 22 }}
-            // name="product-form"
-            // onFinish={handleSave}
-            layout={"vertical"}
-          >
-            <Row>
-              <Col span={8}>
-                <Form.Item
-                  label={t(`placeholderFirstName`)}
-                  rules={requiredFieldRule}
-                >
-                  <Input
-                    disabled={employee.resId != null}
-                    value={employee.firstName}
-                    name="firstName"
-                    onChange={(e) => handleChange(e)}
-                  />
-                </Form.Item>
-                <Form.Item label={t(`placeholderLastName`)}>
-                  <Input
-                    disabled={employee.resId != null}
-                    value={employee.lastName}
-                    name="lastName"
-                    onChange={(e) => handleChange(e)}
-                  />
-                </Form.Item>
-                <Form.Item label="ResId">
-                  <Input
-                    disabled
-                    value={employee.resId}
-                    name="resId"
-                    onChange={(e) => handleChange(e)}
-                  />
-                </Form.Item>
-                <Form.Item label="landIso">
-                  <Input
-                    disabled={employee.resId != null}
-                    value={employee.landIso}
-                    name="landIso"
-                    onChange={(e) => handleChange(e)}
-                  />
-                </Form.Item>
-                <Form.Item label={t(`employeeGraceGroup`)}>
-                  <Select
-                    disabled={employee.resId != null}
-                    defaultValue="აირჩიეთ"
-                    onChange={(value) =>
-                      handleChangeSelect(value, "employeeGraceTypeId")
-                    }
-                    value={employee.employeeGraceTypeId}
-                  >
-                    {employeeGraceTypes.map((i) => (
-                      <Option value={i.id}>{i.name}</Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item label={t(`mobilePhone`)}>
-                  <Input
-                    disabled={employee.resId != null}
-                    value={employee.mobilePhone}
-                    name="mobilePhone"
-                    onChange={(e) => handleChange(e)}
-                  />
-                </Form.Item>
-                <Form.Item label={t(`email`)}>
-                  <Input
-                    disabled={employee.resId != null}
-                    value={employee.email}
-                    name="email"
-                    onChange={(e) => handleChange(e)}
-                  />
-                </Form.Item>
-                <Form.Item label={t(`personalNumber`)}>
-                  <Input
-                    disabled={employee.resId != null}
-                    value={employee.personalNumber}
-                    name="personalNumber"
-                    onChange={(e) => handleChange(e)}
-                  />
-                </Form.Item>
-                <Form.Item label={t(`departmentName`)}>
-                  <Select
-                    disabled={employee.resId != null}
-                    defaultValue="აირჩიეთ"
-                    onChange={(value) =>
-                      handleChangeSelect(value, "departmentId")
-                    }
-                    value={employee.departmentId}
-                  >
-                    {departments.map((i) => (
-                      <Option value={i.id}>{i.name}</Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-                <Form.Item label={t(`graceAmount`)}>
-                  <Input
-                    disabled={employee.resId != null}
-                    type="number"
-                    value={employee.graceAmount}
-                    name="graceAmount"
-                    onChange={(e) => handleChange(e)}
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item label={t(`address`)}>
-                  <Input
-                    disabled={employee.resId != null}
-                    value={employee.address}
-                    name="address"
-                    onChange={(e) => handleChange(e)}
-                  />
-                </Form.Item>
-                <Form.Item label={t(`bankAccountNumber`)}>
-                  <Input
-                    disabled={employee.resId != null}
-                    value={employee.bankAccountNumber}
-                    name="bankAccountNumber"
-                    onChange={(e) => handleChange(e)}
-                  />
-                </Form.Item>
-                <Form.Item label={t(`scheme`)}>
-                  <Select
-                    disabled={employee.resId != null}
-                    defaultValue="აირჩიეთ"
-                    onChange={(value) =>
-                      handleChangeSelect(value, "schemeTypeId")
-                    }
-                    value={employee.schemeTypeId}
-                  >
-                    {schemes.map((i) => (
-                      <Option value={i.id}>{i.name}</Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-                <Form.Item label={t(`position`)}>
-                  <Input
-                    disabled={employee.resId != null}
-                    value={employee.position}
-                    name="position"
-                    onChange={(e) => handleChange(e)}
-                  />
-                </Form.Item>
-                <Form.Item label={t(`remainingGraceAmount`)}>
-                  <Input
-                    disabled
-                    type="number"
-                    value={employee.remainingGraceAmount}
-                    name="remainingGraceAmount"
-                    onChange={(e) => handleChange(e)}
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
           </Form>
         </div>
       </div>

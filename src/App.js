@@ -38,7 +38,7 @@ const oidcConfig1 = {
 };
 
 function App() {
-  const [isAuthorized, setIsAuthorized] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   const setCurrentUser = async () => {
     let user = localStorage.getItem("payrollAppUser");
@@ -55,7 +55,7 @@ function App() {
   useEffect(() => {
     let token = localStorage.getItem("payrollAppLogintoken");
     if (token) {
-      // setCurrentUser();
+      setCurrentUser();
       setIsAuthorized(true);
     }
   }, []);

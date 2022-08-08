@@ -22,22 +22,20 @@ import {
   EditOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
-import constants from "../../constant";
 import { useTranslation } from "react-i18next";
-import { UserContext } from "../../appContext";
 import "./index.css";
-import { MONTHS, WEEKDAYS } from "../../constant";
+import { MONTHS, WEEKDAYS } from "../../../constant";
 import Meta from "antd/lib/card/Meta";
 import TextArea from "antd/lib/input/TextArea";
+import { TimePicker } from "antd";
+
 const { Option } = Select;
 
 const getDays = (year, month) => {
   return new Date(year, month, 0).getDate();
 };
 
-function TimeTable() {
-  const { user } = useContext(UserContext);
-
+function WorkingHours() {
   const [year, setYear] = useState(2022);
   const [months, setMonths] = useState([
     ...MONTHS.map((r) => {
@@ -90,12 +88,13 @@ function TimeTable() {
   };
 
   const tbody = (data) => {
+    console.log("dataaa", data);
     let arr = [];
     for (let i = 1; i <= data.days; i++) {
       arr.push(i);
     }
     return arr.map((r) => (
-      <td style={{border: '1px solid #dddddd', padding: 8}}>
+      <td>
         {" "}
         <div
           style={{ cursor: "pointer" }}
@@ -130,47 +129,23 @@ function TimeTable() {
 
   return (
     <div>
-      <Modal
-        title={selectedDateText()}
-        visible={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
-        <div style={{ display: "flex", gap: 20, marginBottom: 15 }}>
-          <Input placeholder="Basic usage" />
-          <Input placeholder="Basic usage" />
-        </div>
-
-        <TextArea
-          placeholder="Controlled autosize"
-          autoSize={{ minRows: 3, maxRows: 5 }}
-        />
-      </Modal>
-
-      <h2>Time Table</h2>
-
-      <Select style={{ width: 120 }} onChange={handleChangeYear} value={year}>
-        {years?.map((r) => (
-          <Option value={r}>{r}</Option>
-        ))}
-      </Select>
-      <Select style={{ width: 120, marginLeft: 20 }} onChange={handleChange}>
-        {MONTHS?.map((r) => (
-          <Option value={r.value}>{r.text}</Option>
-        ))}
-      </Select>
-      <br />
-      <br />
-
-      <br />
+      <h2>Working Hours</h2>
       <table className="timeTable">
         <tr>
-          <th>Month</th>
+          <th></th>
+          <th>working time</th>
+          <th>break time</th>
         </tr>
-        {months.map((r) => (
+        {WEEKDAYS.map((r) => (
           <tr>
-            <td style={{border: '1px solid #dddddd', padding: 8}}>{r.name}</td>
-            {tbody(r)}
+            <td  width={150}>{r.text}</td>
+            <td width={300}>
+              <TimePicker.RangePicker format={'HH:mm'} />
+            </td>
+            <td width={300}>
+              <TimePicker.RangePicker format={'HH:mm'}/>
+            </td>
+            {/* {tbody(r)} */}
           </tr>
         ))}
       </table>
@@ -178,4 +153,4 @@ function TimeTable() {
   );
 }
 
-export default TimeTable;
+export default WorkingHours;

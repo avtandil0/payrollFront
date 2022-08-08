@@ -79,7 +79,7 @@ function Table({data}) {
 
       <br />
       <br />
-      <table>
+      <table className="timeTable">
         <tr>
           <th>Month</th>
         </tr>
@@ -92,7 +92,7 @@ function Table({data}) {
       </table>
 
       <br />
-      <table>
+      <table className="timeTable">
         <tr>
           <th>Month</th>
         </tr>
