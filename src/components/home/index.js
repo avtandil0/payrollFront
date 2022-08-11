@@ -31,7 +31,8 @@ import {
   LogoutOutlined,
   DashboardOutlined,
   ImportOutlined,
-  CalendarOutlined
+  CalendarOutlined,
+  FieldTimeOutlined
 } from "@ant-design/icons";
 
 import Component from "../component/index";
@@ -49,6 +50,7 @@ import Dashboard from "../dashboard";
 import Import from "../import";
 import Users from "../users";
 import TimeTable from "../timeTable";
+import DayTable from '../dayTable'
 
 import { useTranslation } from "react-i18next";
 
@@ -271,13 +273,24 @@ function Home() {
             {t(`import`)}
           </Menu.Item>
 
-          <Menu.Item
-            key="12"
-            icon={<CalendarOutlined />}
-            onClick={(e) => ClickGoPage(e, "timeTable")}
-          >
-            {t(`timeTable`)}
-          </Menu.Item>
+
+           <SubMenu key="sub2" title={t(`timeKeeping`)} icon={<CalendarOutlined />}>
+            <Menu.Item
+              key="14"
+              icon={<CalendarOutlined />}
+              onClick={(e) => ClickGoPage(e, "timeTable")}
+            >
+               {t(`timeTable`)}
+            </Menu.Item>
+            <Menu.Item
+              key="15"
+              icon={<FieldTimeOutlined />}
+              onClick={(e) => ClickGoPage(e, "dayTable")}
+            >
+              {t(`dayTable`)}
+            </Menu.Item>
+
+          </SubMenu>
 
           {user?.roles?.admin ? (
             <Menu.Item
@@ -440,6 +453,9 @@ function Home() {
             </Route>
             <Route path={`${HOME_PAGE}/timeTable`}>
               <TimeTable />
+            </Route>
+            <Route path={`${HOME_PAGE}/dayTable`}>
+              <DayTable />
             </Route>
             <Route path={`${HOME_PAGE}/users`}>
               <Users />

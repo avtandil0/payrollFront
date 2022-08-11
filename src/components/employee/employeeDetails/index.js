@@ -33,7 +33,7 @@ import { useHistory } from "react-router-dom";
 import AddComponent from "./AddComponent";
 import { useTranslation } from "react-i18next";
 import { HOME_PAGE } from "../../../constant";
-import WorkingHours from './WorkingHours'
+import WorkingHours from "./WorkingHours";
 
 const { TabPane } = Tabs;
 
@@ -591,7 +591,15 @@ function EmployeeDetails() {
                   }
                   key="2"
                 >
-                 <WorkingHours />
+                  <span style={{fontSize:20}}>choose schema</span>
+                  <Select
+                    style={{ width: 520, marginLeft: 50}}
+                  >
+                    <Option value="jack">schema1</Option>
+                    <Option value="lucy">schema2</Option>
+                    <Option value="Yiminghe">schema3</Option>
+                  </Select>
+                  <WorkingHours />
                 </TabPane>
                 <TabPane
                   tab={

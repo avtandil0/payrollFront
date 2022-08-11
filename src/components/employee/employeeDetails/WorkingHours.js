@@ -129,7 +129,7 @@ function WorkingHours() {
 
   return (
     <div>
-      <h2>Working Hours</h2>
+      {/* <h2>Working Hours</h2> */}
       <table className="timeTable">
         <tr>
           <th></th>
