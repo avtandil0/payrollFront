@@ -5,81 +5,81 @@ export const HOME_PAGE = "/payroll";
 export const WEEKDAYS = [
   {
     text: "Monday",
-    value: 0,
-  },
-  {
-    text: "Tuesday",
     value: 1,
   },
   {
-    text: "Wednesday",
+    text: "Tuesday",
     value: 2,
   },
   {
-    text: "Thursday",
+    text: "Wednesday",
     value: 3,
   },
   {
-    text: "Friday",
+    text: "Thursday",
     value: 4,
   },
   {
-    text: "Saturday",
+    text: "Friday",
     value: 5,
   },
   {
-    text: "Sunday",
+    text: "Saturday",
     value: 6,
+  },
+  {
+    text: "Sunday",
+    value: 0,
   },
 ];
 export const MONTHS = [
   {
     text: "January",
-    value: 1,
+    value: 0,
   },
   {
     text: "February",
-    value: 2,
+    value: 1,
   },
   {
     text: "March",
-    value: 3,
+    value: 2,
   },
   {
     text: "April",
-    value: 4,
+    value: 3,
   },
   {
     text: "May",
-    value: 5,
+    value: 4,
   },
   {
     text: "June",
-    value: 6,
+    value: 5,
   },
   {
     text: "July",
-    value: 7,
+    value: 6,
   },
   {
     text: "August",
-    value: 8,
+    value: 7,
   },
   {
     text: "September",
-    value: 9,
+    value: 8,
   },
   {
     text: "October",
-    value: 10,
+    value: 9,
   },
   {
     text: "November",
-    value: 11,
+    value: 10,
   },
   {
     text: "December",
-    value: 12,
+    value: 11,
   },
 ];
 

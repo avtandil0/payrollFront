@@ -15,6 +15,9 @@ import {
   Popconfirm,
   Tooltip,
   Card,
+  TimePicker,
+  Dropdown,
+  Menu
 } from "antd";
 import {
   PlusCircleOutlined,
@@ -35,13 +38,15 @@ const getDays = (year, month) => {
   return new Date(year, month, 0).getDate();
 };
 
+const format = "HH:mm";
+
 function TimeTable() {
   const { user } = useContext(UserContext);
 
   const [year, setYear] = useState(2022);
   const [months, setMonths] = useState([
-    ...MONTHS.map((r) => {
-      return { name: r.text, index: r.value, days: getDays(year, r.value) };
+    ...MONTHS.map((r, i) => {
+      return { name: r.text, index: i, days: getDays(year, r.value) };
     }),
   ]);
 
@@ -55,11 +60,16 @@ function TimeTable() {
 
   const selectedDateText = () => {
     let weekDay = new Date(
-      `${selectedDate.year}-${selectedDate.month}-${selectedDate.day}`
+      // `${selectedDate.year}-${selectedDate.month}-${selectedDate.day}`
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day
     ).getDay();
-    console.log("WEEKDAYSWEEKDAYS", weekDay, WEEKDAYS);
-    let weekDayText = WEEKDAYS.find((r) => r.value + 1 === weekDay).text;
-    return `${selectedDate.day}-${selectedDate.month}-${selectedDate.year} -- ${weekDayText}`;
+    console.log("WEEKDAYSWEEKDAYS", selectedDate, weekDay, WEEKDAYS);
+    let weekDayText = WEEKDAYS.find((r, i) => r.value === weekDay).text;
+    return `${selectedDate.day}-${selectedDate.month + 1}-${
+      selectedDate.year
+    } -- ${weekDayText}`;
   };
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -89,20 +99,47 @@ function TimeTable() {
     showModal();
   };
 
+  const getDayColor = (data, r) => {
+    let day = new Date(year, data.index, r);
+    if (day.getDay() == 0 || day.getDay() == 6) {
+      return "#ccc";
+    }
+    return "";
+  };
+
+  const menu = (
+    <Menu
+      items={[
+        {
+          label: "copy",
+          key: "1",
+        },
+        {
+          label: "paste",
+          key: "2",
+        },
+      ]}
+    />
+  );
+
   const tbody = (data) => {
     let arr = [];
     for (let i = 1; i <= data.days; i++) {
       arr.push(i);
     }
     return arr.map((r) => (
-      <td style={{border: '1px solid #dddddd', padding: 8}}>
+      <td style={{ border: "1px solid #dddddd", padding: 6 }}>
         {" "}
+
+        <Dropdown overlay={menu} trigger={["contextMenu"]}>
         <div
-          style={{ cursor: "pointer" }}
+          style={{ cursor: "pointer", backgroundColor: getDayColor(data, r) }}
           onClick={() => selectDay(r, data.index)}
         >
           {r}
         </div>
+        </Dropdown>
+
         {/* <Card hoverable >
           <Meta title={r} description={r} />
           {r}
@@ -116,8 +153,8 @@ function TimeTable() {
   };
 
   const renderTable = (y) => {
-    return MONTHS.map((r) => {
-      return { name: r.text, index: r.value, days: getDays(y, r.value) };
+    return MONTHS.map((r, i) => {
+      return { name: r.text, index: i, days: getDays(y, i) };
     });
   };
 
@@ -130,21 +167,23 @@ function TimeTable() {
 
   return (
     <div>
+
       <Modal
         title={selectedDateText()}
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
+        width={400}
       >
-        <div style={{ display: "flex", gap: 20, marginBottom: 15 }}>
-          <Input placeholder="Basic usage" />
-          <Input placeholder="Basic usage" />
-        </div>
-
-        <TextArea
-          placeholder="Controlled autosize"
-          autoSize={{ minRows: 3, maxRows: 5 }}
-        />
+        {[1, 2, 3, 4, 5, 6, 7, 8].map((r) => {
+          return (
+            <div style={{ display: "flex", gap: 10, marginBottom: 5 }}>
+              <span>{r}.</span>
+              <TimePicker format={format} />
+              <TimePicker format={format} />
+            </div>
+          );
+        })}
       </Modal>
 
       <h2>Time Table</h2>
@@ -169,7 +208,9 @@ function TimeTable() {
         </tr>
         {months.map((r) => (
           <tr>
-            <td style={{border: '1px solid #dddddd', padding: 8}}>{r.name}</td>
+            <td style={{ border: "1px solid #dddddd", padding: 8 }}>
+              {r.name}
+            </td>
             {tbody(r)}
           </tr>
         ))}
