@@ -156,29 +156,28 @@ function TimeTable() {
 
   const copyDayData = (e, r, monthIndex) => {
     console.log("copyD",  sheets[`${monthIndex + 1}/${r}/${year}`]);
+    setCopedData(sheets[`${monthIndex + 1}/${r}/${year}`])
 
   };
 
-  const pasteDayData = async (e,r,d) => {
-    console.log(r,d)
+  const pasteDayData = async (e,d,m) => {
+    console.log(d,m+1, year)
+    console.log('coped data',copedData)
 
-    // let postData = sheets?.map((r) => {
-    //   return {
-    //     id: r.id,
-    //     date: `${selectedDate.year}-${selectedDate.month + 1}-${
-    //       selectedDate.day
-    //     }`,
-    //     startTime: r.startTime.format(format),
-    //     endTime: r.endTime.format(format),
-    //   };
-    // });
+    let postData = copedData?.map((r) => {
+      return {
+        date: `${year}-${m + 1}-${d}`,
+        startTime: r.startTime,
+        endTime: r.endTime,
+      };
+    });
 
-    // console.log("postDatapostData,postData", postData);
+    console.log("postDatapostData,postData", postData);
 
-    // const result = await axios.post(
-    //   constants.API_PREFIX + "/api/TimeTable",
-    //   postData
-    // );
+    const result = await axios.post(
+      constants.API_PREFIX + "/api/TimeTable",
+      postData
+    );
 
     getSheets();
   }
