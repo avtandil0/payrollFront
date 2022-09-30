@@ -18,8 +18,8 @@ import {
 } from "antd";
 import {
   PlusCircleOutlined,
-  DeleteOutlined,
-  EditOutlined,
+  PlusOutlined,
+  MinusCircleOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
@@ -127,6 +127,12 @@ function WorkingHours() {
     setMonths(data);
   };
 
+  const onFinish = async ({ sheets }) => {
+    console.log("Received values of form:", sheets);
+    // setSheets(values.sheets);
+  };
+  const format = "HH:mm";
+
   return (
     <div>
       {/* <h2>Working Hours</h2> */}
@@ -145,10 +151,33 @@ function WorkingHours() {
             <td width={300}>
               <TimePicker.RangePicker format={'HH:mm'}/>
             </td>
-            {/* {tbody(r)} */}
           </tr>
         ))}
       </table>
+      {/* <Form onFinish={onFinish} autoComplete="off" layout="inline">
+        {WEEKDAYS.map((r) => (
+          <>
+            <Form.Item
+              name={"startTime"}
+              rules={[{ required: true, message: "Missing start time" }]}
+            >
+              <TimePicker format={format} />
+            </Form.Item>
+            <Form.Item
+              name={"endTime"}
+              rules={[{ required: true, message: "Missing end time" }]}
+            >
+              <TimePicker format={format} />
+            </Form.Item>
+          </>
+        ))}
+
+        <Form.Item>
+          <Button type="primary" htmlType="submit" block>
+            Submit
+          </Button>
+        </Form.Item>
+      </Form> */}
     </div>
   );
 }

@@ -17,12 +17,13 @@ import {
   Card,
   TimePicker,
   Dropdown,
-  Menu
+  Menu,
+  Tag,
 } from "antd";
 import {
   PlusCircleOutlined,
-  DeleteOutlined,
-  EditOutlined,
+  PlusOutlined,
+  MinusCircleOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
 import constants from "../../constant";
@@ -32,6 +33,7 @@ import "./index.css";
 import { MONTHS, WEEKDAYS } from "../../constant";
 import Meta from "antd/lib/card/Meta";
 import TextArea from "antd/lib/input/TextArea";
+import { groupBy } from "lodash";
 const { Option } = Select;
 
 const getDays = (year, month) => {
@@ -44,6 +46,7 @@ function TimeTable() {
   const { user } = useContext(UserContext);
 
   const [year, setYear] = useState(2022);
+  const [copedData, setCopedData] = useState([]);
   const [months, setMonths] = useState([
     ...MONTHS.map((r, i) => {
       return { name: r.text, index: i, days: getDays(year, r.value) };
@@ -65,13 +68,13 @@ function TimeTable() {
       selectedDate.month,
       selectedDate.day
     ).getDay();
-    console.log("WEEKDAYSWEEKDAYS", selectedDate, weekDay, WEEKDAYS);
     let weekDayText = WEEKDAYS.find((r, i) => r.value === weekDay).text;
     return `${selectedDate.day}-${selectedDate.month + 1}-${
       selectedDate.year
     } -- ${weekDayText}`;
   };
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [sheets, setSheets] = useState([]);
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -87,7 +90,19 @@ function TimeTable() {
 
   const { t } = useTranslation();
 
-  useEffect(() => {}, []);
+  const getSheets = async () => {
+    let res = await axios.get(constants.API_PREFIX + "/api/TimeTable");
+    const grouped = groupBy(res.data, (d) => {
+      return [moment(d.date).format("l")];
+    });
+    console.log("resresres", grouped);
+    setSheets(grouped);
+  };
+  useEffect(() => {
+    getSheets();
+  }, []);
+
+  const [form] = Form.useForm();
 
   const selectDay = (d, m) => {
     setSelectedDate({
@@ -96,6 +111,23 @@ function TimeTable() {
       month: m,
       year: year,
     });
+    console.log("34343434", sheets[`${m + 1}/${d}/${year}`], form);
+    // setSheets()
+    console.log("{{{{{{{", form.getFieldsValue("sheets1"));
+    if (sheets[`${m + 1}/${d}/${year}`]) {
+      let editableSheets = sheets[`${m + 1}/${d}/${year}`].map((r) => {
+        return {
+          startTime: moment(
+            new Date().toLocaleDateString() + " " + r.startTime
+          ),
+          endTime: moment(new Date().toLocaleDateString() + " " + r.endTime),
+        };
+      });
+
+      console.log("editableSheetseditableSheets", editableSheets);
+      form.setFieldsValue({ sheets: editableSheets });
+    }
+
     showModal();
   };
 
@@ -122,7 +154,37 @@ function TimeTable() {
     />
   );
 
+  const copyDayData = (e, r, monthIndex) => {
+    console.log("copyD",  sheets[`${monthIndex + 1}/${r}/${year}`]);
+
+  };
+
+  const pasteDayData = async (e,r,d) => {
+    console.log(r,d)
+
+    // let postData = sheets?.map((r) => {
+    //   return {
+    //     id: r.id,
+    //     date: `${selectedDate.year}-${selectedDate.month + 1}-${
+    //       selectedDate.day
+    //     }`,
+    //     startTime: r.startTime.format(format),
+    //     endTime: r.endTime.format(format),
+    //   };
+    // });
+
+    // console.log("postDatapostData,postData", postData);
+
+    // const result = await axios.post(
+    //   constants.API_PREFIX + "/api/TimeTable",
+    //   postData
+    // );
+
+    getSheets();
+  }
+
   const tbody = (data) => {
+    console.log("datadata", data);
     let arr = [];
     for (let i = 1; i <= data.days; i++) {
       arr.push(i);
@@ -130,16 +192,41 @@ function TimeTable() {
     return arr.map((r) => (
       <td style={{ border: "1px solid #dddddd", padding: 6 }}>
         {" "}
-
-        <Dropdown overlay={menu} trigger={["contextMenu"]}>
-        <div
-          style={{ cursor: "pointer", backgroundColor: getDayColor(data, r) }}
-          onClick={() => selectDay(r, data.index)}
+        <Dropdown
+          overlay={
+            <Menu
+              items={[
+                {
+                  label: "copy",
+                  key: "1",
+                  onClick: (e) => copyDayData(e, r,data.index),
+                },
+                {
+                  label: "paste",
+                  key: "2",
+                  onClick: (e) => pasteDayData(e, r,data.index),
+                },
+              ]}
+            />
+          }
+          trigger={["contextMenu"]}
         >
-          {r}
-        </div>
+          <div
+            style={{ cursor: "pointer", backgroundColor: getDayColor(data, r) }}
+            onClick={() => selectDay(r, data.index)}
+          >
+            <span style={{ fontSize: 8 }}>{r}</span>
+            {sheets[`${data.index + 1}/${r}/${year}`] ? (
+              <>
+                <div style={{ width: 25 }}>
+                  <Tag>
+                    {sheets[`${data.index + 1}/${r}/${year}`].length} row
+                  </Tag>
+                </div>
+              </>
+            ) : null}
+          </div>
         </Dropdown>
-
         {/* <Card hoverable >
           <Meta title={r} description={r} />
           {r}
@@ -165,25 +252,114 @@ function TimeTable() {
     setMonths(data);
   };
 
+  const onChangeTime = (e) => {
+    console.log("eeeeeeee", e);
+  };
+
+  const onFinish = async ({ sheets }) => {
+    console.log(
+      "Received values of form:",
+      sheets,
+      selectedDate,
+      "----",
+      new Date(selectedDate.year, selectedDate.month, selectedDate.day)
+    );
+    // setSheets(values.sheets);
+    let postData = sheets?.map((r) => {
+      return {
+        id: r.id,
+        date: `${selectedDate.year}-${selectedDate.month + 1}-${
+          selectedDate.day
+        }`,
+        startTime: r.startTime.format(format),
+        endTime: r.endTime.format(format),
+      };
+    });
+
+    console.log("postDatapostData,postData", postData);
+
+    const result = await axios.post(
+      constants.API_PREFIX + "/api/TimeTable",
+      postData
+    );
+
+    getSheets();
+    console.log(result);
+    setIsModalVisible(false);
+  };
+
   return (
     <div>
-
       <Modal
         title={selectedDateText()}
         visible={isModalVisible}
-        onOk={handleOk}
+        // onOk={handleOk}
         onCancel={handleCancel}
+        footer={null}
         width={400}
       >
-        {[1, 2, 3, 4, 5, 6, 7, 8].map((r) => {
+        <Form
+          form={form}
+          name="dynamic_form_nest_item"
+          onFinish={onFinish}
+          autoComplete="off"
+        >
+          <Form.List name="sheets">
+            {(fields, { add, remove }) => (
+              <>
+                {fields.map(({ key, name, ...restField }) => (
+                  <Space
+                    key={key}
+                    style={{ display: "flex", marginBottom: 8 }}
+                    align="baseline"
+                  >
+                    <Form.Item
+                      {...restField}
+                      name={[name, "startTime"]}
+                      rules={[
+                        { required: true, message: "Missing start time" },
+                      ]}
+                    >
+                      <TimePicker format={format} />
+                    </Form.Item>
+                    <Form.Item
+                      {...restField}
+                      name={[name, "endTime"]}
+                      rules={[{ required: true, message: "Missing end time" }]}
+                    >
+                      <TimePicker format={format} />
+                    </Form.Item>
+                    <MinusCircleOutlined onClick={() => remove(name)} />
+                  </Space>
+                ))}
+                <Form.Item>
+                  <Button
+                    type="dashed"
+                    onClick={() => add()}
+                    block
+                    icon={<PlusOutlined />}
+                  >
+                    Add field
+                  </Button>
+                </Form.Item>
+              </>
+            )}
+          </Form.List>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block>
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
+        {/* {[1, 2, 3, 4, 5, 6, 7, 8].map((r) => {
           return (
             <div style={{ display: "flex", gap: 10, marginBottom: 5 }}>
               <span>{r}.</span>
-              <TimePicker format={format} />
-              <TimePicker format={format} />
+              <TimePicker format={format} onChange={onChangeTime} />
+              <TimePicker format={format} onChange={onChangeTime}/>
             </div>
           );
-        })}
+        })} */}
       </Modal>
 
       <h2>Time Table</h2>
