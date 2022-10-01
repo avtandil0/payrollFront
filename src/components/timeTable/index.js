@@ -117,6 +117,8 @@ function TimeTable() {
     if (sheets[`${m + 1}/${d}/${year}`]) {
       let editableSheets = sheets[`${m + 1}/${d}/${year}`].map((r) => {
         return {
+          id: r.id,
+          key: r.id,
           startTime: moment(
             new Date().toLocaleDateString() + " " + r.startTime
           ),
@@ -155,14 +157,13 @@ function TimeTable() {
   );
 
   const copyDayData = (e, r, monthIndex) => {
-    console.log("copyD",  sheets[`${monthIndex + 1}/${r}/${year}`]);
-    setCopedData(sheets[`${monthIndex + 1}/${r}/${year}`])
-
+    console.log("copyD", sheets[`${monthIndex + 1}/${r}/${year}`]);
+    setCopedData(sheets[`${monthIndex + 1}/${r}/${year}`]);
   };
 
-  const pasteDayData = async (e,d,m) => {
-    console.log(d,m+1, year)
-    console.log('coped data',copedData)
+  const pasteDayData = async (e, d, m) => {
+    console.log(d, m + 1, year);
+    console.log("coped data", copedData);
 
     let postData = copedData?.map((r) => {
       return {
@@ -180,7 +181,7 @@ function TimeTable() {
     );
 
     getSheets();
-  }
+  };
 
   const tbody = (data) => {
     console.log("datadata", data);
@@ -198,12 +199,12 @@ function TimeTable() {
                 {
                   label: "copy",
                   key: "1",
-                  onClick: (e) => copyDayData(e, r,data.index),
+                  onClick: (e) => copyDayData(e, r, data.index),
                 },
                 {
                   label: "paste",
                   key: "2",
-                  onClick: (e) => pasteDayData(e, r,data.index),
+                  onClick: (e) => pasteDayData(e, r, data.index),
                 },
               ]}
             />
@@ -287,6 +288,9 @@ function TimeTable() {
     setIsModalVisible(false);
   };
 
+  const removePeriod = (remove, name, id) =>{
+    console.log('remove', remove,name, id)
+  }
   return (
     <div>
       <Modal
@@ -328,7 +332,7 @@ function TimeTable() {
                     >
                       <TimePicker format={format} />
                     </Form.Item>
-                    <MinusCircleOutlined onClick={() => remove(name)} />
+                    <MinusCircleOutlined onClick={(e) => removePeriod(remove, name, e)} />
                   </Space>
                 ))}
                 <Form.Item>
