@@ -35,7 +35,7 @@ const getDays = (year, month) => {
   return new Date(year, month, 0).getDate();
 };
 
-function WorkingHours() {
+function WorkingHours({handleSubmit}) {
   const [year, setYear] = useState(2022);
   const [months, setMonths] = useState([
     ...MONTHS.map((r) => {
@@ -127,33 +127,64 @@ function WorkingHours() {
     setMonths(data);
   };
 
-  const onFinish = async ({ sheets }) => {
+  const onFinish = async (sheets) => {
     console.log("Received values of form:", sheets);
+    handleSubmit(sheets)
     // setSheets(values.sheets);
   };
   const format = "HH:mm";
 
+  const tailLayout = {
+    wrapperCol: {
+      offset: 2,
+      span: 18,
+    },
+  };
   return (
     <div>
       {/* <h2>Working Hours</h2> */}
-      <table className="timeTable">
+      <Form
+        name="nest-messages"
+        onFinish={onFinish}
+        layout="inline"
+      >
+        {WEEKDAYS.map((r) => {
+          return (
+            <>
+              <Form.Item  label={r.text} name={[r.text, "workingTime"]}>
+                <TimePicker.RangePicker format={"HH:mm"} />
+              </Form.Item>
+              <Form.Item  name={[r.text, "breakingTime"]}>
+                <TimePicker.RangePicker format={"HH:mm"} />
+              </Form.Item>
+            </>
+          );
+        })}
+
+        <Form.Item wrapperCol={{ offset: 24, span: 8 }}>
+          <Button type="primary" htmlType="submit">
+            შენახვა
+          </Button>
+        </Form.Item>
+      </Form>
+      {/* <table className="timeTable">
         <tr>
           <th></th>
           <th>working time</th>
           <th>break time</th>
         </tr>
-        {WEEKDAYS.map((r) => (
-          <tr>
-            <td  width={150}>{r.text}</td>
-            <td width={300}>
-              <TimePicker.RangePicker format={'HH:mm'} />
-            </td>
-            <td width={300}>
-              <TimePicker.RangePicker format={'HH:mm'}/>
-            </td>
-          </tr>
-        ))}
-      </table>
+        <tr>
+          <td width={150}>{WEEKDAYS[0].text}</td>
+          <td width={300}>
+            <TimePicker.RangePicker format={"HH:mm"} />
+          </td>
+          <td width={300}>
+            <TimePicker.RangePicker format={"HH:mm"} />
+          </td>
+        </tr>
+
+
+      </table> */}
       {/* <Form onFinish={onFinish} autoComplete="off" layout="inline">
         {WEEKDAYS.map((r) => (
           <>

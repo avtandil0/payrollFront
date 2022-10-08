@@ -13,6 +13,7 @@ import {
   Table,
   Divider,
   Tooltip,
+  Select,
 } from "antd";
 import {
   PlusCircleOutlined,
@@ -24,6 +25,7 @@ import constants from "../../constant";
 import { useTranslation } from "react-i18next";
 import { UserContext } from "../../appContext";
 import WorkingHours from "../employee/employeeDetails/WorkingHours";
+const { Option } = Select;
 
 function DayTable() {
   const { user } = useContext(UserContext);
@@ -80,6 +82,7 @@ function DayTable() {
   ];
 
   const [dataSaveArray, setDataSaveArray] = useState([]);
+  const [name, setName] = useState("");
   const [project, setProject] = useState({
     code: "",
     description: "",
@@ -94,7 +97,7 @@ function DayTable() {
     const result = await axios(constants.API_PREFIX + "/api/Project");
     console.log("result", result.data);
 
-    setDataSaveArray(result.data);
+    // setDataSaveArray(result.data);
     setTableLoading(false);
   };
 
@@ -176,6 +179,34 @@ function DayTable() {
     setIsModalVisible(true);
   };
 
+  const format = "HH:mm";
+
+  const handleSubmit = async (data) => {
+    console.log("dataaaaa", data);
+    let postData = [];
+    for (const [key, value] of Object.entries(data)) {
+      console.log(`${key}: ${value}`);
+      if (value.workingTime && value.breakingTime) {
+        postData.push({
+          name: name,
+          weekDay: key,
+          workingStartTime: value.workingTime[0].format(format),
+          workingEndTime: value.workingTime[1].format(format),
+          breakingStartTime: value.breakingTime[0].format(format),
+          breakingEndTime: value.breakingTime[1].format(format),
+        });
+      }
+    }
+
+    console.log("postDatapostData", postData);
+
+    const result = await axios.post(
+      constants.API_PREFIX + "/api/TimeSheet",
+      postData
+    );
+
+
+  };
   return (
     <div>
       {!user.roles.analyst ? (
@@ -199,11 +230,17 @@ function DayTable() {
         onOk={handleOk}
         onCancel={handleCancel}
         width={700}
+        footer={null}
       >
-        <Input type="name" name="description" placeholder={t(`name`)} />
-        <br/>
-        <br/>
-        <WorkingHours />
+        <Input
+          type="name"
+          name="name"
+          onChange={(e) => setName(e.target.value)}
+          placeholder={t(`name`)}
+        />
+        <br />
+        <br />
+        <WorkingHours handleSubmit={handleSubmit} />
       </Modal>
 
       <Divider />

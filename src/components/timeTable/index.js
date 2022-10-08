@@ -288,9 +288,9 @@ function TimeTable() {
     setIsModalVisible(false);
   };
 
-  const removePeriod = (remove, name, id) =>{
-    console.log('remove', remove,name, id)
-  }
+  const removePeriod = (remove, name, id) => {
+    console.log("remove", remove, name, id);
+  };
   return (
     <div>
       <Modal
@@ -301,6 +301,15 @@ function TimeTable() {
         footer={null}
         width={400}
       >
+        {/* <Select
+          defaultValue="type"
+          style={{ width: 120, marginBottom: 18 }}
+          onChange={handleChange}
+        >
+          <Option value="jack">working</Option>
+          <Option value="lucy">holday</Option>
+
+        </Select> */}
         <Form
           form={form}
           name="dynamic_form_nest_item"
@@ -332,7 +341,9 @@ function TimeTable() {
                     >
                       <TimePicker format={format} />
                     </Form.Item>
-                    <MinusCircleOutlined onClick={(e) => removePeriod(remove, name, e)} />
+                    <MinusCircleOutlined
+                      onClick={(e) => removePeriod(remove, name, e)}
+                    />
                   </Space>
                 ))}
                 <Form.Item>
@@ -350,7 +361,7 @@ function TimeTable() {
           </Form.List>
           <Form.Item>
             <Button type="primary" htmlType="submit" block>
-              Submit
+              შენახვა
             </Button>
           </Form.Item>
         </Form>
@@ -365,18 +376,30 @@ function TimeTable() {
         })} */}
       </Modal>
 
-      <h2>Time Table</h2>
+      <h2>MRS</h2>
 
       <Select style={{ width: 120 }} onChange={handleChangeYear} value={year}>
         {years?.map((r) => (
           <Option value={r}>{r}</Option>
         ))}
       </Select>
-      <Select style={{ width: 120, marginLeft: 20 }} onChange={handleChange}>
+      {/* <Select style={{ width: 120, marginLeft: 20 }} onChange={handleChange}>
         {MONTHS?.map((r) => (
           <Option value={r.value}>{r.text}</Option>
         ))}
-      </Select>
+      </Select> */}
+
+      <Select
+          defaultValue="type"
+          style={{ width: 120, marginLeft: 18 }}
+          onChange={handleChange}
+        >
+          <Option value="jack">dayly</Option>
+          <Option value="lucy">hourly</Option>
+
+        </Select>
+
+
       <br />
       <br />
 
