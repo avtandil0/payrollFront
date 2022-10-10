@@ -25,6 +25,8 @@ import constants from "../../constant";
 import { useTranslation } from "react-i18next";
 import { UserContext } from "../../appContext";
 import WorkingHours from "../employee/employeeDetails/WorkingHours";
+import groupBy from 'lodash/groupBy';
+
 const { Option } = Select;
 
 function DayTable() {
@@ -65,17 +67,18 @@ function DayTable() {
         </div>
       ),
     },
+
     {
-      title: t(`code`),
-      dataIndex: "code",
-      render: (text) => <a>{text}</a>,
+      title: t(`sheetId`),
+      dataIndex: "sheetId",
     },
     {
-      title: t(`description`),
-      dataIndex: "description",
+      title: t(`name`),
+      dataIndex: "name",
     },
+
     {
-      title: t(`dateOfCreation`),
+      title: t(`dateCreated`),
       dataIndex: "dateCreated",
       render: (text) => <p>{moment(text).format("YYYY-MM-DD")}</p>,
     },
@@ -94,10 +97,25 @@ function DayTable() {
 
   const fetchData = async () => {
     setTableLoading(true);
-    const result = await axios(constants.API_PREFIX + "/api/Project");
-    console.log("result", result.data);
+    const result = await axios(constants.API_PREFIX + "/api/TimeSheet");
+    let groupedData = groupBy(result.data, r => {
+      return r.sheetId
+    })
+    console.log("result", groupedData);
 
-    // setDataSaveArray(result.data);
+    let target = [];
+    for (const [key, value] of Object.entries(groupedData)) {
+      console.log(888, `${key}--- ${value}`);
+      target.push({
+        sheetId: key,
+        name: value[0]?.name,
+        dateCreated: value[0]?.dateCreated,
+        child: value,
+      });
+    }
+
+    console.log('targettargettarget',target)
+    setDataSaveArray(target);
     setTableLoading(false);
   };
 
@@ -205,6 +223,7 @@ function DayTable() {
       postData
     );
 
+      setIsModalVisible(false);
 
   };
   return (
