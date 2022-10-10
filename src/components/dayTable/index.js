@@ -224,6 +224,7 @@ function DayTable() {
     );
 
       setIsModalVisible(false);
+      fetchData();
 
   };
   return (
