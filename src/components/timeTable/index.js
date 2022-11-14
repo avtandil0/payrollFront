@@ -19,6 +19,8 @@ import {
   Dropdown,
   Menu,
   Tag,
+  Tabs,
+  DatePicker,
 } from "antd";
 import {
   PlusCircleOutlined,
@@ -34,6 +36,9 @@ import { MONTHS, WEEKDAYS } from "../../constant";
 import Meta from "antd/lib/card/Meta";
 import TextArea from "antd/lib/input/TextArea";
 import { groupBy } from "lodash";
+import WorkingHours from "../employee/employeeDetails/WorkingHours";
+const { RangePicker } = DatePicker;
+
 const { Option } = Select;
 
 const getDays = (year, month) => {
@@ -41,8 +46,9 @@ const getDays = (year, month) => {
 };
 
 const format = "HH:mm";
+const dateFormat = "YYYY/MM/DD";
 
-function TimeTable() {
+function TimeTable({ employeeId }) {
   const { user } = useContext(UserContext);
 
   const [year, setYear] = useState(2022);
@@ -75,6 +81,7 @@ function TimeTable() {
   };
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [sheets, setSheets] = useState([]);
+  const [sheets1, setSheets1] = useState([]);
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -91,14 +98,44 @@ function TimeTable() {
   const { t } = useTranslation();
 
   const getSheets = async () => {
-    let res = await axios.get(constants.API_PREFIX + "/api/TimeTable");
+    let res = await axios.get(
+      constants.API_PREFIX + "/api/TimeTable/GetAllTimePeriods",
+      {
+        params: {
+          employeeId: employeeId,
+        },
+      }
+    );
     const grouped = groupBy(res.data, (d) => {
       return [moment(d.date).format("l")];
     });
     console.log("resresres", grouped);
     setSheets(grouped);
   };
+
+  const getSheets1 = async () => {
+    const result = await axios(constants.API_PREFIX + "/api/TimeSheet");
+    let groupedData = groupBy(result.data, (r) => {
+      return r.sheetId;
+    });
+    console.log("result", groupedData);
+
+    let target = [];
+    for (const [key, value] of Object.entries(groupedData)) {
+      console.log(888, `${key}--- ${value}`);
+      target.push({
+        sheetId: key,
+        name: value[0]?.name,
+        dateCreated: value[0]?.dateCreated,
+        child: value,
+      });
+    }
+
+    console.log("targettargettarget", target);
+    setSheets1(target);
+  };
   useEffect(() => {
+    getSheets1();
     getSheets();
   }, []);
 
@@ -140,21 +177,6 @@ function TimeTable() {
     }
     return "";
   };
-
-  const menu = (
-    <Menu
-      items={[
-        {
-          label: "copy",
-          key: "1",
-        },
-        {
-          label: "paste",
-          key: "2",
-        },
-      ]}
-    />
-  );
 
   const copyDayData = (e, r, monthIndex) => {
     console.log("copyD", sheets[`${monthIndex + 1}/${r}/${year}`]);
@@ -252,10 +274,6 @@ function TimeTable() {
     setMonths(data);
   };
 
-  const onChangeTime = (e) => {
-    console.log("eeeeeeee", e);
-  };
-
   const onFinish = async ({ sheets }) => {
     console.log(
       "Received values of form:",
@@ -265,6 +283,7 @@ function TimeTable() {
       new Date(selectedDate.year, selectedDate.month, selectedDate.day)
     );
     // setSheets(values.sheets);
+
     let postData = sheets?.map((r) => {
       return {
         id: r.id,
@@ -278,10 +297,11 @@ function TimeTable() {
 
     console.log("postDatapostData,postData", postData);
 
-    const result = await axios.post(
-      constants.API_PREFIX + "/api/TimeTable",
-      postData
-    );
+    const result = await axios.post(constants.API_PREFIX + "/api/TimeTable", {
+      timePeriods: postData,
+      range: [],
+      employeeId: employeeId,
+    });
 
     getSheets();
     console.log(result);
@@ -291,6 +311,78 @@ function TimeTable() {
   const removePeriod = (remove, name, id) => {
     console.log("remove", remove, name, id);
   };
+
+  const [sheetData, setSheetData] = useState([]);
+
+  const handleChangeSheet = (value) => {
+    console.log("handleChangeSheet", value);
+    let d = sheets1.find((r) => r.sheetId == value);
+    console.log(d);
+    setSheetData(d.child);
+  };
+
+  const handleSubmitRange = async () => {
+    console.log(" employeeIdemployeeId", employeeId);
+
+    console.log("handleSubmitRangehandleSubmitRange", sheetData);
+
+    // let postData = sheetData?.map((r) => {
+    //   return {
+    //     id: r.id,
+    //     date: `${selectedDate.year}-${selectedDate.month + 1}-${
+    //       selectedDate.day
+    //     }`,
+    //     startTime: r.workingStartTime
+    //       ? r.workingStartTime
+    //       : r.breakingStartTime,
+    //     endTime: r.workingEndTime ? r.workingEndTime : r.breakingEndTime,
+    //     isBreakTime: r.breakingStartTime ? true : false,
+    //   };
+    // });
+
+    let postData = [];
+    sheetData.forEach((r) => {
+      postData.push({
+        id: r.id,
+        date: `${selectedDate.year}-${selectedDate.month + 1}-${
+          selectedDate.day
+        }`,
+        startTime: r.workingStartTime,
+        endTime: r.workingEndTime,
+        isBreakTime: false,
+      });
+
+      postData.push({
+        id: r.id,
+        date: `${selectedDate.year}-${selectedDate.month + 1}-${
+          selectedDate.day
+        }`,
+        startTime: r.breakingStartTime,
+        endTime: r.breakingEndTime,
+        isBreakTime: true,
+      });
+    });
+
+    console.log("postDatapostData,postData1222", postData, rangePickerValue);
+
+    const result = await axios.post(constants.API_PREFIX + "/api/TimeTable", {
+      timePeriods: postData,
+      range: rangePickerValue,
+      employeeId: employeeId,
+    });
+
+    getSheets();
+    console.log(result);
+    setIsModalVisible(false);
+  };
+
+  const [rangePickerValue, setRangePickerValue] = useState([]);
+
+  const onChangeRangePicker = (date, dateString) => {
+    console.log(date, dateString);
+    setRangePickerValue(dateString);
+  };
+
   return (
     <div>
       <Modal
@@ -299,7 +391,7 @@ function TimeTable() {
         // onOk={handleOk}
         onCancel={handleCancel}
         footer={null}
-        width={400}
+        width={800}
       >
         {/* <Select
           defaultValue="type"
@@ -310,61 +402,94 @@ function TimeTable() {
           <Option value="lucy">holday</Option>
 
         </Select> */}
-        <Form
-          form={form}
-          name="dynamic_form_nest_item"
-          onFinish={onFinish}
-          autoComplete="off"
-        >
-          <Form.List name="sheets">
-            {(fields, { add, remove }) => (
-              <>
-                {fields.map(({ key, name, ...restField }) => (
-                  <Space
-                    key={key}
-                    style={{ display: "flex", marginBottom: 8 }}
-                    align="baseline"
-                  >
-                    <Form.Item
-                      {...restField}
-                      name={[name, "startTime"]}
-                      rules={[
-                        { required: true, message: "Missing start time" },
-                      ]}
-                    >
-                      <TimePicker format={format} />
+        <Tabs defaultActiveKey="1" centered>
+          <Tabs.TabPane tab="Manually" key="1">
+            <Form
+              form={form}
+              name="dynamic_form_nest_item"
+              onFinish={onFinish}
+              autoComplete="off"
+            >
+              <Form.List name="sheets">
+                {(fields, { add, remove }) => (
+                  <>
+                    {fields.map(({ key, name, ...restField }) => (
+                      <Space
+                        key={key}
+                        style={{ display: "flex", marginBottom: 8 }}
+                        align="baseline"
+                      >
+                        <Form.Item
+                          {...restField}
+                          name={[name, "startTime"]}
+                          rules={[
+                            { required: true, message: "Missing start time" },
+                          ]}
+                        >
+                          <TimePicker format={format} />
+                        </Form.Item>
+                        <Form.Item
+                          {...restField}
+                          name={[name, "endTime"]}
+                          rules={[
+                            { required: true, message: "Missing end time" },
+                          ]}
+                        >
+                          <TimePicker format={format} />
+                        </Form.Item>
+                        <MinusCircleOutlined
+                          onClick={(e) => removePeriod(remove, name, e)}
+                        />
+                      </Space>
+                    ))}
+                    <Form.Item>
+                      <Button
+                        type="dashed"
+                        onClick={() => add()}
+                        block
+                        icon={<PlusOutlined />}
+                      >
+                        Add field
+                      </Button>
                     </Form.Item>
-                    <Form.Item
-                      {...restField}
-                      name={[name, "endTime"]}
-                      rules={[{ required: true, message: "Missing end time" }]}
-                    >
-                      <TimePicker format={format} />
-                    </Form.Item>
-                    <MinusCircleOutlined
-                      onClick={(e) => removePeriod(remove, name, e)}
-                    />
-                  </Space>
-                ))}
-                <Form.Item>
-                  <Button
-                    type="dashed"
-                    onClick={() => add()}
-                    block
-                    icon={<PlusOutlined />}
-                  >
-                    Add field
-                  </Button>
-                </Form.Item>
-              </>
-            )}
-          </Form.List>
-          <Form.Item>
-            <Button type="primary" htmlType="submit" block>
-              შენახვა
-            </Button>
-          </Form.Item>
-        </Form>
+                  </>
+                )}
+              </Form.List>
+              <Form.Item>
+                <Button type="primary" htmlType="submit" block>
+                  შენახვა
+                </Button>
+              </Form.Item>
+            </Form>
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="Time Range" key="2">
+            <RangePicker
+              onChange={onChangeRangePicker}
+              defaultValue={[
+                moment(
+                  `${selectedDate.year}-${selectedDate.month + 1}-${
+                    selectedDate.day
+                  }`,
+                  dateFormat
+                ),
+              ]}
+            />
+
+            <span style={{ fontSize: 20, marginLeft: 15 }}>choose shift</span>
+            <Select
+              style={{ width: 220, marginLeft: 10 }}
+              onChange={handleChangeSheet}
+            >
+              {sheets1.map((r) => {
+                return <Option value={r.sheetId}>{r.name}</Option>;
+              })}
+            </Select>
+            <br></br>
+            <br></br>
+            <WorkingHours data={sheetData} handleSubmit={handleSubmitRange} />
+          </Tabs.TabPane>
+        </Tabs>
+
         {/* {[1, 2, 3, 4, 5, 6, 7, 8].map((r) => {
           return (
             <div style={{ display: "flex", gap: 10, marginBottom: 5 }}>
@@ -390,15 +515,13 @@ function TimeTable() {
       </Select> */}
 
       <Select
-          defaultValue="type"
-          style={{ width: 120, marginLeft: 18 }}
-          onChange={handleChange}
-        >
-          <Option value="jack">dayly</Option>
-          <Option value="lucy">hourly</Option>
-
-        </Select>
-
+        defaultValue="type"
+        style={{ width: 120, marginLeft: 18 }}
+        onChange={handleChange}
+      >
+        <Option value="jack">dayly</Option>
+        <Option value="lucy">hourly</Option>
+      </Select>
 
       <br />
       <br />

@@ -249,7 +249,7 @@ function DayTable() {
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
-        width={700}
+        width={800}
         footer={null}
       >
         <Input

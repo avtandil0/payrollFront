@@ -35,7 +35,9 @@ const getDays = (year, month) => {
   return new Date(year, month, 0).getDate();
 };
 
-function WorkingHours({handleSubmit}) {
+function WorkingHours({ handleSubmit, data }) {
+  const [form] = Form.useForm();
+
   const [year, setYear] = useState(2022);
   const [months, setMonths] = useState([
     ...MONTHS.map((r) => {
@@ -75,7 +77,36 @@ function WorkingHours({handleSubmit}) {
 
   const { t } = useTranslation();
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    console.log("dataaaa", data, form);
+
+    if (data) {
+      let target = {};
+      data.forEach((element) => {
+        target[element.weekDay] = {
+          workingTime: [
+            moment(
+              new Date().toLocaleDateString() + " " + element.workingStartTime
+            ),
+            moment(
+              new Date().toLocaleDateString() + " " + element.workingEndTime
+            ),
+          ],
+          breakingTime: [
+            moment(
+              new Date().toLocaleDateString() + " " + element.breakingStartTime
+            ),
+            moment(
+              new Date().toLocaleDateString() + " " + element.breakingEndTime
+            ),
+          ],
+        };
+      });
+      console.log("ddddd", target);
+      form.resetFields();
+      form.setFieldsValue(target);
+    }
+  }, [data]);
 
   const selectDay = (d, m) => {
     setSelectedDate({
@@ -129,7 +160,7 @@ function WorkingHours({handleSubmit}) {
 
   const onFinish = async (sheets) => {
     console.log("Received values of form:", sheets);
-    handleSubmit(sheets)
+    handleSubmit(sheets);
     // setSheets(values.sheets);
   };
   const format = "HH:mm";
@@ -144,17 +175,19 @@ function WorkingHours({handleSubmit}) {
     <div>
       {/* <h2>Working Hours</h2> */}
       <Form
+        form={form}
         name="nest-messages"
         onFinish={onFinish}
         layout="inline"
+        style={{ width: 700 }}
       >
         {WEEKDAYS.map((r) => {
           return (
             <>
-              <Form.Item  label={r.text} name={[r.text, "workingTime"]}>
+              <Form.Item label={r.text} name={[r.text, "workingTime"]}>
                 <TimePicker.RangePicker format={"HH:mm"} />
               </Form.Item>
-              <Form.Item  name={[r.text, "breakingTime"]}>
+              <Form.Item name={[r.text, "breakingTime"]}>
                 <TimePicker.RangePicker format={"HH:mm"} />
               </Form.Item>
             </>

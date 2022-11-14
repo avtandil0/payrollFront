@@ -4,31 +4,31 @@ export const HOME_PAGE = "/payroll";
 
 export const WEEKDAYS = [
   {
-    text: "Monday",
+    text: "1",
     value: 1,
   },
   {
-    text: "Tuesday",
+    text: "2",
     value: 2,
   },
   {
-    text: "Wednesday",
+    text: "3",
     value: 3,
   },
   {
-    text: "Thursday",
+    text: "4",
     value: 4,
   },
   {
-    text: "Friday",
+    text: "5",
     value: 5,
   },
   {
-    text: "Saturday",
+    text: "6",
     value: 6,
   },
   {
-    text: "Sunday",
+    text: "7",
     value: 0,
   },
 ];

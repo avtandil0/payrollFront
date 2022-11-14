@@ -34,6 +34,8 @@ import AddComponent from "./AddComponent";
 import { useTranslation } from "react-i18next";
 import { HOME_PAGE } from "../../../constant";
 import WorkingHours from "./WorkingHours";
+import { groupBy } from "lodash";
+import TimeTable from "../../timeTable";
 
 const { TabPane } = Tabs;
 
@@ -62,6 +64,8 @@ function EmployeeDetails() {
   const [saveloading, setSaveloading] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
+  const [sheets, setSheets] = useState([]);
+  const [sheetData, setSheetData]  = useState([]);
 
   const [employee, setEmployee] = useState({
     firstName: "",
@@ -161,8 +165,30 @@ function EmployeeDetails() {
     // setTableLoading(false);
   };
 
+  const getSheets = async () => {
+    const result = await axios(constants.API_PREFIX + "/api/TimeSheet");
+    let groupedData = groupBy(result.data, r => {
+      return r.sheetId
+    })
+    console.log("result", groupedData);
+
+    let target = [];
+    for (const [key, value] of Object.entries(groupedData)) {
+      console.log(888, `${key}--- ${value}`);
+      target.push({
+        sheetId: key,
+        name: value[0]?.name,
+        dateCreated: value[0]?.dateCreated,
+        child: value,
+      });
+    }
+
+    console.log('targettargettarget',target)
+    setSheets(target);
+  };
   useEffect(() => {
-    console.log("----------------------------------");
+    console.log("----------------------------------985");
+    getSheets();
     if (id) {
       setIsEdiT(true);
       setCurrentId(id);
@@ -371,6 +397,12 @@ function EmployeeDetails() {
     );
   };
 
+  const handleChangeSheet = (value) => {
+    console.log('handleChangeSheet',value)
+    let d = sheets.find(r => r.sheetId == value)
+    console.log(d)
+    setSheetData(d.child)
+  }
   return (
     <div>
       {/* <Skeleton.Image  active={true}/>
@@ -410,8 +442,8 @@ function EmployeeDetails() {
                 {uploadButton}
               </Upload>
             </div>
-            <div>
-              <Tabs defaultActiveKey="1" onChange={onChange}>
+            <div style={{width: 1250}}>
+              <Tabs defaultActiveKey="1" onChange={onChange} >
                 <TabPane
                   tab={
                     <span>
@@ -582,7 +614,7 @@ function EmployeeDetails() {
                     </Form>
                   </div>
                 </TabPane>
-                <TabPane
+                {/* <TabPane
                   tab={
                     <span>
                       <FieldTimeOutlined />
@@ -591,32 +623,38 @@ function EmployeeDetails() {
                   }
                   key="2"
                 >
-                  <span style={{fontSize:20}}>choose schema</span>
+                  <span style={{fontSize:20}}>choose shift</span>
                   <Select
                     style={{ width: 520, marginLeft: 50}}
+                    onChange={handleChangeSheet}
                   >
-                    <Option value="jack">schema1</Option>
-                    <Option value="lucy">schema2</Option>
-                    <Option value="Yiminghe">schema3</Option>
+                    {sheets.map(r => {
+                      return  <Option value={r.sheetId}>{r.name}</Option>
+                    })}
+
                   </Select>
-                  <WorkingHours />
-                </TabPane>
+                  <br></br>
+                  <WorkingHours data={sheetData}/>
+                </TabPane> */}
                 <TabPane
                   tab={
                     <span>
                       <PicLeftOutlined />
-                      Other
+                      Time shift
                     </span>
                   }
                   key="3"
                 >
-                  Content of Tab Pane 3
+                  <TimeTable employeeId={id} />
                 </TabPane>
               </Tabs>
             </div>
           </div>
 
-          <Form
+
+        </div>
+      </div>
+      {/* <Form
             // name="product-form"
             // onFinish={handleSave}
             style={{ marginTop: 5 }}
@@ -636,10 +674,7 @@ function EmployeeDetails() {
                 ))}
               </Select>
             </Form.Item>
-          </Form>
-        </div>
-      </div>
-
+          </Form> */}
       <Modal
         visible={previewVisible}
         title={previewTitle}
