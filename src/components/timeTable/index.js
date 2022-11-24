@@ -35,9 +35,13 @@ import "./index.css";
 import { MONTHS, WEEKDAYS } from "../../constant";
 import Meta from "antd/lib/card/Meta";
 import TextArea from "antd/lib/input/TextArea";
+import { TreeSelect } from 'antd';
+
 import { groupBy } from "lodash";
 import WorkingHours from "../employee/employeeDetails/WorkingHours";
 const { RangePicker } = DatePicker;
+const { SHOW_PARENT } = TreeSelect;
+
 
 const { Option } = Select;
 
@@ -47,6 +51,7 @@ const getDays = (year, month) => {
 
 const format = "HH:mm";
 const dateFormat = "YYYY/MM/DD";
+
 
 function TimeTable({ employeeId }) {
   const { user } = useContext(UserContext);
@@ -134,9 +139,33 @@ function TimeTable({ employeeId }) {
     console.log("targettargettarget", target);
     setSheets1(target);
   };
+
+  const getDepData = async () => {
+    let result = await axios(constants.API_PREFIX + "/api/Department/GetAllDepartmentAndEmployees");
+    console.log('resullltt', result)
+    result = result.data.map(r => {
+      return {
+        id: r.depId,
+        title: r.depName,
+        value: r.depId,
+        key: r.depId,
+        children: r.children.map(e => {
+          return {
+            id: e.id,
+            title: e.fullName,
+            value: e.id,
+            key: e.id,
+          }
+        })
+      }
+    })
+    console.log('resullltt', result)
+    setTreeData(result)
+  }
   useEffect(() => {
     getSheets1();
     getSheets();
+    getDepData();
   }, []);
 
   const [form] = Form.useForm();
@@ -369,6 +398,7 @@ function TimeTable({ employeeId }) {
       timePeriods: postData,
       range: rangePickerValue,
       employeeId: employeeId,
+      treeValues: value
     });
 
     getSheets();
@@ -383,6 +413,28 @@ function TimeTable({ employeeId }) {
     setRangePickerValue(dateString);
   };
 
+
+  const [value, setValue] = useState([]);
+  const [treeData, setTreeData] = useState([])
+  const onChange = (newValue) => {
+    console.log('onChange ', value);
+    setValue(newValue);
+  };
+
+
+  const tProps = {
+    treeData,
+    value,
+    onChange,
+    treeCheckable: true,
+    showCheckedStrategy: SHOW_PARENT,
+    placeholder: 'Please select',
+    style: {
+      width: '290px',
+    },
+  };
+
+
   return (
     <div>
       <Modal
@@ -391,7 +443,7 @@ function TimeTable({ employeeId }) {
         // onOk={handleOk}
         onCancel={handleCancel}
         footer={null}
-        width={800}
+        width={1000}
       >
         {/* <Select
           defaultValue="type"
@@ -484,6 +536,8 @@ function TimeTable({ employeeId }) {
                 return <Option value={r.sheetId}>{r.name}</Option>;
               })}
             </Select>
+
+            <TreeSelect {...tProps} />
             <br></br>
             <br></br>
             <WorkingHours data={sheetData} handleSubmit={handleSubmitRange} />
