@@ -35,13 +35,12 @@ import "./index.css";
 import { MONTHS, WEEKDAYS } from "../../constant";
 import Meta from "antd/lib/card/Meta";
 import TextArea from "antd/lib/input/TextArea";
-import { TreeSelect } from 'antd';
+import { TreeSelect } from "antd";
 
 import { groupBy } from "lodash";
 import WorkingHours from "../employee/employeeDetails/WorkingHours";
 const { RangePicker } = DatePicker;
 const { SHOW_PARENT } = TreeSelect;
-
 
 const { Option } = Select;
 
@@ -51,7 +50,6 @@ const getDays = (year, month) => {
 
 const format = "HH:mm";
 const dateFormat = "YYYY/MM/DD";
-
 
 function TimeTable({ employeeId }) {
   const { user } = useContext(UserContext);
@@ -141,27 +139,29 @@ function TimeTable({ employeeId }) {
   };
 
   const getDepData = async () => {
-    let result = await axios(constants.API_PREFIX + "/api/Department/GetAllDepartmentAndEmployees");
-    console.log('resullltt', result)
-    result = result.data.map(r => {
+    let result = await axios(
+      constants.API_PREFIX + "/api/Department/GetAllDepartmentAndEmployees"
+    );
+    console.log("resullltt", result);
+    result = result.data.map((r) => {
       return {
         id: r.depId,
         title: r.depName,
         value: r.depId,
         key: r.depId,
-        children: r.children.map(e => {
+        children: r.children.map((e) => {
           return {
             id: e.id,
             title: e.fullName,
             value: e.id,
             key: e.id,
-          }
-        })
-      }
-    })
-    console.log('resullltt', result)
-    setTreeData(result)
-  }
+          };
+        }),
+      };
+    });
+    console.log("resullltt", result);
+    setTreeData(result);
+  };
   useEffect(() => {
     getSheets1();
     getSheets();
@@ -226,10 +226,11 @@ function TimeTable({ employeeId }) {
 
     console.log("postDatapostData,postData", postData);
 
-    const result = await axios.post(
-      constants.API_PREFIX + "/api/TimeTable",
-      postData
-    );
+    const result = await axios.post(constants.API_PREFIX + "/api/TimeTable", {
+      timePeriods: postData,
+      range: [],
+      employeeId: employeeId,
+    });
 
     getSheets();
   };
@@ -270,9 +271,13 @@ function TimeTable({ employeeId }) {
             {sheets[`${data.index + 1}/${r}/${year}`] ? (
               <>
                 <div style={{ width: 25 }}>
-                  <Tag>
-                    {sheets[`${data.index + 1}/${r}/${year}`].length} row
-                  </Tag>
+                  {sheets[`${data.index + 1}/${r}/${year}`].map((item) => {
+                    return (
+                      <Tag>
+                       {item.workingEndTime}
+                      </Tag>
+                    );
+                  })}
                 </div>
               </>
             ) : null}
@@ -398,7 +403,7 @@ function TimeTable({ employeeId }) {
       timePeriods: postData,
       range: rangePickerValue,
       employeeId: employeeId,
-      treeValues: value
+      treeValues: value,
     });
 
     getSheets();
@@ -413,14 +418,12 @@ function TimeTable({ employeeId }) {
     setRangePickerValue(dateString);
   };
 
-
   const [value, setValue] = useState([]);
-  const [treeData, setTreeData] = useState([])
+  const [treeData, setTreeData] = useState([]);
   const onChange = (newValue) => {
-    console.log('onChange ', value);
+    console.log("onChange ", value);
     setValue(newValue);
   };
-
 
   const tProps = {
     treeData,
@@ -428,12 +431,11 @@ function TimeTable({ employeeId }) {
     onChange,
     treeCheckable: true,
     showCheckedStrategy: SHOW_PARENT,
-    placeholder: 'Please select',
+    placeholder: "Please select",
     style: {
-      width: '290px',
+      width: "290px",
     },
   };
-
 
   return (
     <div>
