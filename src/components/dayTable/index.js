@@ -124,6 +124,8 @@ function DayTable() {
   }, []);
 
   const showModal = () => {
+    setName('')
+    setShiftData([])
     setIsModalVisible(true);
   };
 
