@@ -25,7 +25,7 @@ import constants from "../../constant";
 import { useTranslation } from "react-i18next";
 import { UserContext } from "../../appContext";
 import WorkingHours from "../employee/employeeDetails/WorkingHours";
-import groupBy from 'lodash/groupBy';
+import groupBy from "lodash/groupBy";
 
 const { Option } = Select;
 
@@ -98,9 +98,9 @@ function DayTable() {
   const fetchData = async () => {
     setTableLoading(true);
     const result = await axios(constants.API_PREFIX + "/api/TimeSheet");
-    let groupedData = groupBy(result.data, r => {
-      return r.sheetId
-    })
+    let groupedData = groupBy(result.data, (r) => {
+      return r.sheetId;
+    });
     console.log("result", groupedData);
 
     let target = [];
@@ -114,7 +114,7 @@ function DayTable() {
       });
     }
 
-    console.log('targettargettarget',target)
+    console.log("targettargettarget", target);
     setDataSaveArray(target);
     setTableLoading(false);
   };
@@ -190,10 +190,14 @@ function DayTable() {
     }
   };
 
+  const [shiftData, setShiftData] = useState([]);
   const clickEdit = (record) => {
     setIsEdiT(true);
     console.log("clickEdit", record);
-    setProject(record);
+    // setProject(record);
+    setShiftData(record.child);
+
+    setName(record.name);
     setIsModalVisible(true);
   };
 
@@ -206,14 +210,32 @@ function DayTable() {
       console.log(`${key}: ${value}`);
       if (value.workingTime && value.breakingTime) {
         postData.push({
+          id: value.id,
           name: name,
-          weekDay: key,
+          weekDay: value.weekDay? value.weekDay: key,
+          sheetId: value.sheetId,
           workingStartTime: value.workingTime[0].format(format),
           workingEndTime: value.workingTime[1].format(format),
           breakingStartTime: value.breakingTime[0].format(format),
           breakingEndTime: value.breakingTime[1].format(format),
         });
       }
+    }
+
+    if (isEdiT) {
+      console.log("ediiit", name, data);
+      const result1 = await axios.put(
+        constants.API_PREFIX + "/api/TimeSheet",
+        {
+          timeSheets: postData,
+          name: name,
+          sheetId: shiftData[0].sheetId
+        }
+      );
+
+      setIsModalVisible(false);
+      fetchData();
+      return;
     }
 
     console.log("postDatapostData", postData);
@@ -223,9 +245,8 @@ function DayTable() {
       postData
     );
 
-      setIsModalVisible(false);
-      fetchData();
-
+    setIsModalVisible(false);
+    fetchData();
   };
   return (
     <div>
@@ -256,11 +277,12 @@ function DayTable() {
           type="name"
           name="name"
           onChange={(e) => setName(e.target.value)}
+          value={name}
           placeholder={t(`name`)}
         />
         <br />
         <br />
-        <WorkingHours handleSubmit={handleSubmit} />
+        <WorkingHours handleSubmit={handleSubmit} data={shiftData} />
       </Modal>
 
       <Divider />

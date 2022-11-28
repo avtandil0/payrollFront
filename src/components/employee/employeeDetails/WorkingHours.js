@@ -100,6 +100,9 @@ function WorkingHours({ handleSubmit, data }) {
               new Date().toLocaleDateString() + " " + element.breakingEndTime
             ),
           ],
+          id: element.id,
+          weekDay: element.weekDay,
+          sheetId: element.sheetId
         };
       });
       console.log("ddddd", target);
@@ -159,7 +162,7 @@ function WorkingHours({ handleSubmit, data }) {
   };
 
   const onFinish = async (sheets) => {
-    console.log("Received values of form:", sheets);
+    console.log("Received values of form:0-", sheets, form.getFieldsValue());
     handleSubmit(sheets);
     // setSheets(values.sheets);
   };
@@ -189,6 +192,15 @@ function WorkingHours({ handleSubmit, data }) {
               </Form.Item>
               <Form.Item name={[r.text, "breakingTime"]}>
                 <TimePicker.RangePicker format={"HH:mm"} />
+              </Form.Item>
+              <Form.Item name={[r.text, "id"]} style={{display: "none"}}>
+                <input />
+              </Form.Item>
+              <Form.Item name={[r.text, "sheetId"]} style={{display: "none"}}>
+                <input />
+              </Form.Item>
+              <Form.Item name={[r.text, "weekDay"]} style={{display: "none"}}>
+                <input />
               </Form.Item>
             </>
           );
