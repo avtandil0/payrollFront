@@ -113,7 +113,20 @@ function TimeTable({ employeeId }) {
       return [moment(d.date).format("l")];
     });
     console.log("resresres", grouped);
+
     setSheets(grouped);
+  };
+
+  const getDurationHour = (start, end) => {
+    console.log("staaaart", new Date("1999-11-11 " + start));
+    var date1 = moment(new Date("1999-11-11 " + start));
+    var date2 = moment(new Date("1999-11-11 " + end));
+
+    let differenceInMs = date2.diff(date1); // diff yields milliseconds
+    let duration = moment.duration(differenceInMs); // moment.duration accepts ms
+    let result = duration.asHours();
+    console.log("kkkkkkkkk", result);
+    return result.toFixed(0);
   };
 
   const getSheets1 = async () => {
@@ -235,6 +248,8 @@ function TimeTable({ employeeId }) {
     getSheets();
   };
 
+  console.log("2233443", sheets);
+
   const tbody = (data) => {
     console.log("datadata", data);
     let arr = [];
@@ -267,14 +282,14 @@ function TimeTable({ employeeId }) {
             style={{ cursor: "pointer", backgroundColor: getDayColor(data, r) }}
             onClick={() => selectDay(r, data.index)}
           >
-            <span style={{ fontSize: 8 }}>{r}</span>
+            <span style={{ fontSize: 8, width: 60, height: 60 }}></span>
             {sheets[`${data.index + 1}/${r}/${year}`] ? (
               <>
                 <div style={{ width: 25 }}>
-                  {sheets[`${data.index + 1}/${r}/${year}`].map((item) => {
+                  {sheets[`${data.index + 1}/${r}/${year}`].map((item1) => {
                     return (
                       <Tag>
-                       {item.workingEndTime}
+                        {getDurationHour(item1.startTime, item1.endTime)} hour
                       </Tag>
                     );
                   })}
@@ -437,6 +452,14 @@ function TimeTable({ employeeId }) {
     },
   };
 
+  const tableHeading = () => {
+    let heading = [...Array(31).keys()].map((i) => ++i);
+
+    return heading.map((i) => {
+      return <th>{i}</th>;
+    });
+  };
+
   return (
     <div>
       <Modal
@@ -586,6 +609,7 @@ function TimeTable({ employeeId }) {
       <table className="timeTable">
         <tr>
           <th>Month</th>
+          {tableHeading()}
         </tr>
         {months.map((r) => (
           <tr>

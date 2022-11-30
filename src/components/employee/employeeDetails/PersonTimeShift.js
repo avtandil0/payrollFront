@@ -36,14 +36,12 @@ import { HOME_PAGE } from "../../../constant";
 import WorkingHours from "./WorkingHours";
 import { groupBy } from "lodash";
 import TimeTable from "../../timeTable";
-import Personal from "./Personal";
-import PersonTimeShift from "./PersonTimeShift";
 
 const { TabPane } = Tabs;
 
 const { Option } = Select;
 
-function EmployeeDetails() {
+function PersonTimeShift() {
   const { t } = useTranslation();
 
   const [form] = Form.useForm();
@@ -407,28 +405,9 @@ function EmployeeDetails() {
   };
   return (
     <div>
-      {/* <Skeleton.Image  active={true}/>
-            <Skeleton.Avatar active={true} size={150} shape={'square'} /> */}
-
-      <Tabs
-        defaultActiveKey="1"
-        items={[
-          {
-            label: `Personal`,
-            key: "1",
-            children: <Personal />,
-          },
-          {
-            label: `Time shift`,
-            key: "2",
-            children: <PersonTimeShift />,
-          }
-        ]}
-      />
-
-
+        <TimeTable employeeId={id} />
     </div>
   );
 }
 
-export default EmployeeDetails;
+export default PersonTimeShift;
