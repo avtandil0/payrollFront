@@ -207,8 +207,11 @@ function TimeTable({ employeeId }) {
 
       console.log("editableSheetseditableSheets", editableSheets);
       form.setFieldsValue({ sheets: editableSheets });
+    } else {
+      form.resetFields();
     }
 
+    //
     showModal();
   };
 
@@ -250,6 +253,16 @@ function TimeTable({ employeeId }) {
 
   console.log("2233443", sheets);
 
+  const getSumHour = (array) => {
+    console.log("getSumHourgetSumHour", array);
+    let sum = 0;
+    array.forEach((element) => {
+      sum += Number(getDurationHour(element.startTime, element.endTime));
+    });
+
+    return `${sum} hour`;
+  };
+
   const tbody = (data) => {
     console.log("datadata", data);
     let arr = [];
@@ -282,17 +295,18 @@ function TimeTable({ employeeId }) {
             style={{ cursor: "pointer", backgroundColor: getDayColor(data, r) }}
             onClick={() => selectDay(r, data.index)}
           >
-            <span style={{ fontSize: 8, width: 60, height: 60 }}></span>
+            <span style={{ fontSize: 8, width: 60, height: 60 }}>&nbsp;</span>
             {sheets[`${data.index + 1}/${r}/${year}`] ? (
               <>
-                <div style={{ width: 25 }}>
-                  {sheets[`${data.index + 1}/${r}/${year}`].map((item1) => {
+                <div>
+                  {/* {sheets[`${data.index + 1}/${r}/${year}`].map((item1) => {
                     return (
                       <Tag>
                         {getDurationHour(item1.startTime, item1.endTime)} hour
                       </Tag>
                     );
-                  })}
+                  })} */}
+                  {getSumHour(sheets[`${data.index + 1}/${r}/${year}`])}
                 </div>
               </>
             ) : null}
@@ -613,9 +627,7 @@ function TimeTable({ employeeId }) {
         </tr>
         {months.map((r) => (
           <tr>
-            <td style={{ border: "1px solid #dddddd", padding: 8 }}>
-              {r.name}
-            </td>
+            <td style={{ width: "50px" }}>{r.name}</td>
             {tbody(r)}
           </tr>
         ))}
