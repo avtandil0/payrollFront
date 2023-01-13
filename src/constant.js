@@ -34,19 +34,19 @@ export const WEEKDAYS = [
 ];
 export const MONTHS = [
   {
-    text: "January",
+    text: "Jan",
     value: 0,
   },
   {
-    text: "February",
+    text: "Feb",
     value: 1,
   },
   {
-    text: "March",
+    text: "Mar",
     value: 2,
   },
   {
-    text: "April",
+    text: "Apr",
     value: 3,
   },
   {
@@ -54,31 +54,31 @@ export const MONTHS = [
     value: 4,
   },
   {
-    text: "June",
+    text: "Jun",
     value: 5,
   },
   {
-    text: "July",
+    text: "Jul",
     value: 6,
   },
   {
-    text: "August",
+    text: "Aug",
     value: 7,
   },
   {
-    text: "September",
+    text: "Sep",
     value: 8,
   },
   {
-    text: "October",
+    text: "Oct",
     value: 9,
   },
   {
-    text: "November",
+    text: "Nov",
     value: 10,
   },
   {
-    text: "December",
+    text: "Dec",
     value: 11,
   },
 ];

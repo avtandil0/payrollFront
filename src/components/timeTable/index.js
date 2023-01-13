@@ -260,7 +260,7 @@ function TimeTable({ employeeId }) {
       sum += Number(getDurationHour(element.startTime, element.endTime));
     });
 
-    return `${sum} hour`;
+    return `${sum} h`;
   };
 
   const tbody = (data) => {
@@ -270,7 +270,7 @@ function TimeTable({ employeeId }) {
       arr.push(i);
     }
     return arr.map((r) => (
-      <td style={{ border: "1px solid #dddddd", padding: 6 }}>
+      <td style={{width: 80, border: "1px solid #dddddd", padding: 6 }}>
         {" "}
         <Dropdown
           overlay={
@@ -627,7 +627,7 @@ function TimeTable({ employeeId }) {
         </tr>
         {months.map((r) => (
           <tr>
-            <td style={{ width: "50px" }}>{r.name}</td>
+            <td >{r.name}</td>
             {tbody(r)}
           </tr>
         ))}
