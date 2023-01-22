@@ -310,7 +310,7 @@ function Coefficient() {
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
-        width={700}
+        width={800}
       >
         <Form>
           <Form.Item
@@ -353,56 +353,71 @@ function Coefficient() {
               <Input type="number" />
             </Input.Group> */}
             <Input.Group compact>
-              <Input
-                type="number"
-                value={coefficient.sgross}
-                name="sgross"
-                style={{ width: "14%" }}
-                min={-40}
-                max={100000}
-              />
-              <Input
-                type="number"
-                value={coefficient.snet}
-                name="snet"
-                style={{ width: "14%" }}
-              />
-              <Input
-                type="number"
-                value={coefficient.spaid}
-                name="spaid"
-                style={{ width: "14%" }}
-                defaultValue="1.0"
-              />
-              <Input
-                type="number"
-                value={coefficient.sincomeTax}
-                name="sincomeTax"
-                style={{ width: "14%" }}
-                defaultValue="1.0"
-              />
-              <Input
-                type="number"
-                value={coefficient.spension}
-                name="spension"
-                style={{ width: "14%" }}
-                defaultValue="1.0"
-              />
-              <Input
-                type="number"
-                value={coefficient.stax1}
-                name="stax1"
-                style={{ width: "14%" }}
-                defaultValue="1.0"
-              />
+              <div style={{ display: "flex" }}>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <span>Gross</span>
+                  <Input
+                    type="number"
+                    value={coefficient.sgross}
+                    name="sgross"
+                    min={-40}
+                    max={100000}
+                    style={{width: 98}}
+                  />
+                </div>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <span>Net</span>
+                  <Input type="number" value={coefficient.snet} name="snet" />
+                </div>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <span>Paid</span>
+                  <Input
+                    type="number"
+                    value={coefficient.spaid}
+                    name="spaid"
+                    defaultValue="1.0"
+                  />
+                </div>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <span>IncomeTax</span>
+                  <Input
+                    type="number"
+                    value={coefficient.sincomeTax}
+                    name="sincomeTax"
+                    defaultValue="1.0"
+                  />
+                </div>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <span>Pension</span>
+                  <Input
+                    type="number"
+                    value={coefficient.spension}
+                    name="spension"
+                    defaultValue="1.0"
+                  />
+                </div>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <span>Tax1</span>
+                  <Input
+                    type="number"
+                    value={coefficient.stax1}
+                    name="stax1"
+                    defaultValue="1.0"
+                  />
+                </div>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <span>Tax2</span>
+                  <Input
+                    type="number"
+                    value={coefficient.stax2}
+                    name="stax2"
+                    defaultValue="1.0"
+                  />
+                </div>
+              </div>
+
               {/* <span style={{ display: 'flex', flexDirection: 'column' }}> */}
-              <Input
-                type="number"
-                value={coefficient.stax2}
-                name="stax2"
-                style={{ width: "14%" }}
-                defaultValue="1.0"
-              />
+
               {/* <span>test</span>
               </span> */}
             </Input.Group>

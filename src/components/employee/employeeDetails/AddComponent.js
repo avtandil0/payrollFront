@@ -176,6 +176,7 @@ function AddComponent({ employee, setEmployee }) {
   const [costCenters, setCostCenters] = useState([]);
   const [components, setComponents] = useState([]);
 
+  console.log('employee12',employee)
   const [employeeComponent, setEmployeeComponent] = useState({
     componentName: "",
     projectCode: "",
@@ -189,7 +190,15 @@ function AddComponent({ employee, setEmployee }) {
     paidByCash: false,
     // cashAmount: null,
     paidMultiple: false,
+    schemeTypeId: null
   });
+
+  useEffect(() =>{
+    if(employee?.schemeTypeId){
+      setEmployeeComponent({...employeeComponent,  schemeTypeId: employee?.schemeTypeId})
+    }
+
+  },[employee])
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -432,7 +441,6 @@ function AddComponent({ employee, setEmployee }) {
             <Col className="gutter-row" span={8}>
               <span> {t(`scheme`)}: </span>
               <Select
-                defaultValue="აირჩიეთ"
                 style={{ width: 200, marginTop: 5 }}
                 onChange={(value) =>
                   handleChangeEmployeeComponentSelect(value, "schemeTypeId")
