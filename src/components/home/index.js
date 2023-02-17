@@ -32,7 +32,8 @@ import {
   DashboardOutlined,
   ImportOutlined,
   CalendarOutlined,
-  FieldTimeOutlined
+  FieldTimeOutlined,
+  FileDoneOutlined
 } from "@ant-design/icons";
 
 import Component from "../component/index";
@@ -71,6 +72,7 @@ import constants from '../../constant'
 import GE from "../../assets/logos/ge.png"; // with import
 import EN from "../../assets/logos/en.png"; // with import
 import RU from "../../assets/logos/ru.png"; // with import
+import Declaration from "../declaration";
 
 const { Header, Sider, Content } = LayoutAnt;
 
@@ -274,6 +276,15 @@ function Home() {
           </Menu.Item>
 
 
+          <Menu.Item
+            key="20"
+            icon={<FileDoneOutlined />}
+            onClick={(e) => ClickGoPage(e, "declaration")}
+          >
+            {t(`declaration`)}
+          </Menu.Item>
+
+
            <SubMenu key="sub2" title={t(`timeKeeping`)} icon={<CalendarOutlined />}>
             <Menu.Item
               key="14"
@@ -450,6 +461,9 @@ function Home() {
             </Route>
             <Route path={`${HOME_PAGE}/import`}>
               <Import />
+            </Route>
+            <Route path={`${HOME_PAGE}/declaration`}>
+              <Declaration />
             </Route>
             <Route path={`${HOME_PAGE}/timeTable`}>
               <TimeTable />

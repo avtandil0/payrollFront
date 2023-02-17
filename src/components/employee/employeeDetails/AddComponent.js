@@ -325,11 +325,21 @@ function AddComponent({ employee, setEmployee }) {
 
   const fetchPaymentDaysTypes = async () => {
     // setTableLoading(true);
-    const result = await axios(
-      constants.API_PREFIX + "/api/Common/PaymentDaysTypes"
-    );
+    // const result = await axios(
+    //   constants.API_PREFIX + "/api/Common/PaymentDaysTypes"
+    // );
 
-    setPaymentDaysTypes(result.data);
+    // setPaymentDaysTypes(result.data);
+    setPaymentDaysTypes([
+      {
+        id: 1,
+        name: 'სამუშაო დღეები',
+      },
+      {
+        id: 2,
+        name: 'კალენდარული დღეები',
+      }
+    ]);
     // setTableLoading(false);
   };
 

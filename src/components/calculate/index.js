@@ -37,8 +37,46 @@ function Calculate() {
   const { user } = useContext(UserContext);
   const { t } = useTranslation();
 
-  const expandedRowRender = ({ children }) => {
+  const confirm = async (record) => {
+    console.log("record", record);
+    const result = await axios.delete(
+      constants.API_PREFIX + `/api/Calculation/Delete/${record.id}`,
+    );
+    console.log("result", result);
+    if (result.data.isSuccess) {
+      message.success(result.data.message);
+      search();
+    } else {
+      message.error(result.data.message);
+    }
+  };
+
+  const expandedRowRender = ({ childrens }) => {
+    console.log("childrenchildren", childrens);
+
     const columns = [
+      {
+        title: "Actions",
+        dataIndex: "Actions",
+        key: "Actions",
+        render: (text, row) => {
+          return (
+            <Popconfirm
+              title="Are you sure to delete this?"
+              onConfirm={() => confirm(row)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Tooltip placement="bottom" title="წაშლა">
+                <Button
+                  shape="circle"
+                  icon={<DeleteOutlined style={{ color: "red" }} />}
+                />
+              </Tooltip>
+            </Popconfirm>
+          );
+        },
+      },
       { title: "Component Name", dataIndex: "name", key: "name" },
       { title: "Gross", dataIndex: "gross", key: "gross" },
       { title: "Net", dataIndex: "net", key: "net" },
@@ -52,7 +90,9 @@ function Calculate() {
       },
     ];
 
-    return <Table columns={columns} dataSource={children} pagination={false} />;
+    return (
+      <Table columns={columns} dataSource={childrens} pagination={false} />
+    );
   };
 
   const columns = [
@@ -182,7 +222,8 @@ function Calculate() {
       pensionTax: sumBy(r.calculations, (r) => r.pensionTax),
       remainingGraceAmount: r.remainingGraceAmount,
       name: `${r.firstName} ${r.lastName}`,
-      children: r.calculations.map((c) => ({
+      childrens: r.calculations.map((c) => ({
+        id: c.id,
         gross: c.gross,
         net: c.net,
         paid: c.paid,
@@ -216,6 +257,7 @@ function Calculate() {
   const openDraver = (row) => {
     setVisibleDrawer(true);
     console.log("openDraver", row);
+    console.log("openDraver122");
     setDrawerId(row.key);
   };
 
@@ -352,7 +394,10 @@ function Calculate() {
       <Table
         columns={columns}
         dataSource={calculations}
-        // expandable={{ expandedRowRender }}
+        expandable={{
+          expandedRowRender,
+          rowExpandable: (record) => record.childrens?.length,
+        }}
         scroll={{ x: 200 }}
       />
     </div>
