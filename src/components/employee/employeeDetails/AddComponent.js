@@ -175,6 +175,7 @@ function AddComponent({ employee, setEmployee }) {
   const [paymentDaysTypes, setPaymentDaysTypes] = useState([]);
   const [costCenters, setCostCenters] = useState([]);
   const [components, setComponents] = useState([]);
+  const [currencyList, setCurrencyList] = useState([]);
 
   console.log('employee12',employee)
   const [employeeComponent, setEmployeeComponent] = useState({
@@ -323,6 +324,16 @@ function AddComponent({ employee, setEmployee }) {
     // setTableLoading(false);
   };
 
+  const fetchCurrencies = async () => {
+    // setTableLoading(true);
+    const result = await axios(
+      constants.API_PREFIX + "/api/Common/currencies"
+    );
+
+    setCurrencyList(result.data);
+    // setTableLoading(false);
+  };
+
   const fetchPaymentDaysTypes = async () => {
     // setTableLoading(true);
     // const result = await axios(
@@ -367,6 +378,7 @@ function AddComponent({ employee, setEmployee }) {
     fetchComponents();
     fetchSchemes();
     fetchPaymentDaysTypes();
+    fetchCurrencies();
   }, []);
 
   const clickEdit = (record) => {
@@ -375,7 +387,7 @@ function AddComponent({ employee, setEmployee }) {
     const res = employee.employeeComponents.filter(
       (item) => item.id == record.id
     )[0];
-    // console.log('res', res)
+    console.log('res', res)
     setEmployeeComponent({ ...res });
     setIsModalVisible(true);
   };
@@ -464,15 +476,15 @@ function AddComponent({ employee, setEmployee }) {
               <span> {t(`currency`)}: </span>
               <Select
                 defaultValue="აირჩიეთ"
-                value={employeeComponent.currency}
+                value={Number(employeeComponent.currency)}
                 style={{ width: 200, marginTop: 5 }}
                 onChange={(value) =>
                   handleChangeEmployeeComponentSelect(value, "currency")
                 }
               >
-                <Option value="GEL">GEL</Option>
-                <Option value="USD">USD</Option>
-                <Option value="EUR">EUR</Option>
+                {currencyList.map((i) => (
+                  <Option value={i.id}>{i.currency1}</Option>
+                ))}
               </Select>
             </Col>
 

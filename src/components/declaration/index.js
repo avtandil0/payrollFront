@@ -1,5 +1,8 @@
-import { Form, Space, Table, Tag, Input, Button } from "antd";
-import { SearchOutlined } from '@ant-design/icons';
+import React, { useState, useEffect, useContext } from "react";
+import { Form, Space, Table, Tag, Input, Button,message } from "antd";
+import { SearchOutlined,TableOutlined } from "@ant-design/icons";
+import axios from "axios";
+import constants from "../../constant";
 
 const onFinish = (values) => {
   console.log("Success:", values);
@@ -10,7 +13,7 @@ const onFinishFailed = (errorInfo) => {
 const columns = [
   {
     title: "res_id",
-    dataIndex: "res_id",
+    dataIndex: "resId",
     key: "res_id",
   },
   {
@@ -47,35 +50,61 @@ const columns = [
   },
   {
     title: "comp_code",
-    dataIndex: "comp_code",
+    dataIndex: "compCode",
     key: "comp_code",
   },
   {
     title: "base_value",
-    dataIndex: "base_value",
+    dataIndex: "baseValue",
     key: "base_value",
   },
   {
     title: "issued_amount",
-    dataIndex: "issued_amount",
+    dataIndex: "issuedAmount",
     key: "issued_amount",
   },
   {
     title: "grace_value",
-    dataIndex: "grace_value",
+    dataIndex: "graceValue",
     key: "grace_value",
   },
   {
     title: "income_tax",
-    dataIndex: "income_tax",
+    dataIndex: "incomeTax",
     key: "income_tax",
   },
-
 ];
-const data = [
-
-];
+const data = [];
 const Declaration = () => {
+
+  const [declarationData, setDeclarationData] = useState([])
+  const [tableLoading, setTableLoading] = useState(false);
+
+  const fetchData = async () => {
+    setTableLoading(true);
+    const result = await axios(constants.API_PREFIX + "/api/Calculation/GetDeclaration");
+    console.log("result", result.data);
+
+    setDeclarationData(result.data);
+    setTableLoading(false);
+  }
+
+  useEffect(() => {
+    fetchData();
+  },[])
+  const executeCalculation = async () => {
+    //calculateForDeclaration
+    const result = await axios.post(
+      constants.API_PREFIX + "/api/Calculation/calculateForDeclaration",
+    );
+    console.log("result", result);
+    if (result.data.isSuccess) {
+      message.success(result.data.message);
+      fetchData();
+    } else {
+      message.error(result.data.message);
+    }
+  }
   return (
     <>
       <Form
@@ -86,9 +115,7 @@ const Declaration = () => {
         wrapperCol={{
           span: 16,
         }}
-        style={{
-          maxWidth: 600,
-        }}
+
         initialValues={{
           remember: true,
         }}
@@ -97,23 +124,13 @@ const Declaration = () => {
         autoComplete="off"
         layout="inline"
       >
-        <Form.Item
-          label="year"
-          name="year"
-
-        >
+        <Form.Item label="year" name="year">
           <Input />
         </Form.Item>
 
-        <Form.Item
-          label="period"
-          name="period"
-
-        >
+        <Form.Item label="period" name="period">
           <Input />
         </Form.Item>
-
-
 
         <Form.Item
           wrapperCol={{
@@ -121,19 +138,19 @@ const Declaration = () => {
             span: 16,
           }}
         >
-          <Button type="primary" htmlType="submit"  icon={<SearchOutlined />}>
+          <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
             Search
           </Button>
         </Form.Item>
       </Form>
 
-<br />
-<br />
-<Button>Calculate</Button>
-<br />
-<br />
+      <br />
+      <br />
+      <Button onClick={executeCalculation} icon={<TableOutlined />}>Calculate</Button>
+      <br />
+      <br />
 
-      <Table columns={columns} dataSource={data} />
+      <Table loading={tableLoading} columns={columns} dataSource={declarationData} />
     </>
   );
 };

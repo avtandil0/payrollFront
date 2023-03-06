@@ -33,7 +33,8 @@ import {
   ImportOutlined,
   CalendarOutlined,
   FieldTimeOutlined,
-  FileDoneOutlined
+  FileDoneOutlined,
+  DollarOutlined
 } from "@ant-design/icons";
 
 import Component from "../component/index";
@@ -42,6 +43,8 @@ import Coefficient from "../coefficient/index";
 // import AccountPlan from '../accountPlan/index';
 import Employee from "../employee/index";
 import Project from "../project/index";
+
+import Currency from "../currency/index";
 import CostCenter from "../costCenter/index";
 import AccountsReportChart from "../accountsReportChart/index";
 import EmployeeDetails from "../employee/employeeDetails";
@@ -135,6 +138,9 @@ function Home() {
     }
     if (location.pathname == "/payroll/timeTable") {
       setActiveUrl(["12"]);
+    }
+    if (location.pathname == "/payroll/currency") {
+      setActiveUrl(["13"]);
     }
   }, []);
 
@@ -344,6 +350,13 @@ function Home() {
             >
               {t(`department`)}
             </Menu.Item>
+            <Menu.Item
+              key="13"
+              icon={<DollarOutlined />}
+              onClick={(e) => ClickGoPage(e, "currency")}
+            >
+              {t(`currency`)}
+            </Menu.Item>
           </SubMenu>
         </Menu>
       </Sider>
@@ -473,6 +486,9 @@ function Home() {
             </Route>
             <Route path={`${HOME_PAGE}/users`}>
               <Users />
+            </Route>
+            <Route path={`${HOME_PAGE}/currency`}>
+              <Currency />
             </Route>
           </Switch>
         </Content>

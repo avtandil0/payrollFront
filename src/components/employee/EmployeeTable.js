@@ -48,26 +48,27 @@ function EmployeeTable({ loading,employeeArray, fetchData, showDelete }) {
         {
             title: t(`placeholderFirstName`),
             dataIndex: 'firstName',
+            render: (a,item) => {return <>{item.firstName} {item.lastName}</> }
         },
         {
-            title: t(`placeholderLastName`),
-            dataIndex: 'lastName',
+            title: t(`bankAccountNumber`),
+            dataIndex: 'bankAccountNumber',
         },
         {
-            title: t(`mobilePhone`),
-            dataIndex: 'mobilePhone',
+            title: t(`position`),
+            dataIndex: 'position',
         },
         {
-            title: t(`email`),
-            dataIndex: 'email',
+            title: t(`departmentName`),
+            dataIndex: 'departmentName',
         },
         {
-            title: t(`personalNumber`),
-            dataIndex: 'personalNumber',
+            title: t(`graceAmount`),
+            dataIndex: 'graceAmount',
         },
         {
-            title: t(`address`),
-            dataIndex: 'address',
+            title: t(`schemeTypeId`),
+            dataIndex: 'schemeTypeId',
         },
     ];
     // const [dataSaveArray, setDataSaveArray] = useState([]);

@@ -13,6 +13,7 @@ import {
   Modal,
   Drawer,
   Divider,
+  Upload,
   message,
 } from "antd";
 import {
@@ -21,6 +22,7 @@ import {
   EditOutlined,
   SearchOutlined,
   FileExcelOutlined,
+  UploadOutlined,
   FileExcelFilled,
 } from "@ant-design/icons";
 import axios from "axios";
@@ -31,6 +33,8 @@ import "./index.css";
 import MyDrawer from "./drawer";
 import { useTranslation, initReactI18next } from "react-i18next";
 import { UserContext } from "../../appContext";
+import { UploadCalculations } from "./uploadCalculations";
+
 const { Option } = Select;
 
 function Calculate() {
@@ -40,7 +44,7 @@ function Calculate() {
   const confirm = async (record) => {
     console.log("record", record);
     const result = await axios.delete(
-      constants.API_PREFIX + `/api/Calculation/Delete/${record.id}`,
+      constants.API_PREFIX + `/api/Calculation/Delete/${record.id}`
     );
     console.log("result", result);
     if (result.data.isSuccess) {
@@ -87,6 +91,11 @@ function Calculate() {
         title: "RemainingGraceAmount",
         dataIndex: "remainingGraceAmount",
         key: "RemainingGraceAmount",
+      },
+      {
+        title: t(`totalBalance`),
+        dataIndex: "TotalBalance",
+        render: (text, row) => <p> {row.totalBalance}</p>,
       },
     ];
 
@@ -153,7 +162,7 @@ function Calculate() {
     {
       title: t(`totalBalance`),
       dataIndex: "TotalBalance",
-      render: (text, row) => <p> </p>,
+      render: (text, row) => <p> {row.totalBalance}</p>,
     },
   ];
 
@@ -195,7 +204,7 @@ function Calculate() {
       setIsModalVisible(false);
       message.success("This is a success message");
     } else {
-      message.error("This is an error message");
+      message.error(result.data.message);
     }
   };
 
@@ -221,6 +230,7 @@ function Calculate() {
       incomeTax: sumBy(r.calculations, (r) => r.incomeTax),
       pensionTax: sumBy(r.calculations, (r) => r.pensionTax),
       remainingGraceAmount: r.remainingGraceAmount,
+      totalBalance: sumBy(r.calculations, (r) => r.totalBalance),
       name: `${r.firstName} ${r.lastName}`,
       childrens: r.calculations.map((c) => ({
         id: c.id,
@@ -232,6 +242,7 @@ function Calculate() {
         calculationDate: moment(c.calculationDate).format("YYYY-MM-DD"),
         name: c.employeeComponent?.componentName,
         remainingGraceAmount: c.remainingGraceAmount,
+        totalBalance: r.totalBalance,
       })),
     }));
     setCalculations(mapedData);
@@ -279,6 +290,24 @@ function Calculate() {
     link.click();
 
     setExcelLoading(false);
+  };
+
+  const props = {
+    name: "file",
+    action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
+    headers: {
+      authorization: "authorization-text",
+    },
+    onChange(info) {
+      if (info.file.status !== "uploading") {
+        console.log(info.file, info.fileList);
+      }
+      if (info.file.status === "done") {
+        message.success(`${info.file.name} file uploaded successfully`);
+      } else if (info.file.status === "error") {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    },
   };
 
   return (
@@ -391,6 +420,7 @@ function Calculate() {
       <br />
       <br />
 
+      <UploadCalculations />
       <Table
         columns={columns}
         dataSource={calculations}
