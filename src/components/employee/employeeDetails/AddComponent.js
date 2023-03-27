@@ -35,6 +35,8 @@ import { useTranslation } from "react-i18next";
 const { Option } = Select;
 
 function AddComponent({ employee, setEmployee }) {
+
+
   const { t } = useTranslation();
 
   const columns = [
@@ -83,14 +85,30 @@ function AddComponent({ employee, setEmployee }) {
     },
 
     {
-      title: t(`projectCode`),
-      dataIndex: "projectCode",
-      render: (item, row) => <p>{getProjectCode(row)}</p>,
-    },
-    {
       title: t(`component`),
       dataIndex: "component",
       render: (item, row) => <p>{getComponent(row)}</p>,
+    },
+    {
+      title: t(`scheme`),
+      dataIndex: "scheme",
+      render: (item, row) => <p>{getScheme(row)}</p>,
+    },
+
+    {
+      title: t(`amount`),
+      dataIndex: "amount",
+    },
+    {
+      title: t(`currency`),
+      dataIndex: "currency",
+      render: (item, row) => <p>{getCurrencyCode(row)}</p>,
+    },
+
+    {
+      title: t(`projectCode`),
+      dataIndex: "projectCode",
+      render: (item, row) => <p>{getProjectCode(row)}</p>,
     },
     {
       title: "costCenter",
@@ -103,29 +121,16 @@ function AddComponent({ employee, setEmployee }) {
       render: (item, row) => <p>{getPayment(row)}</p>,
     },
 
-    {
-      title: t(`scheme`),
-      dataIndex: "scheme",
-      render: (item, row) => <p>{getScheme(row)}</p>,
-    },
-    {
-      title: t(`amount`),
-      dataIndex: "amount",
-    },
-    {
-      title: t(`currency`),
-      dataIndex: "currency",
-    },
-    {
-      title: t(`multiplePayment`),
-      dataIndex: "paidMultiple",
-      render: (item, row) => <p>{item ? <CheckOutlined /> : "   "}</p>,
-    },
-    {
-      title: t(`paymentByCash`),
-      dataIndex: "paidByCash",
-      render: (item, row) => <p>{item ? <CheckOutlined /> : "   "}</p>,
-    },
+    // {
+    //   title: t(`multiplePayment`),
+    //   dataIndex: "paidMultiple",
+    //   render: (item, row) => <p>{item ? <CheckOutlined /> : "   "}</p>,
+    // },
+    // {
+    //   title: t(`paymentByCash`),
+    //   dataIndex: "paidByCash",
+    //   render: (item, row) => <p>{item ? <CheckOutlined /> : "   "}</p>,
+    // },
     {
       title: t(`start`),
       dataIndex: "startDate",
@@ -177,7 +182,7 @@ function AddComponent({ employee, setEmployee }) {
   const [components, setComponents] = useState([]);
   const [currencyList, setCurrencyList] = useState([]);
 
-  console.log('employee12',employee)
+  console.log("employee12", employee);
   const [employeeComponent, setEmployeeComponent] = useState({
     componentName: "",
     projectCode: "",
@@ -187,19 +192,21 @@ function AddComponent({ employee, setEmployee }) {
     endDate: null,
     scheme: "",
     // amount: null,
-    currency: "",
+    currency: 1,
     paidByCash: false,
     // cashAmount: null,
     paidMultiple: false,
-    schemeTypeId: null
+    schemeTypeId: null,
   });
 
-  useEffect(() =>{
-    if(employee?.schemeTypeId){
-      setEmployeeComponent({...employeeComponent,  schemeTypeId: employee?.schemeTypeId})
+  useEffect(() => {
+    if (employee?.schemeTypeId) {
+      setEmployeeComponent({
+        ...employeeComponent,
+        schemeTypeId: employee?.schemeTypeId,
+      });
     }
-
-  },[employee])
+  }, [employee]);
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -284,6 +291,12 @@ function AddComponent({ employee, setEmployee }) {
     return res?.code;
   };
 
+  const getCurrencyCode = (row) => {
+    console.log('currencyListcurrencyList',currencyList,row.currency)
+    const res = currencyList.filter((item) => item.id == row.currency)[0];
+    return res?.currency1;
+  };
+
   const getComponent = (row) => {
     const res = components.filter((item) => item.id == row.componentId)[0];
     return res?.name;
@@ -326,9 +339,7 @@ function AddComponent({ employee, setEmployee }) {
 
   const fetchCurrencies = async () => {
     // setTableLoading(true);
-    const result = await axios(
-      constants.API_PREFIX + "/api/Common/currencies"
-    );
+    const result = await axios(constants.API_PREFIX + "/api/Common/currencies");
 
     setCurrencyList(result.data);
     // setTableLoading(false);
@@ -344,12 +355,12 @@ function AddComponent({ employee, setEmployee }) {
     setPaymentDaysTypes([
       {
         id: 1,
-        name: 'სამუშაო დღეები',
+        name: "სამუშაო დღეები",
       },
       {
         id: 2,
-        name: 'კალენდარული დღეები',
-      }
+        name: "კალენდარული დღეები",
+      },
     ]);
     // setTableLoading(false);
   };
@@ -387,7 +398,7 @@ function AddComponent({ employee, setEmployee }) {
     const res = employee.employeeComponents.filter(
       (item) => item.id == record.id
     )[0];
-    console.log('res', res)
+    console.log("res", res);
     setEmployeeComponent({ ...res });
     setIsModalVisible(true);
   };
@@ -531,7 +542,7 @@ function AddComponent({ employee, setEmployee }) {
                             </Select> */}
               <span>{t(`paymentByCash`)}: </span> <br />
               <Checkbox
-                value={employeeComponent.paidByCash}
+                checked={employeeComponent.paidByCash}
                 onChange={(e) => onChangeBoolean(e, "paidByCash")}
               >
                 Checkbox
@@ -541,7 +552,7 @@ function AddComponent({ employee, setEmployee }) {
               <span> {t(`multiplePayment`)}: </span>
               <Checkbox
                 style={{ marginTop: 5 }}
-                value={employeeComponent.paidMultiple}
+                checked={employeeComponent.paidMultiple}
                 onChange={(e) => onChangeBoolean(e, "paidMultiple")}
               >
                 Checkbox

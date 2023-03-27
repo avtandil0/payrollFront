@@ -69,7 +69,7 @@ function MyDrawer({ visibleDrawer, setVisibleDrawer, drawerId }) {
       dataIndex: 'currency',
       key: 'currency',
     }
-    
+
   ];
 
   const { t } = useTranslation();
@@ -111,7 +111,7 @@ function MyDrawer({ visibleDrawer, setVisibleDrawer, drawerId }) {
         <p className="site-description-item-profile-p">{t(`personal`)}</p>
         <Row>
           <Col span={12}>
-            <DescriptionItem title={t(`fullName`)} content={`${employee.firstName} ${employee.lastName}`} />
+            <DescriptionItem title={t(`fullName`)} content={  <Link to={`Employee/Edit/${employee.id}`}>{employee.firstName} ${employee.lastName}</Link>} />
           </Col>
           <Col span={12}>
             <DescriptionItem title={t(`email`)} content={employee.email} />
@@ -154,7 +154,7 @@ function MyDrawer({ visibleDrawer, setVisibleDrawer, drawerId }) {
 
 
         <p className="site-description-item-profile-p">Components</p>
-        
+
 
         <Table columns={columns} dataSource={employeeComponent} />
 
@@ -163,8 +163,8 @@ function MyDrawer({ visibleDrawer, setVisibleDrawer, drawerId }) {
 
 
 
-        <p className="site-description-item-profile-p">{t(`links`)}</p>
-        <Row>
+        {/* <p className="site-description-item-profile-p">{t(`links`)}</p> */}
+        {/* <Row>
           <Col span={24}>
             <DescriptionItem
               title={t(`edit`)}
@@ -176,7 +176,7 @@ function MyDrawer({ visibleDrawer, setVisibleDrawer, drawerId }) {
               }
             />
           </Col>
-        </Row>
+        </Row> */}
 
 
 

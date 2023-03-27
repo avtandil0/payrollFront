@@ -77,6 +77,7 @@ function Currency() {
     {
       title: t(`currency`),
       dataIndex: "currency",
+      render: (text, record) => <span>{ record.currency.currency1}</span>,
     },
   ];
 

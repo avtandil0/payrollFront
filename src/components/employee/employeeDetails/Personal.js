@@ -457,7 +457,7 @@ function Personal() {
                             rules={requiredFieldRule}
                           >
                             <Input
-                              disabled={employee.resId != null}
+                              // disabled={employee.resId != null}
                               value={employee.firstName}
                               name="firstName"
                               onChange={(e) => handleChange(e)}
@@ -465,7 +465,7 @@ function Personal() {
                           </Form.Item>
                           <Form.Item label={t(`placeholderLastName`)}>
                             <Input
-                              disabled={employee.resId != null}
+                              // disabled={employee.resId != null}
                               value={employee.lastName}
                               name="lastName"
                               onChange={(e) => handleChange(e)}
@@ -481,7 +481,7 @@ function Personal() {
                           </Form.Item>
                           <Form.Item label="landIso">
                             <Input
-                              disabled={employee.resId != null}
+                              // disabled={employee.resId != null}
                               value={employee.landIso}
                               name="landIso"
                               onChange={(e) => handleChange(e)}
@@ -489,7 +489,7 @@ function Personal() {
                           </Form.Item>
                           <Form.Item label={t(`employeeGraceGroup`)}>
                             <Select
-                              disabled={employee.resId != null}
+                              // disabled={employee.resId != null}
                               defaultValue="აირჩიეთ"
                               onChange={(value) =>
                                 handleChangeSelect(value, "employeeGraceTypeId")
@@ -505,7 +505,7 @@ function Personal() {
                         <Col span={8}>
                           <Form.Item label={t(`mobilePhone`)}>
                             <Input
-                              disabled={employee.resId != null}
+                              // disabled={employee.resId != null}
                               value={employee.mobilePhone}
                               name="mobilePhone"
                               onChange={(e) => handleChange(e)}
@@ -513,7 +513,7 @@ function Personal() {
                           </Form.Item>
                           <Form.Item label={t(`email`)}>
                             <Input
-                              disabled={employee.resId != null}
+                              // disabled={employee.resId != null}
                               value={employee.email}
                               name="email"
                               onChange={(e) => handleChange(e)}
@@ -521,7 +521,7 @@ function Personal() {
                           </Form.Item>
                           <Form.Item label={t(`personalNumber`)}>
                             <Input
-                              disabled={employee.resId != null}
+                              // disabled={employee.resId != null}
                               value={employee.personalNumber}
                               name="personalNumber"
                               onChange={(e) => handleChange(e)}
@@ -529,7 +529,7 @@ function Personal() {
                           </Form.Item>
                           <Form.Item label={t(`departmentName`)}>
                             <Select
-                              disabled={employee.resId != null}
+                              // disabled={employee.resId != null}
                               defaultValue="აირჩიეთ"
                               onChange={(value) =>
                                 handleChangeSelect(value, "departmentId")
@@ -543,7 +543,7 @@ function Personal() {
                           </Form.Item>
                           <Form.Item label={t(`graceAmount`)}>
                             <Input
-                              disabled={employee.resId != null}
+                              // disabled={employee.resId != null}
                               type="number"
                               value={employee.graceAmount}
                               name="graceAmount"
@@ -554,7 +554,7 @@ function Personal() {
                         <Col span={8}>
                           <Form.Item label={t(`address`)}>
                             <Input
-                              disabled={employee.resId != null}
+                              // disabled={employee.resId != null}
                               value={employee.address}
                               name="address"
                               onChange={(e) => handleChange(e)}
@@ -562,7 +562,7 @@ function Personal() {
                           </Form.Item>
                           <Form.Item label={t(`bankAccountNumber`)}>
                             <Input
-                              disabled={employee.resId != null}
+                              // disabled={employee.resId != null}
                               value={employee.bankAccountNumber}
                               name="bankAccountNumber"
                               onChange={(e) => handleChange(e)}
@@ -570,7 +570,7 @@ function Personal() {
                           </Form.Item>
                           <Form.Item label={t(`scheme`)}>
                             <Select
-                              disabled={employee.resId != null}
+                              // disabled={employee.resId != null}
                               defaultValue="აირჩიეთ"
                               onChange={(value) =>
                                 handleChangeSelect(value, "schemeTypeId")
@@ -584,7 +584,7 @@ function Personal() {
                           </Form.Item>
                           <Form.Item label={t(`position`)}>
                             <Input
-                              disabled={employee.resId != null}
+                              // disabled={employee.resId != null}
                               value={employee.position}
                               name="position"
                               onChange={(e) => handleChange(e)}

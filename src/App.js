@@ -55,7 +55,7 @@ function App() {
   useEffect(() => {
     let token = localStorage.getItem("payrollAppLogintoken");
     if (token) {
-      setCurrentUser();
+      // setCurrentUser();
       setIsAuthorized(true);
     }
   }, []);

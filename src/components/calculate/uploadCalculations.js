@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { UploadOutlined } from '@ant-design/icons';
 import { Button, message, Upload } from 'antd';
 import type { RcFile, UploadFile, UploadProps } from 'antd/es/upload/interface';
+import constants from "../../constant";
 
 export const UploadCalculations = () => {
   const [fileList, setFileList] = useState([]);
@@ -10,11 +11,11 @@ export const UploadCalculations = () => {
   const handleUpload = () => {
     const formData = new FormData();
     fileList.forEach((file) => {
-      formData.append('files[]', file );
+      formData.append('file', file );
     });
     setUploading(true);
     // You can use any AJAX library you like
-    fetch('https://www.mocky.io/v2/5cc8019d300000980a055e76', {
+    fetch(constants.API_PREFIX + `/api/Calculation/CreateEmployeeFromFile`, {
       method: 'POST',
       body: formData,
     })

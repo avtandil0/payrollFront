@@ -16,6 +16,7 @@ import {
   Tooltip,
   DatePicker,
   Tag,
+  Checkbox
 } from "antd";
 import {
   PlusCircleOutlined,
@@ -84,6 +85,11 @@ function Component() {
       ),
     },
     {
+      title: t(`typeName`),
+      dataIndex: "typeName",
+      render: (text) => <p>{text}</p>,
+    },
+    {
       title: t(`placeholderFirstName`),
       dataIndex: "name",
       render: (text) => <p>{text}</p>,
@@ -145,6 +151,7 @@ function Component() {
     debitAccountId: null,
     startDate: null,
     endDate: null,
+    type: 1
   });
   const [tableLoading, setTableLoading] = useState(false);
   const [isEdiT, setIsEdiT] = useState(false);
@@ -186,6 +193,7 @@ function Component() {
     fetchData();
     fetchAaccountsReportCharts();
     fetchCoefficients();
+    setComponent({ ...component, ['type']: 1 });
   }, []);
 
   const showModal = () => {
@@ -276,8 +284,9 @@ function Component() {
     console.log("handleChangeSelect", value);
   };
 
-  function onChange(date, dateString) {
-    console.log(date, dateString);
+  function onChangeCheckbox(value) {
+    console.log(value.target.checked);
+    setComponent({ ...component, ['ignoreIncome']: value.target.checked });
   }
 
   return (
@@ -305,42 +314,54 @@ function Component() {
 
         // width={1000}
       >
-        <Form>
-          <Form.Item>
-            <Space style={{ marginRight: "40px" }}>
-              <Form.Item
-                label={t(`placeholderFirstName`)}
-                rules={[{ required: true }]}
-                style={{ display: "inline-block", width: "calc(100% + 8px)" }}
-              >
-                <Input
-                  value={component.name}
-                  type="text"
-                  name="name"
-                  onChange={(e) => handleChange(e)}
-                  placeholder={t(`placeholderFirstName`)}
-                />
-              </Form.Item>
-            </Space>
+        <Form layout="vertical">
+          <Space style={{ marginRight: "40px" }}>
+            <Form.Item
+              label={t(`placeholderFirstName`)}
+              rules={[{ required: true }]}
+              labelAlign={"right"}
+              style={{ display: "inline-block", width: 220 }}
+            >
+              <Input
+                value={component.name}
+                type="text"
+                name="name"
+                onChange={(e) => handleChange(e)}
+                placeholder={t(`placeholderFirstName`)}
+              />
+            </Form.Item>
 
+            <Form.Item
+              label={t(`type`)}
+              rules={[{ required: true }]}
+              style={{ display: "inline-block", width: 220 }}
+            >
+              <Select
+                // defaultValue={'1'}
+                name="type"
+                value={component.type}
+                onChange={(value) => handleChangeSelect(value, "type")}
+                options={[
+                  { value: 1, label: "დარიცხვა" },
+                  { value: 2, label: "დაკავება" },
+                ]}
+              />
+            </Form.Item>
+          </Space>
+
+          <Space style={{ marginRight: "40px" }}>
             <Form.Item
               label={t(`coefficient`)}
               style={{
                 display: "inline-block",
-                width: "calc(50% - 8px)",
-                margin: "-20 8px",
+                width: 220,
               }}
             >
               <Select
                 defaultValue="აირჩიეთ"
-                style={{ width: 120 }}
                 onChange={(value) => handleChangeSelect(value, "coefficientId")}
                 value={component.coefficientId}
-                style={{
-                  display: "inline-block",
-                  width: "calc(100% - 8px)",
-                  margin: "-20 8px",
-                }}
+                style={{ width: 220 }}
               >
                 {coefficients.map((i) => (
                   <Option value={i.id}>{i.name}</Option>
@@ -351,49 +372,36 @@ function Component() {
             <Form.Item
               label={t(`creditAcount`)}
               style={{
-                display: "inline-block",
-                width: "calc(50% - 8px)",
-                margin: "-20 8px",
+                width: 220,
               }}
             >
               <Select
                 defaultValue="აირჩიეთ"
-                style={{ width: 120 }}
                 onChange={(value) =>
                   handleChangeSelect(value, "creditAccountId")
                 }
                 value={component.creditAccountId}
-                style={{
-                  display: "inline-block",
-                  width: "calc(100% - 8px)",
-                  margin: "-20 8px",
-                }}
               >
                 {accountsReportCharts.map((i) => (
                   <Option value={i.id}>{i.code}</Option>
                 ))}
               </Select>
             </Form.Item>
+          </Space>
+
+          <Space style={{ marginRight: "40px" }}>
             <Form.Item
               label={t(`debitAcount`)}
               style={{
-                display: "inline-block",
-                width: "calc(50% - 8px)",
-                margin: "-20 8px",
+                width: 220,
               }}
             >
               <Select
                 defaultValue="აირჩიეთ"
-                style={{ width: 120 }}
                 onChange={(value) =>
                   handleChangeSelect(value, "debitAccountId")
                 }
                 value={component.debitAccountId}
-                style={{
-                  display: "inline-block",
-                  width: "calc(100% - 8px)",
-                  margin: "-20 8px",
-                }}
               >
                 {accountsReportCharts.map((i) => (
                   <Option value={i.id}>{i.code}</Option>
@@ -404,9 +412,7 @@ function Component() {
             <Form.Item
               label={t(`start`)}
               style={{
-                display: "inline-block",
-                width: "calc(50% - 8px)",
-                margin: "-20 8px",
+                width: 220,
               }}
             >
               <Space>
@@ -422,29 +428,36 @@ function Component() {
                 </Space>
               </Space>
             </Form.Item>
+          </Space>
+          <Space>
 
-            <Form.Item
-              label={t(`finish`)}
-              style={{
-                display: "inline-block",
-                width: "calc(50% - 8px)",
-                margin: "-20 8px",
-              }}
-            >
-              <Space>
-                <Space direction="vertical">
-                  <DatePicker
-                    value={
-                      component?.endDate
-                        ? moment.utc(component?.endDate, "YYYY/MM/DD")
-                        : null
-                    }
-                    onChange={(value) => handleChangeSelect(value, "endDate")}
-                  />
-                </Space>
+          <Form.Item
+            label={t(`finish`)}
+            style={{
+              width: 220,
+            }}
+          >
+              <Space direction="vertical">
+                <DatePicker
+                  value={
+                    component?.endDate
+                      ? moment.utc(component?.endDate, "YYYY/MM/DD")
+                      : null
+                  }
+                  onChange={(value) => handleChangeSelect(value, "endDate")}
+                />
               </Space>
-            </Form.Item>
           </Form.Item>
+          <Form.Item
+            label={t(`finish`)}
+            style={{
+              width: 220,
+            }}
+          >
+              <Checkbox checked={component.ignoreIncome} onChange={onChangeCheckbox}>Ignore income value </Checkbox>
+          </Form.Item>
+          </Space>
+
         </Form>
       </Modal>
 

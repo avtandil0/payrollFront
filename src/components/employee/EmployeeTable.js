@@ -67,8 +67,8 @@ function EmployeeTable({ loading,employeeArray, fetchData, showDelete }) {
             dataIndex: 'graceAmount',
         },
         {
-            title: t(`schemeTypeId`),
-            dataIndex: 'schemeTypeId',
+            title: t(`schemeTypeName`),
+            dataIndex: 'schemeTypeName',
         },
     ];
     // const [dataSaveArray, setDataSaveArray] = useState([]);

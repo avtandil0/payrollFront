@@ -34,12 +34,34 @@ import MyDrawer from "./drawer";
 import { useTranslation, initReactI18next } from "react-i18next";
 import { UserContext } from "../../appContext";
 import { UploadCalculations } from "./uploadCalculations";
+import qs from "qs";
+import { orderBy } from "lodash";
 
 const { Option } = Select;
 
 function Calculate() {
   const { user } = useContext(UserContext);
   const { t } = useTranslation();
+
+  const confirmAll = async (record) => {
+    console.log("record", record, filter);
+    const result = await axios.delete(
+      constants.API_PREFIX + `/api/Calculation/deleteCalculations`,
+      {
+        params: {
+          id: record.key,
+          calculationPeriod: filter.calculationPeriod,
+        },
+      }
+    );
+    console.log("result", result);
+    if (result.data.isSuccess) {
+      message.success(result.data.message);
+      search();
+    } else {
+      message.error(result.data.message);
+    }
+  };
 
   const confirm = async (record) => {
     console.log("record", record);
@@ -82,6 +104,11 @@ function Calculate() {
         },
       },
       { title: "Component Name", dataIndex: "name", key: "name" },
+      {
+        title: "calculationDate",
+        dataIndex: "calculationDate",
+        key: "calculationDate",
+      },
       { title: "Gross", dataIndex: "gross", key: "gross" },
       { title: "Net", dataIndex: "net", key: "net" },
       { title: "Paid", dataIndex: "paid", key: "paid" },
@@ -108,6 +135,23 @@ function Calculate() {
     {
       title: t(`actions`),
       dataIndex: "actions",
+      render: (text, row) => {
+        return (
+          <Popconfirm
+            title="Are you sure to delete this?"
+            onConfirm={() => confirmAll(row)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Tooltip placement="bottom" title="წაშლა">
+              <Button
+                shape="circle"
+                icon={<DeleteOutlined style={{ color: "red" }} />}
+              />
+            </Tooltip>
+          </Popconfirm>
+        );
+      },
     },
     {
       title: t(`fullName`),
@@ -120,10 +164,10 @@ function Calculate() {
         );
       },
     },
-    {
-      title: t(`calculateDate`),
-      dataIndex: "calculationDate",
-    },
+    // {
+    //   title: t(`calculateDate`),
+    //   dataIndex: "calculationDate",
+    // },
     {
       title: "Gross",
       dataIndex: "gross",
@@ -148,6 +192,11 @@ function Calculate() {
       title: "PensionTax",
       dataIndex: "PensionTax",
       render: (text, row) => <p>{row.pensionTax} </p>,
+    },
+    {
+      title: "Deduction",
+      dataIndex: "Deduction",
+      render: (text, row) => <p>{row.deduction} </p>,
     },
     {
       title: t(`RemainingGraceAmount`),
@@ -218,9 +267,9 @@ function Calculate() {
     console.log("filter", filter);
     const result = await axios(
       constants.API_PREFIX + "/api/Employee/GetEmployeeByCalculationFilter",
-      { params: filter }
+      { params: filter, paramsSerializer: (params) => qs.stringify(params) }
     );
-    console.log("result", result.data);
+    console.log("result980", result.data);
 
     let mapedData = result.data.map((r) => ({
       key: r.id,
@@ -232,6 +281,9 @@ function Calculate() {
       remainingGraceAmount: r.remainingGraceAmount,
       totalBalance: sumBy(r.calculations, (r) => r.totalBalance),
       name: `${r.firstName} ${r.lastName}`,
+      deduction: sumBy(r.calculations, (r) =>
+        r.employeeComponent.component.type == 2 ? r.net : 0
+      ), //დაკავება
       childrens: r.calculations.map((c) => ({
         id: c.id,
         gross: c.gross,
@@ -240,11 +292,17 @@ function Calculate() {
         incomeTax: c.incomeTax,
         pensionTax: c.pensionTax,
         calculationDate: moment(c.calculationDate).format("YYYY-MM-DD"),
-        name: c.employeeComponent?.componentName,
+        name: c.employeeComponent?.componentName ?? "Gross",
         remainingGraceAmount: c.remainingGraceAmount,
         totalBalance: r.totalBalance,
       })),
     }));
+
+    mapedData.forEach(element => {
+      element.childrens = orderBy(element.childrens, ["calculationDate"], ["asc"]);
+    });
+    console.log("ordered",mapedData);
+
     setCalculations(mapedData);
     setSearchLoading(false);
   };
@@ -342,6 +400,9 @@ function Calculate() {
             placeholder={t(`placeholderChoose`)}
             style={{ width: "100%" }}
             value={filter.departmentId}
+            onChange={(e) => setFilter({ ...filter, departmentId: e })}
+            allowClear
+            mode="multiple"
           >
             {departments.map((i) => (
               <Option value={i.id}>{i.name}</Option>
@@ -409,7 +470,7 @@ function Calculate() {
             <Col span={8}>
               <DatePicker
                 onChange={onChangeCalculationDate}
-                placeholder={t(`placeholderSelectMonth`)}
+                placeholder={t(`Select Date`)}
               />
             </Col>
             <Col span={8}></Col>
