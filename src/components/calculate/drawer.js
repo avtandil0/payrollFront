@@ -47,7 +47,6 @@ function MyDrawer({ visibleDrawer, setVisibleDrawer, drawerId }) {
       title: 'componentName',
       dataIndex: 'componentName',
       key: 'componentName',
-      render: text => <p>{text}</p>,
     },
     {
       title: 'costCenterCode',
@@ -68,9 +67,27 @@ function MyDrawer({ visibleDrawer, setVisibleDrawer, drawerId }) {
       title: 'currency',
       dataIndex: 'currency',
       key: 'currency',
+      render: (item, row) => <>{getCurrencyCode(row)}</>,
     }
 
   ];
+
+  const [currencyList, setCurrencyList] = useState([]);
+
+  const fetchCurrencies = async () => {
+    // setTableLoading(true);
+    const result = await axios(constants.API_PREFIX + "/api/Common/currencies");
+
+    setCurrencyList(result.data);
+    // setTableLoading(false);
+  };
+
+  const getCurrencyCode = (row) => {
+    console.log('currencyListcurrencyList',currencyList,row.currency)
+    const res = currencyList.filter((item) => item.id == row.currency)[0];
+    return res?.currency1;
+  };
+
 
   const { t } = useTranslation();
 
@@ -93,6 +110,8 @@ function MyDrawer({ visibleDrawer, setVisibleDrawer, drawerId }) {
   useEffect(() => {
     if (drawerId) {
       getEmployee();
+    fetchCurrencies();
+
     }
     // console.log("drawerId", drawerId)
   }, [drawerId]);
@@ -111,7 +130,7 @@ function MyDrawer({ visibleDrawer, setVisibleDrawer, drawerId }) {
         <p className="site-description-item-profile-p">{t(`personal`)}</p>
         <Row>
           <Col span={12}>
-            <DescriptionItem title={t(`fullName`)} content={  <Link to={`Employee/Edit/${employee.id}`}>{employee.firstName} ${employee.lastName}</Link>} />
+            <DescriptionItem title={t(`fullName`)} content={  <Link to={`Employee/Edit/${employee.id}`}>{employee.firstName} {employee.lastName}</Link>} />
           </Col>
           <Col span={12}>
             <DescriptionItem title={t(`email`)} content={employee.email} />
@@ -119,7 +138,7 @@ function MyDrawer({ visibleDrawer, setVisibleDrawer, drawerId }) {
         </Row>
         <Row>
           <Col span={12}>
-            <DescriptionItem title={t(`mersonalNumber`)} content={employee.personalNumber} />
+            <DescriptionItem title={t(`PersonalNumber`)} content={employee.personalNumber} />
           </Col>
           <Col span={12}>
             <DescriptionItem title={t(`mobilePhone`)} content={employee.mobilePhone} />

@@ -35,8 +35,6 @@ import { useTranslation } from "react-i18next";
 const { Option } = Select;
 
 function AddComponent({ employee, setEmployee }) {
-
-
   const { t } = useTranslation();
 
   const columns = [
@@ -154,22 +152,23 @@ function AddComponent({ employee, setEmployee }) {
     {
       title: t(`finish`),
       dataIndex: "endDate",
-      render: (endDate, row) => (
-        <p style={{ width: 100 }}>
-          {row.status ? (
-            row.status.fieldNames &&
-            row.status.fieldNames.includes("EndDate") ? (
-              <Tag color={"volcano"}>
-                {moment(endDate).format("YYYY-MM-DD")}
-              </Tag>
+      render: (endDate, row) =>
+        endDate ? (
+          <p style={{ width: 100 }}>
+            {row.status ? (
+              row.status.fieldNames &&
+              row.status.fieldNames.includes("EndDate") ? (
+                <Tag color={"volcano"}>
+                  {moment(endDate).format("YYYY-MM-DD")}
+                </Tag>
+              ) : (
+                moment(endDate).format("YYYY-MM-DD")
+              )
             ) : (
               moment(endDate).format("YYYY-MM-DD")
-            )
-          ) : (
-            moment(endDate).format("YYYY-MM-DD")
-          )}
-        </p>
-      ),
+            )}
+          </p>
+        ) : null,
     },
   ];
 
@@ -292,7 +291,7 @@ function AddComponent({ employee, setEmployee }) {
   };
 
   const getCurrencyCode = (row) => {
-    console.log('currencyListcurrencyList',currencyList,row.currency)
+    console.log("currencyListcurrencyList", currencyList, row.currency);
     const res = currencyList.filter((item) => item.id == row.currency)[0];
     return res?.currency1;
   };

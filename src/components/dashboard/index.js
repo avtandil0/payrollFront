@@ -22,6 +22,9 @@ import {
   useLocation,
 } from "react-router-dom";
 
+import axios from "axios";
+import { exportedFunction, Rectangle } from "../../test";
+
 function Dashboard() {
   const { Countdown } = Statistic;
   const deadline = Date.now() + 1000 * 60 * 60 * 24 * 2 + 1000 * 30; // Moment is also OK
@@ -36,6 +39,10 @@ function Dashboard() {
     }
   }
 
+  useEffect(() => {
+
+  }, []);
+
   return (
     <div>
       <Row>
@@ -44,19 +51,19 @@ function Dashboard() {
           <Row gutter={16}>
             <Col span={12}>
               <div style={{ display: "flex" }}>
-              <Space size="large">
-                <div>
-                  <Statistic title="Active Users" value={1460} />
-                </div>
-                <div >
-                  <Statistic title="Passive Users" value={379} />
-                </div>
-                <div >
-                  <Statistic title="Analitics" value={1000} />
-                </div>
-                <div >
-                  <Statistic title="Operators" value={460} />
-                </div>
+                <Space size="large">
+                  <div>
+                    <Statistic title="Active Users" value={1460} />
+                  </div>
+                  <div>
+                    <Statistic title="Passive Users" value={379} />
+                  </div>
+                  <div>
+                    <Statistic title="Analitics" value={1000} />
+                  </div>
+                  <div>
+                    <Statistic title="Operators" value={460} />
+                  </div>
                 </Space>
               </div>
             </Col>

@@ -34,7 +34,9 @@ import {
   CalendarOutlined,
   FieldTimeOutlined,
   FileDoneOutlined,
-  DollarOutlined
+  DollarOutlined,
+  SnippetsOutlined,
+  FileExcelOutlined
 } from "@ant-design/icons";
 
 import Component from "../component/index";
@@ -54,7 +56,7 @@ import Dashboard from "../dashboard";
 import Import from "../import";
 import Users from "../users";
 import TimeTable from "../timeTable";
-import DayTable from '../dayTable'
+import DayTable from "../dayTable";
 
 import { useTranslation } from "react-i18next";
 
@@ -67,15 +69,17 @@ import {
   useRouteMatch,
   useLocation,
 } from "react-router-dom";
-import axios from 'axios'
+import axios from "axios";
 import { useHistory } from "react-router-dom";
 import { HOME_PAGE } from "../../constant";
-import constants from '../../constant'
+import constants from "../../constant";
 
 import GE from "../../assets/logos/ge.png"; // with import
 import EN from "../../assets/logos/en.png"; // with import
 import RU from "../../assets/logos/ru.png"; // with import
 import Declaration from "../declaration";
+import DeclarationPension from "../declaration/declarationPension";
+import Report from "../report";
 
 const { Header, Sider, Content } = LayoutAnt;
 
@@ -161,9 +165,11 @@ function Home() {
 
   const logOut = async () => {
     let token = localStorage.getItem("payrollAppLogintoken");
-    axios.defaults.headers.common = {'Authorization': `Bearer ${token}`}
-    const result = await axios.post(constants.API_PREFIX+"/api/Account/logout")
-    console.log('resultresultresult',result)
+    axios.defaults.headers.common = { Authorization: `Bearer ${token}` };
+    const result = await axios.post(
+      constants.API_PREFIX + "/api/Account/logout"
+    );
+    console.log("resultresultresult", result);
     localStorage.removeItem("payrollAppLogintoken");
     localStorage.removeItem("payrollAppUser");
     // history.push(`${HOME_PAGE}`); ???
@@ -281,23 +287,46 @@ function Home() {
             {t(`import`)}
           </Menu.Item>
 
-
           <Menu.Item
-            key="20"
-            icon={<FileDoneOutlined />}
-            onClick={(e) => ClickGoPage(e, "declaration")}
+            key="40"
+            icon={<FileExcelOutlined />}
+            onClick={(e) => ClickGoPage(e, "report")}
           >
-            {t(`declaration`)}
+            {t(`Report`)}
           </Menu.Item>
 
+          <SubMenu
+            key="sub7"
+            title={t(`declarations`)}
+            icon={<SnippetsOutlined />}
+          >
+            <Menu.Item
+              key="20"
+              icon={<FileDoneOutlined />}
+              onClick={(e) => ClickGoPage(e, "declaration")}
+            >
+              {t(`Standart `)}
+            </Menu.Item>
+            <Menu.Item
+              key="30"
+              icon={<FileDoneOutlined />}
+              onClick={(e) => ClickGoPage(e, "declarationPension")}
+            >
+              {t(`Pension`)}
+            </Menu.Item>
+          </SubMenu>
 
-           <SubMenu key="sub2" title={t(`timeKeeping`)} icon={<CalendarOutlined />}>
+          <SubMenu
+            key="sub2"
+            title={t(`timeKeeping`)}
+            icon={<CalendarOutlined />}
+          >
             <Menu.Item
               key="14"
               icon={<CalendarOutlined />}
               onClick={(e) => ClickGoPage(e, "timeTable")}
             >
-               {t(`timeTable`)}
+              {t(`timeTable`)}
             </Menu.Item>
             <Menu.Item
               key="15"
@@ -306,7 +335,6 @@ function Home() {
             >
               {t(`dayTable`)}
             </Menu.Item>
-
           </SubMenu>
 
           {user?.roles?.admin ? (
@@ -475,8 +503,14 @@ function Home() {
             <Route path={`${HOME_PAGE}/import`}>
               <Import />
             </Route>
+            <Route path={`${HOME_PAGE}/report`}>
+              <Report />
+            </Route>
             <Route path={`${HOME_PAGE}/declaration`}>
               <Declaration />
+            </Route>
+            <Route path={`${HOME_PAGE}/declarationPension`}>
+              <DeclarationPension />
             </Route>
             <Route path={`${HOME_PAGE}/timeTable`}>
               <TimeTable />

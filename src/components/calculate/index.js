@@ -119,11 +119,11 @@ function Calculate() {
         dataIndex: "remainingGraceAmount",
         key: "RemainingGraceAmount",
       },
-      {
-        title: t(`totalBalance`),
-        dataIndex: "TotalBalance",
-        render: (text, row) => <p> {row.totalBalance}</p>,
-      },
+      // {
+      //   title: t(`totalBalance`),
+      //   dataIndex: "TotalBalance",
+      //   render: (text, row) => <p> {row.totalBalance}</p>,
+      // },
     ];
 
     return (
@@ -238,6 +238,8 @@ function Calculate() {
   useEffect(() => {
     console.log("user from context ", user);
     fetchDepartments();
+    fetchComponents();
+    fetchCurrencies();
   }, []);
 
   const handleOk = async () => {
@@ -261,6 +263,18 @@ function Calculate() {
     setIsModalVisible(false);
   };
 
+  const getToTalBalance = (items) => {
+    let paids = 0;
+    console.log('itemsitems',items)
+    items.forEach((element) => {
+      if (element.employeeComponent?.component?.name.toLowerCase().includes("paid")) {
+        paids += element.paid;
+      }
+    });
+
+    console.log("paidspaids,paids",paids);
+    return sumBy(items, (r) => r.net)?.toFixed(2) - paids;
+  };
   const search = async () => {
     setSearchLoading(true);
 
@@ -273,17 +287,17 @@ function Calculate() {
 
     let mapedData = result.data.map((r) => ({
       key: r.id,
-      gross: sumBy(r.calculations, (r) => r.gross),
-      net: sumBy(r.calculations, (r) => r.net),
-      paid: sumBy(r.calculations, (r) => r.paid),
-      incomeTax: sumBy(r.calculations, (r) => r.incomeTax),
-      pensionTax: sumBy(r.calculations, (r) => r.pensionTax),
+      gross: sumBy(r.calculations, (r) => r.gross)?.toFixed(2),
+      net: sumBy(r.calculations, (r) => r.net)?.toFixed(2),
+      paid: sumBy(r.calculations, (r) => r.paid)?.toFixed(2),
+      incomeTax: sumBy(r.calculations, (r) => r.incomeTax)?.toFixed(2),
+      pensionTax: sumBy(r.calculations, (r) => r.pensionTax)?.toFixed(2),
       remainingGraceAmount: r.remainingGraceAmount,
-      totalBalance: sumBy(r.calculations, (r) => r.totalBalance),
+      totalBalance: getToTalBalance(r.calculations), //
       name: `${r.firstName} ${r.lastName}`,
       deduction: sumBy(r.calculations, (r) =>
-        r.employeeComponent.component.type == 2 ? r.net : 0
-      ), //დაკავება
+        r.employeeComponent?.component.type == 2 ? r.net : 0
+      )?.toFixed(2), //დაკავება
       childrens: r.calculations.map((c) => ({
         id: c.id,
         gross: c.gross,
@@ -294,14 +308,18 @@ function Calculate() {
         calculationDate: moment(c.calculationDate).format("YYYY-MM-DD"),
         name: c.employeeComponent?.componentName ?? "Gross",
         remainingGraceAmount: c.remainingGraceAmount,
-        totalBalance: r.totalBalance,
+        // totalBalance: r.totalBalance,
       })),
     }));
 
-    mapedData.forEach(element => {
-      element.childrens = orderBy(element.childrens, ["calculationDate"], ["asc"]);
+    mapedData.forEach((element) => {
+      element.childrens = orderBy(
+        element.childrens,
+        ["calculationDate"],
+        ["asc"]
+      );
     });
-    console.log("ordered",mapedData);
+    console.log("ordered", mapedData);
 
     setCalculations(mapedData);
     setSearchLoading(false);
@@ -366,6 +384,78 @@ function Calculate() {
         message.error(`${info.file.name} file upload failed.`);
       }
     },
+  };
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const showModalAddComp = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOkAddComp = async () => {
+    console.log("asasas", importData);
+    const result = await axios.post(
+      constants.API_PREFIX +
+        `/api/Calculation/addCalculation/${importData.calculationDate}/${importData.componentId}/${importData.amount}/${importData.currency}`,
+      filter
+    );
+
+    console.log("result calculation---", result.data);
+
+    if (result.data.isSuccess) {
+      search();
+      setIsModalVisible(false);
+      message.success("This is a success message");
+    } else {
+      message.error(result.data.message);
+    }
+    setIsModalOpen(false);
+  };
+
+  const handleCancelAddComp = () => {
+    setIsModalOpen(false);
+  };
+
+  const [components, setComponents] = useState([]);
+
+  const fetchComponents = async () => {
+    const result = await axios(
+      constants.API_PREFIX + "/api/Component/getAllActive"
+    );
+
+    setComponents(result.data);
+  };
+
+  const fetchCurrencies = async () => {
+    // setTableLoading(true);
+    const result = await axios(constants.API_PREFIX + "/api/Common/currencies");
+
+    setCurrencyList(result.data);
+    // setTableLoading(false);
+  };
+
+  const [currencyList, setCurrencyList] = useState([]);
+
+  const [importData, setImportData] = useState({
+    paidPeriod: null,
+    paidDate: null,
+    componentId: null,
+    persons: [],
+  });
+
+  const handleChangeForm = (value, name) => {
+    setImportData({ ...importData, [name]: value });
+    console.log("------", value, name);
+  };
+
+  const handleChangeFormDate = (value, name) => {
+    // setImportData({ ...importData, [name]: value });
+    console.log("------", value, name);
+    setImportData({ ...importData, ["calculationDate"]: name });
+  };
+
+  const handleChangeFormInput = (e) => {
+    setImportData({ ...importData, ["amount"]: e.target.value });
   };
 
   return (
@@ -477,6 +567,56 @@ function Calculate() {
           </Row>
         </Modal>
       </Space>
+      <Button
+        style={{ marginLeft: 15 }}
+        type="primary"
+        onClick={showModalAddComp}
+      >
+        Add Component
+      </Button>
+      <Modal
+        title="Add Component"
+        open={isModalOpen}
+        onOk={handleOkAddComp}
+        onCancel={handleCancelAddComp}
+        width={600}
+      >
+        <div>
+          <Select
+            defaultValue="Component"
+            onChange={(value) => handleChangeForm(value, "componentId")}
+            style={{ width: "249px" }}
+          >
+            {components.map((i) => (
+              <Option value={i.id}>{i.name}</Option>
+            ))}
+          </Select>
+
+          <DatePicker
+            style={{ marginLeft: 13, width: "249px" }}
+            onChange={handleChangeFormDate}
+            placeholder={t(`Select Date`)}
+          />
+        </div>
+
+        <div>
+          <Select
+            defaultValue="Currency"
+            style={{ width: 249, marginTop: 15 }}
+            onChange={(value) => handleChangeForm(value, "currency")}
+          >
+            {currencyList.map((i) => (
+              <Option value={i.id}>{i.currency1}</Option>
+            ))}
+          </Select>
+
+          <Input
+            onChange={handleChangeFormInput}
+            style={{ width: 249, marginLeft: 15 }}
+            placeholder="Amount"
+          />
+        </div>
+      </Modal>
 
       <br />
       <br />

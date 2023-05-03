@@ -71,18 +71,28 @@ const columns = [
     key: "issuedAmount",
   },
   {
-    title: "Grace Value",
-    dataIndex: "remainingGrace",
-    key: "remainingGrace",
+    title: "Pension Schema",
+    dataIndex: "pensionSchema",
+    key: "pensionSchema",
+    render: (pensionSchema) => (
+      <>{pensionSchema == 1 ? "" : <span>&#x2713;</span>}</>
+    ),
   },
   {
-    title: "Income Tax",
-    dataIndex: "incomeTax",
-    key: "incomeTax",
+    title: "%",
+    dataIndex: "percent",
+    key: "percent",
+    render: (percent, record) => (
+      <>
+        {record.pensionSchema == 1
+          ? ""
+          : (record.issuedAmount * 0.02).toFixed(2)}
+      </>
+    ),
   },
 ];
 const data = [];
-const Declaration = () => {
+const DeclarationPension = () => {
   const [form] = Form.useForm();
 
   const [declarationData, setDeclarationData] = useState([]);
@@ -198,4 +208,4 @@ const Declaration = () => {
     </>
   );
 };
-export default Declaration;
+export default DeclarationPension;

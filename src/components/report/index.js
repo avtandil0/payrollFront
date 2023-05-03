@@ -14,6 +14,7 @@ import { SearchOutlined, TableOutlined } from "@ant-design/icons";
 import axios from "axios";
 import constants from "../../constant";
 import moment from "moment";
+import { sumBy } from "lodash";
 
 const yearsOptions = [];
 for (let i = 2020; i < new Date().getFullYear(); i++) {
@@ -31,58 +32,33 @@ for (let i = 0; i < 12; i++) {
   });
 }
 
-const columns = [
+const data = [];
+const Report = () => {
+
+const [columns, setColumns] = useState([
   {
     title: "Res_id",
     dataIndex: "resId",
     key: "res_id",
   },
   {
-    title: "PersonalNumber",
+    title: "პირადი ნომერი",
     dataIndex: "personalNumber",
     key: "personalNumber",
     render: (text) => <>{text}</>,
   },
   {
-    title: "FirstName",
+    title: "სახელი",
     dataIndex: "firstName",
     key: "firstName",
   },
   {
-    title: "LastName",
+    title: "გვარი",
     dataIndex: "lastName",
     key: "lastName",
   },
-  {
-    title: "Address",
-    dataIndex: "address1",
-    key: "address1",
-  },
 
-  {
-    title: "Calculation Date",
-    dataIndex: "calculationDate",
-    key: "calculationDate",
-    render: (text) => <>{moment(text).format("YYYY-MM-DD")}</>,
-  },
-  {
-    title: "Issued Amount",
-    dataIndex: "issuedAmount",
-    key: "issuedAmount",
-  },
-  {
-    title: "Grace Value",
-    dataIndex: "remainingGrace",
-    key: "remainingGrace",
-  },
-  {
-    title: "Income Tax",
-    dataIndex: "incomeTax",
-    key: "incomeTax",
-  },
-];
-const data = [];
-const Declaration = () => {
+]);
   const [form] = Form.useForm();
 
   const [declarationData, setDeclarationData] = useState([]);
@@ -91,7 +67,7 @@ const Declaration = () => {
   const fetchData = async (year, month) => {
     setTableLoading(true);
     const result = await axios(
-      constants.API_PREFIX + "/api/Calculation/GetDeclaration",
+      constants.API_PREFIX + "/api/Report/GetReport",
       {
         params: {
           year: year,
@@ -115,7 +91,55 @@ const Declaration = () => {
     console.log("Failed:", errorInfo);
   };
 
+  const renderCompValue = (id,record) => {
+    console.log('texttext',id, record)
+    let target = record.employeeComponents.find(r => r.componentId == id)
+    console.log('amount', target)
+    return target?.amount
+  }
+
+
+  const getActiveComp = (data) => {
+    let currentDate = new Date();
+    let activeComp = data.filter(r => new Date(r.startDate) < currentDate && new Date(r.endDate) > currentDate)
+    console.log('activeComp',data,activeComp)
+    return activeComp
+  }
+  const fetchComponents =async () =>{
+    const result = await axios(
+      constants.API_PREFIX + "/api/Component",
+
+    );
+    console.log("fetchComponentsfetchComponents", result.data);
+
+    let comps =  result.data.map(r => {
+      return {
+        title: r.name,
+        dataIndex: r.id,
+        key: r.name,
+        render: (text, record) => <>{renderCompValue(r.id,record)}</>,
+      }
+    })
+
+    let sumAmount = 0;
+    // result.data.forEach(r => {
+    //   sumAmount += renderCompValue(r.id,r)
+    // });
+
+
+
+    let sum = {
+      title: 'Sum',
+      dataIndex: 'sum',
+      key: 'sum',
+      render: (text, record) => <>{sumBy(getActiveComp(record.employeeComponents), (r) => r.amount)?.toFixed(2)}</>,
+    }
+
+    console.log('compscomps',comps)
+    setColumns([...columns,  ...comps,sum])
+  }
   useEffect(() => {
+    fetchComponents();
     fetchData(moment(new Date()).year(), moment(new Date()).month());
   }, []);
   const executeCalculation = async () => {
@@ -137,56 +161,12 @@ const Declaration = () => {
   };
   return (
     <>
-      <Form
-        form={form}
-        name="basic"
-        labelCol={{
-          span: 8,
-        }}
-        wrapperCol={{
-          span: 16,
-        }}
-        initialValues={{
-          remember: true,
-        }}
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
-        autoComplete="off"
-        layout="inline"
-        style={{ display: "flex", justifyContent: "center" }}
-      >
-        <Form.Item name="monthYear">
-          <DatePicker
-            defaultValue={moment(new Date())}
-            style={{ width: 240 }}
-            onChange={onChange}
-            picker="month"
-          />
-        </Form.Item>
 
-        {/* <Form.Item label="period" name="period">
-        <Select
-            style={{ width: 120 }}
-            options={monthOptions}
-          />
-        </Form.Item> */}
-
-        {/* <Form.Item
-          wrapperCol={{
-            offset: 8,
-            span: 16,
-          }}
-        >
-          <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-            Search
-          </Button>
-        </Form.Item> */}
-      </Form>
 
       <br />
-      <Button onClick={executeCalculation} icon={<TableOutlined />}>
+      {/* <Button onClick={executeCalculation} icon={<TableOutlined />}>
         Calculate
-      </Button>
+      </Button> */}
       <br />
       <br />
 
@@ -198,4 +178,4 @@ const Declaration = () => {
     </>
   );
 };
-export default Declaration;
+export default Report;
