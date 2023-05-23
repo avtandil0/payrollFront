@@ -36,7 +36,8 @@ import {
   FileDoneOutlined,
   DollarOutlined,
   SnippetsOutlined,
-  FileExcelOutlined
+  FileExcelOutlined,
+  SwapOutlined,
 } from "@ant-design/icons";
 
 import Component from "../component/index";
@@ -46,6 +47,7 @@ import Coefficient from "../coefficient/index";
 import Employee from "../employee/index";
 import Project from "../project/index";
 
+import ComponentType from "../componentType/index";
 import Currency from "../currency/index";
 import CostCenter from "../costCenter/index";
 import AccountsReportChart from "../accountsReportChart/index";
@@ -385,6 +387,13 @@ function Home() {
             >
               {t(`currency`)}
             </Menu.Item>
+            <Menu.Item
+              key="14"
+              icon={<SwapOutlined />}
+              onClick={(e) => ClickGoPage(e, "componentType")}
+            >
+              {t(`componentType`)}
+            </Menu.Item>
           </SubMenu>
         </Menu>
       </Sider>
@@ -523,6 +532,9 @@ function Home() {
             </Route>
             <Route path={`${HOME_PAGE}/currency`}>
               <Currency />
+            </Route>
+            <Route path={`${HOME_PAGE}/componentType`}>
+              <ComponentType />
             </Route>
           </Switch>
         </Content>

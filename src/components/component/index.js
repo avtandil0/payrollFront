@@ -189,8 +189,16 @@ function Component() {
     // setTableLoading(false);
   };
 
+  const [componentTypes, setComponentTypes] = useState([])
+  const fetchComponentTypeData = async () =>{
+    const result = await axios(constants.API_PREFIX + "/api/ComponentType");
+    console.log("result", result.data);
+
+    setComponentTypes(result.data);
+  }
   useEffect(() => {
     fetchData();
+    fetchComponentTypeData();
     fetchAaccountsReportCharts();
     fetchCoefficients();
     setComponent({ ...component, ['type']: 1 });
@@ -341,11 +349,11 @@ function Component() {
                 name="type"
                 value={component.type}
                 onChange={(value) => handleChangeSelect(value, "type")}
-                options={[
-                  { value: 1, label: "დარიცხვა" },
-                  { value: 2, label: "დაკავება" },
-                ]}
-              />
+               >
+               {componentTypes.map((i) => (
+                  <Option value={i.id}>{i.name}</Option>
+                ))}
+              </Select>
             </Form.Item>
           </Space>
 

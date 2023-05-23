@@ -14,7 +14,7 @@ import { SearchOutlined, TableOutlined } from "@ant-design/icons";
 import axios from "axios";
 import constants from "../../constant";
 import moment from "moment";
-import { sumBy } from "lodash";
+import { sumBy,orderBy } from "lodash";
 import { Col, Row } from "antd";
 import { useTranslation } from "react-i18next";
 import qs from "qs";
@@ -136,6 +136,7 @@ const Report = () => {
         title: r.name,
         dataIndex: r.id,
         key: r.name,
+        type: r.type,
         render: (text, record) => <>{renderCompValue(r.id, record)}</>,
       };
     });
@@ -160,7 +161,10 @@ const Report = () => {
     };
 
     console.log("compscomps", comps);
-    setColumns([...columns, ...comps, sum]);
+    const ordered = orderBy(comps, ['type'])
+    console.log("compscomps1", ordered);
+
+    setColumns([...columns, ...ordered, sum]);
   };
   useEffect(() => {
     fetchDepartments();
