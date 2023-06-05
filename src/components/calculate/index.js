@@ -36,6 +36,8 @@ import { UserContext } from "../../appContext";
 import { UploadCalculations } from "./uploadCalculations";
 import qs from "qs";
 import { orderBy } from "lodash";
+import { useHistory, useLocation } from "react-router-dom";
+import { HOME_PAGE } from "../../constant";
 
 const { Option } = Select;
 
@@ -225,6 +227,61 @@ function Calculate() {
   const [excelLoading, setExcelLoading] = useState(false);
   const [drawerId, setDrawerId] = useState("");
 
+  const useLocationSearch = useLocation();
+
+  let history = useHistory();
+
+  useEffect(() => {
+    if (useLocationSearch.search) {
+      console.log("useLocationSearch.search", useLocationSearch.search);
+      const urlParams = new URLSearchParams(window.location.search);
+
+      console.log("urlParamsurlParams", urlParams);
+      const firstName = urlParams.get("firstName");
+      const lastName = urlParams.get("lastName");
+      const departmentId = urlParams.getAll("departmentId");
+      const calculationPeriod = urlParams.getAll("calculationPeriod");
+      console.log("departmentId", departmentId);
+      console.log("lastName", lastName);
+      let filterData = {
+        firstName: firstName,
+        lastName: lastName,
+        departmentId: departmentId,
+        calculationPeriod: calculationPeriod
+      };
+      // history.push({ pathname: `${HOME_PAGE}/calculate`,search: `?${qs.stringify(filterData)}` });
+      setFilter(filterData);
+      search(filterData);
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log("filter useef", filter, qs.stringify(filter));
+    let params = new URLSearchParams();
+
+    for (const [key, value] of Object.entries(filter)) {
+      console.log('www',key,value)
+      if(Array.isArray(value)){
+        value.forEach(element => {
+          params.append(key, element);
+        });
+      }
+      else{
+        params.append(key, value);
+      }
+
+    }
+
+    console.log('paramsparams',params)
+    console.log('getalll',params.getAll("departmentId")); //Prints ["1","4"].
+
+
+    history.push({
+      pathname: `${HOME_PAGE}/calculate`,
+      search: `?${params}`,
+    });
+  }, [filter]);
+
   const showCalculationModal = () => {
     setIsModalVisible(true);
   };
@@ -265,23 +322,33 @@ function Calculate() {
 
   const getToTalBalance = (items) => {
     let paids = 0;
-    console.log('itemsitems',items)
+    console.log("itemsitems", items);
     items.forEach((element) => {
-      if (element.employeeComponent?.component?.name.toLowerCase().includes("paid")) {
+      if (
+        element.employeeComponent?.component?.name
+          .toLowerCase()
+          .includes("paid")
+      ) {
         paids += element.paid;
       }
     });
 
-    console.log("paidspaids,paids",paids);
+    console.log("paidspaids,paids", paids);
     return sumBy(items, (r) => r.net)?.toFixed(2) - paids;
   };
-  const search = async () => {
-    setSearchLoading(true);
 
-    console.log("filter", filter);
+  const search = async (data) => {
+    console.log("sppp", useLocationSearch);
+    setSearchLoading(true);
+    let filterData = filter;
+
+    if (data) {
+      filterData = data;
+    }
+    console.log("filter12", data, filterData);
     const result = await axios(
       constants.API_PREFIX + "/api/Employee/GetEmployeeByCalculationFilter",
-      { params: filter, paramsSerializer: (params) => qs.stringify(params) }
+      { params: filterData, paramsSerializer: (params) => qs.stringify(params) }
     );
     console.log("result980", result.data);
 
@@ -510,7 +577,7 @@ function Calculate() {
         <Col span={4}>
           <Button
             loading={searchLoading}
-            onClick={search}
+            onClick={() => search()}
             type="primary"
             icon={<SearchOutlined />}
           >
