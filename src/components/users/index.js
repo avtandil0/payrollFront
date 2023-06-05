@@ -309,13 +309,13 @@ function Users() {
               rules={[{ required: true }]}
               style={{
                 display: "inline-block",
-                width: "calc(50% - 8px)",
+                width: "120px",
                 marginLeft: "10px",
               }}
             >
               <Select
                 value={user.role}
-                style={{ width: 320 }}
+                style={{ width: 280 }}
                 onChange={handleChangeSelect}
               >
                 {roles.map((r) => {

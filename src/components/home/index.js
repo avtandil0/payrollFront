@@ -59,7 +59,7 @@ import Import from "../import";
 import Users from "../users";
 import TimeTable from "../timeTable";
 import DayTable from "../dayTable";
-
+import {AppBreadcrumb} from "../appBreadcrumb"
 import { useTranslation } from "react-i18next";
 
 import {
@@ -456,6 +456,7 @@ function Home() {
 
           {/* </div> */}
         </Header>
+        <AppBreadcrumb />
         <Content
           className="site-layout-background"
           style={{
