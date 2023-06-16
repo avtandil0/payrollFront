@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import "./i18n";
+import axios from "axios";
 
 import { AuthProvider } from "react-oidc-context";
 
@@ -15,9 +16,37 @@ const oidcConfig = {
   // ...
 };
 
+axios.interceptors.request.use(
+  function (config) {
+    let token = localStorage.getItem("payrollAppLogintoken");
+    config.headers.common = { Authorization: `Bearer ${token}` };
+    return config;
+  },
+  function (error) {
+    // Do something with request error
+    return Promise.reject(error);
+  }
+);
+
+axios.interceptors.response.use(
+  (response) => {
+    console.log("iiiiiiii", response);
+    // Edit response config
+    return response;
+  },
+  (error) => {
+    console.log("iiiiiiii error", error.response?.status);
+    if (error.response?.status == 401) {
+      localStorage.clear();
+      window.location.href = "/";
+    }
+    return Promise.reject(error);
+  }
+);
+
 ReactDOM.render(
   <React.StrictMode>
-      <App />
+    <App />
   </React.StrictMode>,
   document.getElementById("root")
 );

@@ -16,7 +16,7 @@ import {
   Tooltip,
   DatePicker,
   Tag,
-  Checkbox
+  Checkbox,
 } from "antd";
 import {
   PlusCircleOutlined,
@@ -84,6 +84,13 @@ function Component() {
         </span>
       ),
     },
+
+    {
+      title: t(`code`),
+      dataIndex: "code",
+      render: (text) => <p>{text}</p>,
+    },
+
     {
       title: t(`typeName`),
       dataIndex: "typeName",
@@ -151,7 +158,7 @@ function Component() {
     debitAccountId: null,
     startDate: null,
     endDate: null,
-    type: 1
+    type: 1,
   });
   const [tableLoading, setTableLoading] = useState(false);
   const [isEdiT, setIsEdiT] = useState(false);
@@ -189,19 +196,19 @@ function Component() {
     // setTableLoading(false);
   };
 
-  const [componentTypes, setComponentTypes] = useState([])
-  const fetchComponentTypeData = async () =>{
+  const [componentTypes, setComponentTypes] = useState([]);
+  const fetchComponentTypeData = async () => {
     const result = await axios(constants.API_PREFIX + "/api/ComponentType");
     console.log("result", result.data);
 
     setComponentTypes(result.data);
-  }
+  };
   useEffect(() => {
     fetchData();
     fetchComponentTypeData();
     fetchAaccountsReportCharts();
     fetchCoefficients();
-    setComponent({ ...component, ['type']: 1 });
+    setComponent({ ...component, ["type"]: 1 });
   }, []);
 
   const showModal = () => {
@@ -280,9 +287,11 @@ function Component() {
     }
   };
 
+  const [editedData, setEditedData] = useState({ code: null });
   const clickEdit = (record) => {
     setIsEdiT(true);
     console.log("clickEdit", record);
+    setEditedData(record);
     setComponent(record);
     setIsModalVisible(true);
   };
@@ -294,7 +303,7 @@ function Component() {
 
   function onChangeCheckbox(value) {
     console.log(value.target.checked);
-    setComponent({ ...component, ['ignoreIncome']: value.target.checked });
+    setComponent({ ...component, ["ignoreIncome"]: value.target.checked });
   }
 
   return (
@@ -325,6 +334,22 @@ function Component() {
         <Form layout="vertical">
           <Space style={{ marginRight: "40px" }}>
             <Form.Item
+              label={t(`Code`)}
+              rules={[{ required: true }]}
+              labelAlign={"right"}
+              style={{ display: "inline-block", width: 220 }}
+            >
+              <Input
+                value={component.code}
+                type="text"
+                name="code"
+                onChange={(e) => handleChange(e)}
+                placeholder={t(`code`)}
+                disabled={isEdiT && editedData.code}
+              />
+            </Form.Item>
+
+            <Form.Item
               label={t(`placeholderFirstName`)}
               rules={[{ required: true }]}
               labelAlign={"right"}
@@ -338,7 +363,9 @@ function Component() {
                 placeholder={t(`placeholderFirstName`)}
               />
             </Form.Item>
+          </Space>
 
+          <Space style={{ marginRight: "40px" }}>
             <Form.Item
               label={t(`type`)}
               rules={[{ required: true }]}
@@ -349,15 +376,12 @@ function Component() {
                 name="type"
                 value={component.type}
                 onChange={(value) => handleChangeSelect(value, "type")}
-               >
-               {componentTypes.map((i) => (
+              >
+                {componentTypes.map((i) => (
                   <Option value={i.id}>{i.name}</Option>
                 ))}
               </Select>
             </Form.Item>
-          </Space>
-
-          <Space style={{ marginRight: "40px" }}>
             <Form.Item
               label={t(`coefficient`)}
               style={{
@@ -376,7 +400,9 @@ function Component() {
                 ))}
               </Select>
             </Form.Item>
+          </Space>
 
+          <Space style={{ marginRight: "40px" }}>
             <Form.Item
               label={t(`creditAcount`)}
               style={{
@@ -395,9 +421,6 @@ function Component() {
                 ))}
               </Select>
             </Form.Item>
-          </Space>
-
-          <Space style={{ marginRight: "40px" }}>
             <Form.Item
               label={t(`debitAcount`)}
               style={{
@@ -416,7 +439,8 @@ function Component() {
                 ))}
               </Select>
             </Form.Item>
-
+          </Space>
+          <Space>
             <Form.Item
               label={t(`start`)}
               style={{
@@ -436,15 +460,12 @@ function Component() {
                 </Space>
               </Space>
             </Form.Item>
-          </Space>
-          <Space>
-
-          <Form.Item
-            label={t(`finish`)}
-            style={{
-              width: 220,
-            }}
-          >
+            <Form.Item
+              label={t(`finish`)}
+              style={{
+                width: 220,
+              }}
+            >
               <Space direction="vertical">
                 <DatePicker
                   value={
@@ -455,17 +476,23 @@ function Component() {
                   onChange={(value) => handleChangeSelect(value, "endDate")}
                 />
               </Space>
-          </Form.Item>
-          <Form.Item
-            label={t(`finish`)}
-            style={{
-              width: 220,
-            }}
-          >
-              <Checkbox checked={component.ignoreIncome} onChange={onChangeCheckbox}>Ignore income value </Checkbox>
-          </Form.Item>
+            </Form.Item>
           </Space>
 
+          <Space>
+            <Form.Item
+              style={{
+                width: 220,
+              }}
+            >
+              <Checkbox
+                checked={component.ignoreIncome}
+                onChange={onChangeCheckbox}
+              >
+                Ignore income value{" "}
+              </Checkbox>
+            </Form.Item>
+          </Space>
         </Form>
       </Modal>
 

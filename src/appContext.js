@@ -11,10 +11,10 @@ export const AppProvider = ({ children }) => {
 
   const fetchDepartments = async () => {
     // setTableLoading(true);
-    const result = await axios(constants.API_PREFIX + "/api/department");
+    // const result = await axios(constants.API_PREFIX + "/api/department");
 
-    console.log('result fetchDepartments---', result.data)
-    setglobalDepartments(result.data)
+    // console.log('result fetchDepartments---', result.data)
+    // setglobalDepartments(result.data)
     // setTableLoading(false);
   }
 

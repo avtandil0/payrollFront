@@ -32,11 +32,12 @@ const Login =  () => {
     }
     else{
       message.success("Success")
-      axios.defaults.headers.common = {'Authorization': `Bearer ${result.data.message}`}
+      localStorage.setItem('payrollAppLogintoken', result.data.message)
 
+      // axios.defaults.headers.common = {'Authorization': `Bearer ${result.data.message}`}
+      console.log('resultresultresultresult',result)
      const currentUser = await axios.get(constants.API_PREFIX+"/api/Account/currentUser", { params: user})
       //console.log('currentUser', currentUser)
-      localStorage.setItem('payrollAppLogintoken', result.data.message)
       // localStorage.setItem('payrollAppUser', JSON.stringify({user: user}));
       localStorage.setItem('payrollAppUser', JSON.stringify(currentUser.data))
       // history.push(`${HOME_PAGE}/dashboard`); ????

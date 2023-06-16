@@ -334,7 +334,7 @@ function Calculate() {
     });
 
     console.log("paidspaids,paids", paids);
-    return sumBy(items, (r) => r.net)?.toFixed(2) - paids;
+    return sumBy(items, (r) => r.net)?.toFixed(2) + paids;
   };
 
   const search = async (data) => {
