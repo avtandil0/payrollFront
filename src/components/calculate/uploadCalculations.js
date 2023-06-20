@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { UploadOutlined } from '@ant-design/icons';
-import { Button, message, Upload } from 'antd';
-import type { RcFile, UploadFile, UploadProps } from 'antd/es/upload/interface';
+import React, { useState } from "react";
+import { UploadOutlined } from "@ant-design/icons";
+import { Button, message, Upload } from "antd";
+import axios from "axios";
 import constants from "../../constant";
 
 export const UploadCalculations = () => {
@@ -11,21 +11,28 @@ export const UploadCalculations = () => {
   const handleUpload = () => {
     const formData = new FormData();
     fileList.forEach((file) => {
-      formData.append('file', file );
+      formData.append("file", file);
     });
     setUploading(true);
     // You can use any AJAX library you like
-    fetch(constants.API_PREFIX + `/api/Calculation/CreateEmployeeFromFile`, {
-      method: 'POST',
-      body: formData,
-    })
-      .then((res) => res.json())
+    axios
+      .post(
+        constants.API_PREFIX + `/api/Calculation/CreateEmployeeFromFile`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+      .then((res) => res)
       .then(() => {
         setFileList([]);
-        message.success('upload successfully.');
+        message.success("upload successfully.");
       })
-      .catch(() => {
-        message.error('upload failed.');
+      .catch((err) => {
+        console.log('eeeerrrr',err)
+        message.error("upload failed.");
       })
       .finally(() => {
         setUploading(false);
@@ -48,7 +55,7 @@ export const UploadCalculations = () => {
   };
 
   return (
-    <div style={{display: 'flex', marginBottom: 15}}>
+    <div style={{ display: "flex", marginBottom: 15 }}>
       <Upload {...props}>
         <Button icon={<UploadOutlined />}>Select File</Button>
       </Upload>
@@ -58,7 +65,7 @@ export const UploadCalculations = () => {
         disabled={fileList.length === 0}
         loading={uploading}
       >
-        {uploading ? 'Uploading' : 'Start Upload'}
+        {uploading ? "Uploading" : "Start Upload"}
       </Button>
     </div>
   );

@@ -373,7 +373,7 @@ function Calculate() {
         incomeTax: c.incomeTax,
         pensionTax: c.pensionTax,
         calculationDate: moment(c.calculationDate).format("YYYY-MM-DD"),
-        name: c.employeeComponent?.componentName ?? "Gross",
+        name: c.employeeComponent?.componentName ?? c.compCode,
         remainingGraceAmount: c.remainingGraceAmount,
         // totalBalance: r.totalBalance,
       })),

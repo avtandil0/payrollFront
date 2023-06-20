@@ -70,6 +70,10 @@ function Department() {
     //   dataIndex: 'id',
     // },
     {
+      title: t(`Code`),
+      dataIndex: "code",
+    },
+    {
       title: t(`placeholderFirstName`),
       dataIndex: "name",
     },
@@ -173,9 +177,12 @@ function Department() {
     }
   };
 
+  const [editedData, setEditedData] = useState({ code: null });
+
   const clickEdit = (record) => {
     setIsEdiT(true);
     console.log("clickEdit", record);
+    setEditedData(record);
     setDepartment(record);
     setIsModalVisible(true);
   };
@@ -207,11 +214,28 @@ function Department() {
       >
         <Form>
           <Form.Item
+            label={t(`Code`)}
+            rules={[
+              {
+                required: true,
+                message: "Please input code!",
+              },
+            ]}
+          >
+            <Input
+              value={department.code}
+              type="text"
+              name="code"
+              onChange={(e) => handleChange(e)}
+              disabled={isEdiT && editedData.code}
+            />
+          </Form.Item>
+          <Form.Item
             label={t(`placeholderFirstName`)}
             rules={[
               {
                 required: true,
-                message: "Please input your username!",
+                message: "Please input name!",
               },
             ]}
           >
