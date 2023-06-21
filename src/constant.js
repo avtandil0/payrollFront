@@ -1,5 +1,5 @@
-const API_PREFIX = "http://localhost:5000";
-// const API_PREFIX = 'http://localhost/payrollBack'
+// const API_PREFIX = "http://localhost:5000";
+const API_PREFIX = 'http://localhost/payrollBack'
 export const HOME_PAGE = "/payroll";
 
 export const WEEKDAYS = [

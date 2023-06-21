@@ -247,7 +247,7 @@ function Calculate() {
         firstName: firstName,
         lastName: lastName,
         departmentId: departmentId,
-        calculationPeriod: calculationPeriod
+        calculationPeriod: calculationPeriod,
       };
       // history.push({ pathname: `${HOME_PAGE}/calculate`,search: `?${qs.stringify(filterData)}` });
       setFilter(filterData);
@@ -260,21 +260,18 @@ function Calculate() {
     let params = new URLSearchParams();
 
     for (const [key, value] of Object.entries(filter)) {
-      console.log('www',key,value)
-      if(Array.isArray(value)){
-        value.forEach(element => {
+      console.log("www", key, value);
+      if (Array.isArray(value)) {
+        value.forEach((element) => {
           params.append(key, element);
         });
-      }
-      else{
+      } else {
         params.append(key, value);
       }
-
     }
 
-    console.log('paramsparams',params)
-    console.log('getalll',params.getAll("departmentId")); //Prints ["1","4"].
-
+    console.log("paramsparams", params);
+    console.log("getalll", params.getAll("departmentId")); //Prints ["1","4"].
 
     history.push({
       pathname: `${HOME_PAGE}/calculate`,
@@ -299,7 +296,9 @@ function Calculate() {
     fetchCurrencies();
   }, []);
 
+  const [calculateLoading, setCalculateLoading] = useState(false);
   const handleOk = async () => {
+    setCalculateLoading(true);
     const result = await axios.post(
       constants.API_PREFIX + `/api/Calculation/calculate/${calculationDate}`,
       filter
@@ -311,8 +310,10 @@ function Calculate() {
       search();
       setIsModalVisible(false);
       message.success("This is a success message");
+      setCalculateLoading(false);
     } else {
       message.error(result.data.message);
+      setCalculateLoading(false);
     }
   };
 
@@ -420,7 +421,11 @@ function Calculate() {
 
     let response = await axios(
       constants.API_PREFIX + `/api/Calculation/generateExcel`,
-      { params: filter, responseType: "blob" }
+      {
+        params: filter,
+        responseType: "blob",
+        paramsSerializer: (params) => qs.stringify(params)
+      }
     );
 
     console.log("-444444444", response);
@@ -459,8 +464,10 @@ function Calculate() {
     setIsModalOpen(true);
   };
 
+  const [addComponentCalculation, setAddComponentCalculation] = useState(false);
   const handleOkAddComp = async () => {
     console.log("asasas", importData);
+    setAddComponentCalculation(true);
     const result = await axios.post(
       constants.API_PREFIX +
         `/api/Calculation/addCalculation/${importData.calculationDate}/${importData.componentId}/${importData.amount}/${importData.currency}`,
@@ -473,8 +480,10 @@ function Calculate() {
       search();
       setIsModalVisible(false);
       message.success("This is a success message");
+      setAddComponentCalculation(false);
     } else {
       message.error(result.data.message);
+      setAddComponentCalculation(false);
     }
     setIsModalOpen(false);
   };
@@ -621,6 +630,7 @@ function Calculate() {
           onCancel={handleCancel}
           okText={t(`okText`)}
           cancelText={t(`cancelText`)}
+          okButtonProps={{ loading: calculateLoading }}
         >
           <Row gutter={[16, 24]}>
             <Col span={8}></Col>
@@ -647,6 +657,7 @@ function Calculate() {
         onOk={handleOkAddComp}
         onCancel={handleCancelAddComp}
         width={600}
+        okButtonProps={{ loading: addComponentCalculation }}
       >
         <div>
           <Select
