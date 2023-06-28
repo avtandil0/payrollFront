@@ -28,6 +28,17 @@ const { Option } = Select;
 
 function Users() {
   const { t } = useTranslation();
+  const [roles, setRoles] = useState([]);
+
+  const disabledDelete = (record) => {
+    console.log("disabledDelete", record, roles);
+    let admin = roles.find((r) => r.name.toLowerCase() == "admin");
+    console.log("adminadminadmin", record.userClaimTypes.includes(admin?.id));
+    if (record.userClaimTypes.includes(admin.id)) {
+      return true;
+    }
+    return false;
+  };
 
   const columns = [
     // {
@@ -45,9 +56,14 @@ function Users() {
               onConfirm={() => confirm(record)}
               okText="Yes"
               cancelText="No"
+              disabled={disabledDelete(record)}
             >
               <Tooltip placement="bottom" title="წაშლა">
-                <Button type="primary" icon={<DeleteOutlined />} />
+                <Button
+                  disabled={disabledDelete(record)}
+                  type="primary"
+                  icon={<DeleteOutlined />}
+                />
               </Tooltip>
             </Popconfirm>
 
@@ -87,7 +103,6 @@ function Users() {
   ];
 
   const [dataSaveArray, setDataSaveArray] = useState([]);
-  const [roles, setRoles] = useState([]);
   const [costCenter, setCostCenter] = useState({
     code: "",
     description: "",
@@ -110,8 +125,10 @@ function Users() {
   const fetchData = async () => {
     setTableLoading(true);
     let token = localStorage.getItem("payrollAppLogintoken");
-    axios.defaults.headers.common = {'Authorization': `Bearer ${token}`}
-    const result = await axios(constants.API_PREFIX + "/api/Account/getAllUser");
+    axios.defaults.headers.common = { Authorization: `Bearer ${token}` };
+    const result = await axios(
+      constants.API_PREFIX + "/api/Account/getAllUser"
+    );
     console.log("result", result.data);
 
     setDataSaveArray(result.data);
@@ -132,6 +149,7 @@ function Users() {
   }, []);
 
   const showModal = () => {
+    setUser({})
     setIsModalVisible(true);
   };
 
@@ -185,13 +203,13 @@ function Users() {
   };
 
   const handleChangeSelect = (id) => {
-    setUser({ ...user, ["role"]: id});
+    setUser({ ...user, ["role"]: id });
   };
 
   const confirm = async (record) => {
     console.log("record", record);
     const result = await axios.delete(
-      constants.API_PREFIX + "/api/CostCenter",
+      constants.API_PREFIX + "/api/Account/Delete",
       { data: record }
     );
     console.log("result", result);
@@ -206,7 +224,7 @@ function Users() {
   const clickEdit = (record) => {
     setIsEdiT(true);
     console.log("clickEdit", record);
-    setUser({...record, role: record.userClaimTypes[0] });
+    setUser({ ...record, role: record.userClaimTypes[0] });
     setIsModalVisible(true);
   };
 
@@ -319,7 +337,11 @@ function Users() {
                 onChange={handleChangeSelect}
               >
                 {roles.map((r) => {
-                  return <Option value={r.id} key={r.id}>{r.name}</Option>;
+                  return (
+                    <Option value={r.id} key={r.id}>
+                      {r.name}
+                    </Option>
+                  );
                 })}
               </Select>
             </Form.Item>
