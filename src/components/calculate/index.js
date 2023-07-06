@@ -347,6 +347,7 @@ function Calculate() {
       filterData = data;
     }
     console.log("filter12", data, filterData);
+    filterData.name = filterData.firstName
     const result = await axios(
       constants.API_PREFIX + "/api/Employee/GetEmployeeByCalculationFilter",
       { params: filterData, paramsSerializer: (params) => qs.stringify(params) }
@@ -355,7 +356,7 @@ function Calculate() {
 
     let mapedData = result.data.map((r) => ({
       key: r.id,
-      gross: sumBy(r.calculations, (r) => r.gross)?.toFixed(2),
+      gross: sumBy(r.calculations, (r) => r.gross)?.toFixed(2)?? '',
       net: sumBy(r.calculations, (r) => r.net)?.toFixed(2),
       paid: sumBy(r.calculations, (r) => r.paid)?.toFixed(2),
       incomeTax: sumBy(r.calculations, (r) => r.incomeTax)?.toFixed(2),
@@ -424,7 +425,7 @@ function Calculate() {
       {
         params: filter,
         responseType: "blob",
-        paramsSerializer: (params) => qs.stringify(params)
+        paramsSerializer: (params) => qs.stringify(params),
       }
     );
 
@@ -534,6 +535,28 @@ function Calculate() {
     setImportData({ ...importData, ["amount"]: e.target.value });
   };
 
+
+  const confirmDeleteCalculations = async (e) => {
+    console.log("record",  filter);
+    const result = await axios.delete(
+      constants.API_PREFIX + `/api/Calculation/deleteCalculationsByFiler`,
+      { params: filter, paramsSerializer: (params) => qs.stringify(params) }
+    );
+    console.log("result", result);
+    if (result.data.isSuccess) {
+      message.success(result.data.message);
+      search();
+    } else {
+      message.error(result.data.message);
+    }
+  };
+  
+  const cancelDeleteCalculations = (e) => {
+    console.log(e);
+    message.error('Click on No');
+  };
+
+  console.log("ught runtime error");
   return (
     <div>
       <MyDrawer
@@ -548,10 +571,10 @@ function Calculate() {
             onChange={handleChangeInput}
             value={filter?.firstName}
             name="firstName"
-            placeholder={t(`placeholderFirstName`)}
+            placeholder={t(`firstName / lasttname`)}
           />
         </Col>
-        <Col span={4}>
+        {/* <Col span={4}>
           <Input
             onChange={handleChangeInput}
             value={filter.lastName}
@@ -559,7 +582,7 @@ function Calculate() {
             // placeholder="lastName"
             placeholder={t(`placeholderLastName`)}
           />
-        </Col>
+        </Col> */}
         <Col span={4}>
           <Select
             // defaultValue="აირჩიეთ"
@@ -651,6 +674,16 @@ function Calculate() {
       >
         Add Component
       </Button>
+      
+      <Popconfirm
+        title="Are you sure to delete this calculations?"
+        onConfirm={confirmDeleteCalculations}
+        onCancel={cancelDeleteCalculations}
+        okText="Yes"
+        cancelText="No"
+      >
+        <Button icon={<DeleteOutlined />} style={{ marginLeft: 15 }} danger>Delete Calculations</Button>
+      </Popconfirm>
       <Modal
         title="Add Component"
         open={isModalOpen}
@@ -707,7 +740,7 @@ function Calculate() {
           expandedRowRender,
           rowExpandable: (record) => record.childrens?.length,
         }}
-        scroll={{ x: 200 }}
+        // scroll={{ x: 200 }}
       />
     </div>
   );

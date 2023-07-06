@@ -72,10 +72,16 @@ function Department() {
     {
       title: t(`Code`),
       dataIndex: "code",
+      sorter: (a, b) => {
+        return a.code && b.code ? a.code.localeCompare(b.code) : false
+      }
     },
     {
       title: t(`placeholderFirstName`),
       dataIndex: "name",
+      sorter: (a, b) => {
+        return a.name && b.name ? a.name.localeCompare(b.name) : false
+      }
     },
     {
       title: t(`quantity`),

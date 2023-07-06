@@ -9,7 +9,9 @@ import {
   Menu,
   Dropdown,
   Space,
-  Divider,
+  Modal,
+  Input,
+  message,
 } from "antd";
 
 import {
@@ -59,7 +61,7 @@ import Import from "../import";
 import Users from "../users";
 import TimeTable from "../timeTable";
 import DayTable from "../dayTable";
-import {AppBreadcrumb} from "../appBreadcrumb"
+import { AppBreadcrumb } from "../appBreadcrumb";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -198,6 +200,10 @@ function Home() {
     </Menu>
   );
 
+  const changeePassword = () => {
+    console.log("changeePassword");
+    setIsModalOpen(true);
+  };
   const userMenu = (
     <Menu>
       <Menu.Item>
@@ -205,7 +211,7 @@ function Home() {
           <UserOutlined /> Settings
         </Space>
       </Menu.Item>
-      <Menu.Item>
+      <Menu.Item onClick={changeePassword}>
         <Space>
           <UnlockOutlined />
           Change Password
@@ -221,8 +227,76 @@ function Home() {
     </Menu>
   );
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const [passChange, setPassChange] = useState({
+    password: "",
+    newPassword: "",
+    repeatNewPassword: "",
+  });
+  const handlePassChangeInput = (e) => {
+    setPassChange({...passChange, [e.target.name]: e.target.value})
+  };
+
+  const handleOk = async () => {
+    if(passChange.newPassword != passChange.repeatNewPassword){
+      message.error('New Password and RepeatPassword does not match !')
+      return;
+    }
+    console.log('passssss',passChange)
+    const userName = JSON.parse(localStorage.getItem('payrollAppUser'));
+    const result = await axios.post(
+      constants.API_PREFIX + "/api/account/ChangePassword",
+      {
+        userName: userName.userName,currentPassword: passChange.password, newPassword: passChange.newPassword
+      }
+    );
+
+    console.log('resultresultresult',result)
+    if(result.data.isSuccess){
+      message.success('Password change succsefully')
+    }
+    else{
+      message.error('Error !')
+    }
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
+ 
   return (
     <LayoutAnt>
+      <Modal
+        title="Basic Modal"
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <Input
+            placeholder="Current password"
+            name="password"
+            onChange={handlePassChangeInput}
+          />
+          <Input
+            placeholder="new password"
+            name="newPassword"
+            onChange={handlePassChangeInput}
+          />
+          <Input
+            placeholder="Repeat new password"
+            name="repeatNewPassword"
+            onChange={handlePassChangeInput}
+          />
+        </div>
+      </Modal>
       <Sider
         className="site-layout"
         style={{

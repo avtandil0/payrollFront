@@ -61,6 +61,10 @@ function EmployeeTable({ loading, employeeArray, fetchData, showDelete }) {
       },
     },
     {
+      title: t(`personalNumber`),
+      dataIndex: "personalNumber",
+    },
+    {
       title: t(`bankAccountNumber`),
       dataIndex: "bankAccountNumber",
     },
