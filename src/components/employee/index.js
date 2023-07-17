@@ -86,6 +86,10 @@ function Employee() {
             allowClear
             style={{ width: 300 }}
             mode="multiple"
+            filterOption={(input, option) =>
+              // console.log('optionoptionoption',input,option)
+              (option?.children ?? '').toLowerCase().includes(input.toLowerCase())
+            }
           >
             {departments.map((i) => (
               <Option value={i.id}>{i.name}</Option>

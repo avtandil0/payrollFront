@@ -1,6 +1,7 @@
 const API_PREFIX = "http://localhost:5000";
-// const API_PREFIX = 'http://localhost/payrollBack'
+// const API_PREFIX = `${window.location.origin}/payrollBack`
 export const HOME_PAGE = "/payroll";
+console.log('121212121',window.location)
 
 export const WEEKDAYS = [
   {

@@ -592,6 +592,10 @@ function Calculate() {
             onChange={(e) => setFilter({ ...filter, departmentId: e })}
             allowClear
             mode="multiple"
+            filterOption={(input, option) =>
+              // console.log('optionoptionoption',input,option)
+              (option?.children ?? '').toLowerCase().includes(input.toLowerCase())
+            }
           >
             {departments.map((i) => (
               <Option value={i.id}>{i.name}</Option>
@@ -732,7 +736,8 @@ function Calculate() {
       <br />
       <br />
 
-      <UploadCalculations />
+      {/* <UploadCalculations /> */}
+      <Button onClick={() => history.push('calculateFromFile')} style={{marginBottom: 16}} icon={<UploadOutlined />}>Add calculation from file</Button>
       <Table
         columns={columns}
         dataSource={calculations}

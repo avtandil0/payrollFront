@@ -84,6 +84,7 @@ import RU from "../../assets/logos/ru.png"; // with import
 import Declaration from "../declaration";
 import DeclarationPension from "../declaration/declarationPension";
 import Report from "../report";
+import CalculateFromFile from "../calculate/calculateFromFile";
 
 const { Header, Sider, Content } = LayoutAnt;
 
@@ -283,16 +284,19 @@ function Home() {
           <Input
             placeholder="Current password"
             name="password"
+            type="password"
             onChange={handlePassChangeInput}
           />
           <Input
             placeholder="new password"
             name="newPassword"
+            type="password"
             onChange={handlePassChangeInput}
           />
           <Input
             placeholder="Repeat new password"
             name="repeatNewPassword"
+            type="password"
             onChange={handlePassChangeInput}
           />
         </div>
@@ -610,6 +614,9 @@ function Home() {
             </Route>
             <Route path={`${HOME_PAGE}/componentType`}>
               <ComponentType />
+            </Route>
+            <Route path={`${HOME_PAGE}/calculateFromFile`}>
+              <CalculateFromFile />
             </Route>
           </Switch>
         </Content>
