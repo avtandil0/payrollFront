@@ -149,7 +149,7 @@ function CalculateFromFile({ next }) {
     // You can use any AJAX library you like
     axios
       .post(
-        constants.API_PREFIX + `/api/Calculation/CreateEmployeeFromFile`,
+        constants.API_PREFIX + `/api/Calculation/CreateEmployeeFromFile/${date}`,
         formData,
         {
           headers: {

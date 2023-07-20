@@ -556,6 +556,11 @@ function Calculate() {
     message.error('Click on No');
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      search()
+    }
+  };
   console.log("ught runtime error");
   return (
     <div>
@@ -570,6 +575,9 @@ function Calculate() {
           <Input
             onChange={handleChangeInput}
             value={filter?.firstName}
+            onKeyDown={handleKeyDown}
+
+
             name="firstName"
             placeholder={t(`firstName / lasttname`)}
           />
