@@ -92,7 +92,7 @@ function CalculateFromFile({ next }) {
     let fileObj = e.file.originFileObj;
     // let fileObj = e.fileList[0] ? e.fileList[0].originFileObj : {};
     console.log("fileObjfileObjfileObj", fileObj);
-    setNotExist(false)
+    setNotExist(false);
     setFileList([fileObj]);
     //just pass the fileObj as parameter
     ExcelRenderer(fileObj, (err, resp) => {
@@ -149,7 +149,8 @@ function CalculateFromFile({ next }) {
     // You can use any AJAX library you like
     axios
       .post(
-        constants.API_PREFIX + `/api/Calculation/CreateEmployeeFromFile/${date}`,
+        constants.API_PREFIX +
+          `/api/Calculation/CreateEmployeeFromFile/${date}`,
         formData,
         {
           headers: {
@@ -159,22 +160,50 @@ function CalculateFromFile({ next }) {
       )
       .then((res) => res)
       .then((res) => {
-        console.log("resres", res);
-        setFileList([]);
-        if (res.data.length) {
+        console.log("res.data.employees", res.data.employees);
+        // setFileList([]);
+        if (!res.data.success) {
+          setFileIsUploaded (false);
           setNotExist(true);
-          setFile({
-            cols: [
-              { name: "A", key: 0 },
-              { name: "B", key: 1 },
+          const firstRow = [
+            [
+              "",
+              "სახელი და გვარი",
+              "GLAccount",
+              "Project",
+              "Cost Center",
+              "Cost Unit	",
+              "პირადი ნომერი",
+              "ხელფასი",
+              "კომპონენტი",
             ],
-
-            rows: res.data.map((r) => {
-              return [r];
-            }),
+          ];
+          setFile({
+            cols: file.cols,
+            rows: [...firstRow,...res.data.employees.map((r) => {
+              return [
+                ...[
+                  [""],
+                  [r.fullname],
+                  [r.glAccount],
+                  [r.project],
+                  [r.costCenter],
+                  [r.costUnit],
+                  [r.personalNumber],
+                  [r.amount],
+                  [r.component],
+                ],
+              ];
+            })],
           });
+
+          setUploading(false);
         } else {
-          message.success("upload successfully.");
+          console.log("res.datares.data", res.data);
+          if (res.data.success) {
+            message.success(res.data.message);
+          }
+          setUploading(false);
         }
       })
       .catch((err) => {
@@ -183,8 +212,9 @@ function CalculateFromFile({ next }) {
       })
       .finally(() => {
         setUploading(false);
-      });
     setIsModalOpen(false);
+
+      });
   };
 
   const handleCancel = () => {
@@ -211,7 +241,7 @@ function CalculateFromFile({ next }) {
           }}
         >
           <Button style={{ marginLeft: 15 }} icon={<UploadOutlined />}>
-            {t(`chooseBankFile`)}
+            {t(`Choose File`)}
           </Button>
         </Upload>
       </div>
@@ -226,7 +256,7 @@ function CalculateFromFile({ next }) {
             onClick={showModal}
             type="primary"
             icon={<CloudUploadOutlined />}
-            disabled={!fileIsUploaded}
+            disabled={!fileIsUploaded || notExist}
           >
             {t(`upload`)}
           </Button>
@@ -244,7 +274,14 @@ function CalculateFromFile({ next }) {
               <DatePicker onChange={onChange} />
             </div>
           </Modal>
-          {notExist? <div ><h3 style={{color: 'red', marginLeft: 50, marginTop:15}}> This record Not exist in database !</h3> </div>: null}
+          {notExist ? (
+            <div>
+              <h3 style={{ color: "red", marginLeft: 50, marginTop: 15 }}>
+                {" "}
+                This records does Not exist in database !
+              </h3>{" "}
+            </div>
+          ) : null}
           <div
             style={{
               width: "98%",
@@ -257,8 +294,8 @@ function CalculateFromFile({ next }) {
             <OutTable
               data={file.rows}
               columns={file.cols}
-              tableClassName="table"
-              tableHeaderRowClass="heading"
+              tableClassName={notExist? "table error": "table "}
+              tableHeaderRowClass="heading "
             />
           </div>
         </>
