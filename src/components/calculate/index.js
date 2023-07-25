@@ -38,6 +38,7 @@ import qs from "qs";
 import { orderBy } from "lodash";
 import { useHistory, useLocation } from "react-router-dom";
 import { HOME_PAGE } from "../../constant";
+import { Checkbox } from 'antd';
 
 const { Option } = Select;
 
@@ -600,9 +601,12 @@ function Calculate() {
       return;
     }
     console.log("record", filter);
-    const result = await axios.delete(
+    const result = await axios.post(
       constants.API_PREFIX + `/api/Calculation/deleteCalculationsByFiler`,
-      { data: calculations.map((r) => r.key) }
+      {
+        employeeIds: calculations.map((r) => r.key),
+        calculationPeriod: filter.calculationPeriod,
+      }
     );
     console.log("result", result);
     if (result.data.isSuccess) {
@@ -630,6 +634,12 @@ function Calculate() {
     );
   };
 
+
+  const onChangeCheckbox = (e) => {
+    setFilter({ ...filter, ['calculated']: e.target.checked });
+    console.log(`checked = ${e.target.checked}`);
+  };
+  
   console.log("ught runtime error");
   return (
     <div>
@@ -680,15 +690,17 @@ function Calculate() {
             ))}
           </Select>
         </Col>
-        <Col span={4}>
+        <Col span={5}>
           <Select
             allowClear
+            mode="multiple"
+             maxTagCount={2}
             placeholder={"component"}
             onChange={(e) => setFilter({ ...filter, componentId: e })}
             style={{ width: "100%" }}
           >
             {components.map((i) => (
-              <Option value={i.id}>{i.name}</Option>
+              <Option value={i.name}>{i.name}</Option>
             ))}
           </Select>
         </Col>
@@ -710,6 +722,8 @@ function Calculate() {
             {t(`buttonSeach`)}
           </Button>
         </Col>
+
+        <Checkbox style={{marginLeft: 10}} onChange={onChangeCheckbox}>Only Calculated</Checkbox>
       </Row>
       <br />
       <Row gutter={[16, 24]}>
