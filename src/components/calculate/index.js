@@ -167,6 +167,11 @@ function Calculate() {
       },
     },
     {
+      title: t(`ResId`),
+      dataIndex: "ResId",
+      render: (text, row) => <> {row.resId}</>,
+    },
+    {
       title: t(`fullName`),
       dataIndex: "name",
       render: (text, row) => {
@@ -177,39 +182,36 @@ function Calculate() {
         );
       },
     },
-    // {
-    //   title: t(`calculateDate`),
-    //   dataIndex: "calculationDate",
-    // },
+   
     {
       title: "Gross",
       dataIndex: "gross",
-      render: (text, row) => <p> {row.gross}</p>,
+      render: (text, row) => <> {row.gross}</>,
     },
     {
       title: "Net",
       dataIndex: "net",
-      render: (text, row) => <p>{row.net} </p>,
+      render: (text, row) => <>{row.net} </>,
     },
     {
       title: "Paid",
       dataIndex: "paid",
-      render: (text, row) => <p>{row.paid}</p>,
+      render: (text, row) => <>{row.paid}</>,
     },
     {
       title: "IncomeTax",
       dataIndex: "incomeTax",
-      render: (text, row) => <p>{row.incomeTax}</p>,
+      render: (text, row) => <>{row.incomeTax}</>,
     },
     {
       title: "PensionTax",
       dataIndex: "PensionTax",
-      render: (text, row) => <p>{row.pensionTax} </p>,
+      render: (text, row) => <>{row.pensionTax} </>,
     },
     {
       title: "Deduction",
       dataIndex: "Deduction",
-      render: (text, row) => <p>{row.deduction} </p>,
+      render: (text, row) => <>{row.deduction} </>,
     },
     {
       title: t(`RemainingGraceAmount`),
@@ -354,7 +356,7 @@ function Calculate() {
     });
 
     let sumb = sumBy(items, (r) => r.net)?.toFixed(2);
-    console.log("paidspaids,paids", typeof Number(sumb), paids);
+    console.log("paidspaids,paids",  Number(sumb), paids);
     return (Number(sumb) + paids).toFixed(2);
   };
 
@@ -376,6 +378,7 @@ function Calculate() {
 
     let mapedData = result.data.map((r) => ({
       key: r.id,
+      resId: r.resId,
       gross: sumBy(r.calculations, (r) => r.gross)?.toFixed(2) ?? "",
       net: sumBy(r.calculations, (r) => r.net)?.toFixed(2),
       paid: sumBy(r.calculations, (r) => r.paid)?.toFixed(2),
@@ -424,6 +427,7 @@ function Calculate() {
     console.log("ordered", mapedData);
 
     setCalculations(mapedData);
+    setSelectedRowKeys(mapedData.map(r => r.key))
     setSearchLoading(false);
   };
 
@@ -457,10 +461,13 @@ function Calculate() {
     }
     setExcelLoading(true);
 
+    console.log('filterfilter',filter)
+    let par = {...filter}
+    par.notIncludes = notIncluded.map(r => r.key)
     let response = await axios(
       constants.API_PREFIX + `/api/Calculation/generateExcel`,
       {
-        params: filter,
+        params: par,
         responseType: "blob",
         paramsSerializer: (params) => qs.stringify(params),
       }
@@ -641,6 +648,23 @@ function Calculate() {
   };
   
   console.log("ught runtime error");
+
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [notIncluded, setNotIncluded] = useState([]);
+
+  const onSelectChange = (newSelectedRowKeys) => {
+    console.log('selectedRowKeys changed: ', calculations.filter(r => !newSelectedRowKeys.includes(r.key)));
+    let notIn = calculations.filter(r => !newSelectedRowKeys.includes(r.key));
+    let newNotInt = [ ...notIn]
+    console.log('newNotIntnewNotInt',newNotInt)
+    setNotIncluded(newNotInt)
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
+
   return (
     <div>
       <MyDrawer
@@ -873,6 +897,9 @@ function Calculate() {
       </Button>
       <Table
         columns={columns}
+        rowSelection={{
+          ...rowSelection,
+        }}
         dataSource={calculations}
         size="small"
         pagination={{
