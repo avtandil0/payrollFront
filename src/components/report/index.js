@@ -63,6 +63,7 @@ const Report = () => {
       title: "Res_id",
       dataIndex: "resId",
       key: "res_id",
+      sorter: (a, b) => a.resId - b.resId,
     },
     {
       title: "პირადი ნომერი",

@@ -63,9 +63,14 @@ function ComponentType() {
       ),
     },
     {
+      title: t(`id`),
+      dataIndex: "id",
+      render: (text) => <>{text}</>,
+    },
+    {
       title: t(`name`),
       dataIndex: "name",
-      render: (text) => <a>{text}</a>,
+      render: (text) => <>{text}</>,
     },
     {
       title: t(`dateOfCreation`),

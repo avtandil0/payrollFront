@@ -66,10 +66,16 @@ function Project() {
       title: t(`code`),
       dataIndex: "code",
       render: (text) => <a>{text}</a>,
+      sorter: (a, b) => {
+        return a.code && b.code ? a.code.localeCompare(b.code) : false
+      }
     },
     {
       title: t(`description`),
       dataIndex: "description",
+      sorter: (a, b) => {
+        return a.description && b.description ? a.description.localeCompare(b.description) : false
+      }
     },
     {
       title: t(`dateOfCreation`),

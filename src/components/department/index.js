@@ -72,10 +72,16 @@ function Department() {
     {
       title: t(`Code`),
       dataIndex: "code",
+      sorter: (a, b) => {
+        return a.code && b.code ? a.code.localeCompare(b.code) : false
+      }
     },
     {
       title: t(`placeholderFirstName`),
       dataIndex: "name",
+      sorter: (a, b) => {
+        return a.name && b.name ? a.name.localeCompare(b.name) : false
+      }
     },
     {
       title: t(`quantity`),
@@ -97,9 +103,11 @@ function Department() {
   const [tableLoading, setTableLoading] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
 
-  const fetchData = async () => {
+  const fetchData = async (filter) => {
     setTableLoading(true);
-    const result = await axios(constants.API_PREFIX + "/api/Department");
+    const result = await axios(constants.API_PREFIX + "/api/Department",{
+      params: filter
+    });
     console.log("resultDepartment", result);
     setDataSaveArray(result.data);
     setTableLoading(false);
@@ -187,10 +195,30 @@ function Department() {
     setIsModalVisible(true);
   };
 
+  const [form] = Form.useForm();
+
+  const onFinish = (values) => {
+    console.log(values);
+    fetchData(values)
+  };
+
   return (
     <div>
       {/* <h2>{`department ${globalDepartments} again!`}</h2> */}
 
+      <Form layout={"inline"} form={form} onFinish={onFinish}>
+        <Form.Item name="code" label="Code" style={{width: 200}}>
+          <Input placeholder="input placeholder" />
+        </Form.Item>
+        <Form.Item name="name" label="Name" style={{width: 200}}>
+          <Input placeholder="input placeholder" />
+        </Form.Item>
+        <Form.Item>
+          <Button  htmlType="submit" style={{marginTop:30}}>Search</Button>
+        </Form.Item>
+      </Form>
+<br/>
+<br/>
       {!user.roles.analyst ? (
         <Button
           type="primary"

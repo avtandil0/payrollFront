@@ -38,6 +38,7 @@ import qs from "qs";
 import { orderBy } from "lodash";
 import { useHistory, useLocation } from "react-router-dom";
 import { HOME_PAGE } from "../../constant";
+import { Checkbox } from 'antd';
 
 const { Option } = Select;
 
@@ -111,6 +112,11 @@ function Calculate() {
         dataIndex: "calculationDate",
         key: "calculationDate",
       },
+      {
+        title: "dateCreated",
+        dataIndex: "dateCreated",
+        key: "dateCreated",
+      },
       { title: "Gross", dataIndex: "gross", key: "gross" },
       { title: "Net", dataIndex: "net", key: "net" },
       { title: "Paid", dataIndex: "paid", key: "paid" },
@@ -129,7 +135,12 @@ function Calculate() {
     ];
 
     return (
-      <Table columns={columns} dataSource={childrens} pagination={false} />
+      <Table
+        size="small"
+        columns={columns}
+        dataSource={childrens}
+        pagination={false}
+      />
     );
   };
 
@@ -156,6 +167,11 @@ function Calculate() {
       },
     },
     {
+      title: t(`ResId`),
+      dataIndex: "ResId",
+      render: (text, row) => <> {row.resId}</>,
+    },
+    {
       title: t(`fullName`),
       dataIndex: "name",
       render: (text, row) => {
@@ -166,39 +182,36 @@ function Calculate() {
         );
       },
     },
-    // {
-    //   title: t(`calculateDate`),
-    //   dataIndex: "calculationDate",
-    // },
+   
     {
       title: "Gross",
       dataIndex: "gross",
-      render: (text, row) => <p> {row.gross}</p>,
+      render: (text, row) => <> {row.gross}</>,
     },
     {
       title: "Net",
       dataIndex: "net",
-      render: (text, row) => <p>{row.net} </p>,
+      render: (text, row) => <>{row.net} </>,
     },
     {
       title: "Paid",
       dataIndex: "paid",
-      render: (text, row) => <p>{row.paid}</p>,
+      render: (text, row) => <>{row.paid}</>,
     },
     {
       title: "IncomeTax",
       dataIndex: "incomeTax",
-      render: (text, row) => <p>{row.incomeTax}</p>,
+      render: (text, row) => <>{row.incomeTax}</>,
     },
     {
       title: "PensionTax",
       dataIndex: "PensionTax",
-      render: (text, row) => <p>{row.pensionTax} </p>,
+      render: (text, row) => <>{row.pensionTax} </>,
     },
     {
       title: "Deduction",
       dataIndex: "Deduction",
-      render: (text, row) => <p>{row.deduction} </p>,
+      render: (text, row) => <>{row.deduction} </>,
     },
     {
       title: t(`RemainingGraceAmount`),
@@ -280,6 +293,10 @@ function Calculate() {
   }, [filter]);
 
   const showCalculationModal = () => {
+    if (!calculations.length) {
+      message.error("გაფილტრეთ მონაცემები !");
+      return;
+    }
     setIsModalVisible(true);
   };
   const fetchDepartments = async () => {
@@ -298,10 +315,14 @@ function Calculate() {
 
   const [calculateLoading, setCalculateLoading] = useState(false);
   const handleOk = async () => {
+    console.log(
+      "calculationscalculations",
+      calculations.map((r) => r.key)
+    );
     setCalculateLoading(true);
     const result = await axios.post(
       constants.API_PREFIX + `/api/Calculation/calculate/${calculationDate}`,
-      filter
+      calculations.map((r) => r.key)
     );
 
     console.log("result calculation---", result.data);
@@ -309,7 +330,7 @@ function Calculate() {
     if (result.data.isSuccess) {
       search();
       setIsModalVisible(false);
-      message.success("This is a success message");
+      message.success(result.data.message);
       setCalculateLoading(false);
     } else {
       message.error(result.data.message);
@@ -334,8 +355,9 @@ function Calculate() {
       }
     });
 
-    console.log("paidspaids,paids", paids);
-    return sumBy(items, (r) => r.net)?.toFixed(2) + paids;
+    let sumb = sumBy(items, (r) => r.net)?.toFixed(2);
+    console.log("paidspaids,paids",  Number(sumb), paids);
+    return (Number(sumb) + paids).toFixed(2);
   };
 
   const search = async (data) => {
@@ -347,6 +369,7 @@ function Calculate() {
       filterData = data;
     }
     console.log("filter12", data, filterData);
+    filterData.name = filterData.firstName;
     const result = await axios(
       constants.API_PREFIX + "/api/Employee/GetEmployeeByCalculationFilter",
       { params: filterData, paramsSerializer: (params) => qs.stringify(params) }
@@ -355,12 +378,13 @@ function Calculate() {
 
     let mapedData = result.data.map((r) => ({
       key: r.id,
-      gross: sumBy(r.calculations, (r) => r.gross)?.toFixed(2),
+      resId: r.resId,
+      gross: sumBy(r.calculations, (r) => r.gross)?.toFixed(2) ?? "",
       net: sumBy(r.calculations, (r) => r.net)?.toFixed(2),
       paid: sumBy(r.calculations, (r) => r.paid)?.toFixed(2),
       incomeTax: sumBy(r.calculations, (r) => r.incomeTax)?.toFixed(2),
       pensionTax: sumBy(r.calculations, (r) => r.pensionTax)?.toFixed(2),
-      remainingGraceAmount: r.remainingGraceAmount,
+      remainingGraceAmount: r.remainingGraceAmount?.toFixed(2),
       totalBalance: getToTalBalance(r.calculations), //
       name: `${r.firstName} ${r.lastName}`,
       deduction: sumBy(r.calculations, (r) =>
@@ -374,22 +398,36 @@ function Calculate() {
         incomeTax: c.incomeTax,
         pensionTax: c.pensionTax,
         calculationDate: moment(c.calculationDate).format("YYYY-MM-DD"),
+        dateCreated: moment(c.dateCreated).format("YYYY-MM-DD HH:mm:ss"),
         name: c.employeeComponent?.componentName ?? c.compCode,
-        remainingGraceAmount: c.remainingGraceAmount,
+        remainingGraceAmount: c.remainingGraceAmount?.toFixed(2),
         // totalBalance: r.totalBalance,
       })),
     }));
 
     mapedData.forEach((element) => {
+      // element.childrens = orderBy(
+      //   element.childrens,
+      //   ["calculationDate",'dateCreated'],
+      //   ["asc","desc"]
+      // );
       element.childrens = orderBy(
         element.childrens,
-        ["calculationDate"],
-        ["asc"]
+        [
+          (item) => {
+            return [
+              moment(item.calculationDate).format("YYYY-MM-DD HH:mm:ss"),
+              moment(item.dateCreated).format("YYYY-MM-DD hh:mm:ss"),
+            ];
+          },
+        ],
+        ["asc", "desc"]
       );
     });
     console.log("ordered", mapedData);
 
     setCalculations(mapedData);
+    setSelectedRowKeys(mapedData.map(r => r.key))
     setSearchLoading(false);
   };
 
@@ -417,14 +455,21 @@ function Calculate() {
   };
 
   const handleClickExport = async () => {
+    if (!calculations.length) {
+      message.error("გაფილტრეთ მონაცემები !");
+      return;
+    }
     setExcelLoading(true);
 
+    console.log('filterfilter',filter)
+    let par = {...filter}
+    par.notIncludes = notIncluded.map(r => r.key)
     let response = await axios(
       constants.API_PREFIX + `/api/Calculation/generateExcel`,
       {
-        params: filter,
+        params: par,
         responseType: "blob",
-        paramsSerializer: (params) => qs.stringify(params)
+        paramsSerializer: (params) => qs.stringify(params),
       }
     );
 
@@ -461,17 +506,32 @@ function Calculate() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const showModalAddComp = () => {
+    if (!calculations.length) {
+      message.error("გაფილტრეთ მონაცემები !");
+      return;
+    }
     setIsModalOpen(true);
   };
 
   const [addComponentCalculation, setAddComponentCalculation] = useState(false);
   const handleOkAddComp = async () => {
-    console.log("asasas", importData);
+    console.log("addComponentObject", addComponentObject);
+    if (
+      !addComponentObject.date ||
+      !addComponentObject.componentId ||
+      !addComponentObject.currency ||
+      !addComponentObject.amount
+    ) {
+      message.error("შეავსეთ ყველა ველი!");
+      return;
+    }
     setAddComponentCalculation(true);
     const result = await axios.post(
-      constants.API_PREFIX +
-        `/api/Calculation/addCalculation/${importData.calculationDate}/${importData.componentId}/${importData.amount}/${importData.currency}`,
-      filter
+      constants.API_PREFIX + `/api/Calculation/addCalculation`,
+      {
+        addComponentObject: addComponentObject,
+        employeeIds: calculations.map((r) => r.key),
+      }
     );
 
     console.log("result calculation---", result.data);
@@ -479,7 +539,7 @@ function Calculate() {
     if (result.data.isSuccess) {
       search();
       setIsModalVisible(false);
-      message.success("This is a success message");
+      message.success(result.data.message);
       setAddComponentCalculation(false);
     } else {
       message.error(result.data.message);
@@ -519,6 +579,13 @@ function Calculate() {
     persons: [],
   });
 
+  const [addComponentObject, setAddComponentObject] = useState({
+    date: null,
+    componentId: null,
+    currency: 1,
+    amount: null,
+  });
+
   const handleChangeForm = (value, name) => {
     setImportData({ ...importData, [name]: value });
     console.log("------", value, name);
@@ -534,6 +601,70 @@ function Calculate() {
     setImportData({ ...importData, ["amount"]: e.target.value });
   };
 
+  const confirmDeleteCalculations = async (e) => {
+    console.log("calculations", calculations);
+    if (!calculations.length) {
+      message.error("გაფილტრეთ მონაცემები !");
+      return;
+    }
+    console.log("record", filter);
+    const result = await axios.post(
+      constants.API_PREFIX + `/api/Calculation/deleteCalculationsByFiler`,
+      {
+        employeeIds: calculations.map((r) => r.key),
+        calculationPeriod: filter.calculationPeriod,
+      }
+    );
+    console.log("result", result);
+    if (result.data.isSuccess) {
+      message.success(result.data.message);
+      search();
+    } else {
+      message.error(result.data.message);
+    }
+  };
+
+  const cancelDeleteCalculations = (e) => {
+    console.log(e);
+    message.error("Click on No");
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      search();
+    }
+  };
+
+  const showTotal = (total) => {
+    return (
+      <h3 style={{ marginRight: 50, marginTop: 3 }}> რაოდენობა {total} </h3>
+    );
+  };
+
+
+  const onChangeCheckbox = (e) => {
+    setFilter({ ...filter, ['calculated']: e.target.checked });
+    console.log(`checked = ${e.target.checked}`);
+  };
+  
+  console.log("ught runtime error");
+
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [notIncluded, setNotIncluded] = useState([]);
+
+  const onSelectChange = (newSelectedRowKeys) => {
+    console.log('selectedRowKeys changed: ', calculations.filter(r => !newSelectedRowKeys.includes(r.key)));
+    let notIn = calculations.filter(r => !newSelectedRowKeys.includes(r.key));
+    let newNotInt = [ ...notIn]
+    console.log('newNotIntnewNotInt',newNotInt)
+    setNotIncluded(newNotInt)
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
+
   return (
     <div>
       <MyDrawer
@@ -543,15 +674,16 @@ function Calculate() {
       />
 
       <Row gutter={[16, 24]}>
-        <Col span={4}>
+        <Col span={3}>
           <Input
             onChange={handleChangeInput}
             value={filter?.firstName}
+            onKeyDown={handleKeyDown}
             name="firstName"
-            placeholder={t(`placeholderFirstName`)}
+            placeholder={t(`firstName / lasttname`)}
           />
         </Col>
-        <Col span={4}>
+        {/* <Col span={4}>
           <Input
             onChange={handleChangeInput}
             value={filter.lastName}
@@ -559,19 +691,40 @@ function Calculate() {
             // placeholder="lastName"
             placeholder={t(`placeholderLastName`)}
           />
-        </Col>
-        <Col span={4}>
+        </Col> */}
+        <Col span={7}>
           <Select
             // defaultValue="აირჩიეთ"
-            placeholder={t(`placeholderChoose`)}
+            placeholder={t(`department`)}
             style={{ width: "100%" }}
             value={filter.departmentId}
             onChange={(e) => setFilter({ ...filter, departmentId: e })}
             allowClear
+            maxTagCount={1}
             mode="multiple"
+            filterOption={(input, option) =>
+              // console.log('optionoptionoption',input,option)
+              (option?.children ?? "")
+                .toLowerCase()
+                .includes(input.toLowerCase())
+            }
           >
             {departments.map((i) => (
-              <Option value={i.id}>{i.name}</Option>
+              <Option value={i.id}>{i.name.substring(0, 35)}</Option>
+            ))}
+          </Select>
+        </Col>
+        <Col span={5}>
+          <Select
+            allowClear
+            mode="multiple"
+             maxTagCount={2}
+            placeholder={"component"}
+            onChange={(e) => setFilter({ ...filter, componentId: e })}
+            style={{ width: "100%" }}
+          >
+            {components.map((i) => (
+              <Option value={i.name}>{i.name}</Option>
             ))}
           </Select>
         </Col>
@@ -593,6 +746,8 @@ function Calculate() {
             {t(`buttonSeach`)}
           </Button>
         </Col>
+
+        <Checkbox style={{marginLeft: 10}} onChange={onChangeCheckbox}>Only Calculated</Checkbox>
       </Row>
       <br />
       <Row gutter={[16, 24]}>
@@ -651,6 +806,18 @@ function Calculate() {
       >
         Add Component
       </Button>
+
+      <Popconfirm
+        title="Are you sure to delete this calculations?"
+        onConfirm={confirmDeleteCalculations}
+        onCancel={cancelDeleteCalculations}
+        okText="Yes"
+        cancelText="No"
+      >
+        <Button icon={<DeleteOutlined />} style={{ marginLeft: 15 }} danger>
+          Delete Calculations
+        </Button>
+      </Popconfirm>
       <Modal
         title="Add Component"
         open={isModalOpen}
@@ -662,7 +829,12 @@ function Calculate() {
         <div>
           <Select
             defaultValue="Component"
-            onChange={(value) => handleChangeForm(value, "componentId")}
+            onChange={(value) =>
+              setAddComponentObject({
+                ...addComponentObject,
+                ["componentId"]: value,
+              })
+            }
             style={{ width: "249px" }}
           >
             {components.map((i) => (
@@ -672,16 +844,26 @@ function Calculate() {
 
           <DatePicker
             style={{ marginLeft: 13, width: "249px" }}
-            onChange={handleChangeFormDate}
+            onChange={(d, ds) =>
+              setAddComponentObject({
+                ...addComponentObject,
+                ["date"]: ds,
+              })
+            }
             placeholder={t(`Select Date`)}
           />
         </div>
 
         <div>
           <Select
-            defaultValue="Currency"
             style={{ width: 249, marginTop: 15 }}
-            onChange={(value) => handleChangeForm(value, "currency")}
+            value={addComponentObject.currency}
+            onChange={(value) =>
+              setAddComponentObject({
+                ...addComponentObject,
+                ["currency"]: value,
+              })
+            }
           >
             {currencyList.map((i) => (
               <Option value={i.id}>{i.currency1}</Option>
@@ -689,9 +871,15 @@ function Calculate() {
           </Select>
 
           <Input
-            onChange={handleChangeFormInput}
+            onChange={(event) =>
+              setAddComponentObject({
+                ...addComponentObject,
+                ["amount"]: event.target.value,
+              })
+            }
             style={{ width: 249, marginLeft: 15 }}
             placeholder="Amount"
+            type="number"
           />
         </div>
       </Modal>
@@ -699,15 +887,29 @@ function Calculate() {
       <br />
       <br />
 
-      <UploadCalculations />
+      {/* <UploadCalculations /> */}
+      <Button
+        onClick={() => history.push("calculateFromFile")}
+        style={{ marginBottom: 16 }}
+        icon={<UploadOutlined />}
+      >
+        Add calculation from file
+      </Button>
       <Table
         columns={columns}
+        rowSelection={{
+          ...rowSelection,
+        }}
         dataSource={calculations}
+        size="small"
+        pagination={{
+          showTotal: showTotal,
+        }}
         expandable={{
           expandedRowRender,
           rowExpandable: (record) => record.childrens?.length,
         }}
-        scroll={{ x: 200 }}
+        // scroll={{ x: 200 }}
       />
     </div>
   );

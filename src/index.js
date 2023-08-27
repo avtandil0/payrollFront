@@ -19,7 +19,10 @@ const oidcConfig = {
 axios.interceptors.request.use(
   function (config) {
     let token = localStorage.getItem("payrollAppLogintoken");
-    config.headers.common = { Authorization: `Bearer ${token}` };
+    console.log('configconfig',config)
+    if(!config.url.includes('eapi.rs.ge')){
+      config.headers.common = { Authorization: `Bearer ${token}` };
+    }
     return config;
   },
   function (error) {
