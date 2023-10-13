@@ -7,6 +7,7 @@ import "./i18n";
 import axios from "axios";
 
 import { AuthProvider } from "react-oidc-context";
+import { HOME_PAGE } from "./constant";
 
 const oidcConfig = {
   authority: "https://localhost:5443",
@@ -41,7 +42,7 @@ axios.interceptors.response.use(
     console.log("iiiiiiii error", error.response?.status);
     if (error.response?.status == 401) {
       localStorage.clear();
-      window.location.href = "/";
+      window.location.href = "/" + HOME_PAGE;
     }
     return Promise.reject(error);
   }

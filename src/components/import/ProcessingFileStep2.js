@@ -147,6 +147,7 @@ function ProcessingFileStep2({ next, file, setFile }) {
         BankName: r[18],
         destination: r[19],
         fullName: r[14],
+        personalNumber: r[15],
         amount: r[3],
       })),
     };
@@ -164,6 +165,16 @@ function ProcessingFileStep2({ next, file, setFile }) {
     }
 
     console.log("result", result);
+    if (!result.data.isSuccess) {
+      if (result.data.code == 10) {
+        message.error('This BankAccountNumbers does not exists - ' + result.data.message, 5)
+      }
+      if (result.data.code == 20) {
+        message.error('This PersonalNumbers does not match - ' + result.data.message, 5)
+      }
+      setImportDataInDBLoading(false);
+      return;
+    }
     next();
   };
 

@@ -89,13 +89,14 @@ const Declaration = () => {
   const [tableLoading, setTableLoading] = useState(false);
 
   const fetchData = async (year, month) => {
+    console.log(233, form.getFieldValue('monthYear')?.year())
     setTableLoading(true);
     const result = await axios(
       constants.API_PREFIX + "/api/Calculation/GetDeclaration",
       {
         params: {
-          year: year,
-          month: month ? month + 1 : null,
+          year: year ?? form.getFieldValue('monthYear')?.year(),
+          month: month ? month + 1 : form.getFieldValue('monthYear')?.month() + 1,
         },
       }
     );
@@ -116,7 +117,7 @@ const Declaration = () => {
   };
 
   useEffect(() => {
-    fetchData(moment(new Date()).year(), moment(new Date()).month());
+    // fetchData(moment(new Date()).year(), moment(new Date()).month());
   }, []);
   const executeCalculation = async () => {
     //calculateForDeclaration
@@ -126,7 +127,22 @@ const Declaration = () => {
     console.log("result", result);
     if (result.data.isSuccess) {
       message.success(result.data.message);
-      fetchData();
+      // fetchData();
+    } else {
+      message.error(result.data.message);
+    }
+  };
+
+
+  const executeDeleteAndCalculate = async () => {
+    //calculateForDeclaration
+    const result = await axios.post(
+      constants.API_PREFIX + "/api/Calculation/deleteAndCalculateForDeclaration"
+    );
+    console.log("result", result);
+    if (result.data.isSuccess) {
+      message.success(result.data.message);
+      // fetchData();
     } else {
       message.error(result.data.message);
     }
@@ -157,7 +173,6 @@ const Declaration = () => {
       >
         <Form.Item name="monthYear">
           <DatePicker
-            defaultValue={moment(new Date())}
             style={{ width: 240 }}
             onChange={onChange}
             picker="month"
@@ -186,6 +201,9 @@ const Declaration = () => {
       <br />
       <Button onClick={executeCalculation} icon={<TableOutlined />}>
         Calculate
+      </Button>
+      <Button  style={{marginLeft: 15}} type="dashed" danger  onClick={executeDeleteAndCalculate} icon={<TableOutlined />}>
+        delete and calculate
       </Button>
       <br />
       <br />

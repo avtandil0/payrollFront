@@ -104,8 +104,8 @@ const DeclarationPension = () => {
       constants.API_PREFIX + "/api/Calculation/GetDeclaration",
       {
         params: {
-          year: year,
-          month: month ? month + 1 : null,
+          year: year ?? form.getFieldValue('monthYear')?.year(),
+          month: month ? month + 1 : form.getFieldValue('monthYear')?.month() +1,
         },
       }
     );
@@ -126,7 +126,7 @@ const DeclarationPension = () => {
   };
 
   useEffect(() => {
-    fetchData(moment(new Date()).year(), moment(new Date()).month());
+    // fetchData(moment(new Date()).year(), moment(new Date()).month());
   }, []);
   const executeCalculation = async () => {
     //calculateForDeclaration
@@ -136,7 +136,7 @@ const DeclarationPension = () => {
     console.log("result", result);
     if (result.data.isSuccess) {
       message.success(result.data.message);
-      fetchData();
+      // fetchData();
     } else {
       message.error(result.data.message);
     }
@@ -167,7 +167,6 @@ const DeclarationPension = () => {
       >
         <Form.Item name="monthYear">
           <DatePicker
-            defaultValue={moment(new Date())}
             style={{ width: 240 }}
             onChange={onChange}
             picker="month"

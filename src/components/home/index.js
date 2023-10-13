@@ -40,6 +40,8 @@ import {
   SnippetsOutlined,
   FileExcelOutlined,
   SwapOutlined,
+  CloudSyncOutlined,
+  UserSwitchOutlined
 } from "@ant-design/icons";
 
 import Component from "../component/index";
@@ -85,6 +87,7 @@ import Declaration from "../declaration";
 import DeclarationPension from "../declaration/declarationPension";
 import Report from "../report";
 import CalculateFromFile from "../calculate/calculateFromFile";
+import Humres from "../syncronization/users";
 
 const { Header, Sider, Content } = LayoutAnt;
 
@@ -240,28 +243,28 @@ function Home() {
     repeatNewPassword: "",
   });
   const handlePassChangeInput = (e) => {
-    setPassChange({...passChange, [e.target.name]: e.target.value})
+    setPassChange({ ...passChange, [e.target.name]: e.target.value })
   };
 
   const handleOk = async () => {
-    if(passChange.newPassword != passChange.repeatNewPassword){
+    if (passChange.newPassword != passChange.repeatNewPassword) {
       message.error('New Password and RepeatPassword does not match !')
       return;
     }
-    console.log('passssss',passChange)
+    console.log('passssss', passChange)
     const userName = JSON.parse(localStorage.getItem('payrollAppUser'));
     const result = await axios.post(
       constants.API_PREFIX + "/api/account/ChangePassword",
       {
-        userName: userName.userName,currentPassword: passChange.password, newPassword: passChange.newPassword
+        userName: userName.userName, currentPassword: passChange.password, newPassword: passChange.newPassword
       }
     );
 
-    console.log('resultresultresult',result)
-    if(result.data.isSuccess){
+    console.log('resultresultresult', result)
+    if (result.data.isSuccess) {
       message.success('Password change succsefully')
     }
-    else{
+    else {
       message.error('Error !')
     }
     setIsModalOpen(false);
@@ -271,7 +274,7 @@ function Home() {
     setIsModalOpen(false);
   };
 
- 
+
   return (
     <LayoutAnt>
       <Modal
@@ -429,6 +432,20 @@ function Home() {
             ""
           )}
 
+          <SubMenu
+            key="sub21"
+            title={t(`Syncronization`)}
+            icon={<CloudSyncOutlined />}
+          >
+            <Menu.Item
+              key="14"
+              icon={<UserSwitchOutlined />}
+              onClick={(e) => ClickGoPage(e, "Syncronization/Humres")}
+            >
+              {t(`Humres`)}
+            </Menu.Item>
+
+          </SubMenu>
           <SubMenu key="sub1" title={t(`setting`)} icon={<SettingOutlined />}>
             <Menu.Item
               key="4"
@@ -608,6 +625,9 @@ function Home() {
             </Route>
             <Route path={`${HOME_PAGE}/users`}>
               <Users />
+            </Route>
+            <Route path={`${HOME_PAGE}/Syncronization/Humres`}>
+              <Humres />
             </Route>
             <Route path={`${HOME_PAGE}/currency`}>
               <Currency />

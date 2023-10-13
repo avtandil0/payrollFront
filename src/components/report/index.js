@@ -10,7 +10,7 @@ import {
   Select,
   DatePicker,
 } from "antd";
-import { SearchOutlined, TableOutlined } from "@ant-design/icons";
+import { SearchOutlined, TableOutlined,FileExcelOutlined } from "@ant-design/icons";
 import axios from "axios";
 import constants from "../../constant";
 import moment from "moment";
@@ -69,17 +69,18 @@ const Report = () => {
       title: "პირადი ნომერი",
       dataIndex: "personalNumber",
       key: "personalNumber",
-      render: (text) => <>{text}</>,
+      render: (text, row) => <>{row.employee.personalNumber}</>,
     },
     {
       title: "სახელი",
       dataIndex: "firstName",
       key: "firstName",
+      render: (text, row) => <>{row.employee.firstName}</>,
     },
     {
       title: "გვარი",
       dataIndex: "lastName",
-      key: "lastName",
+      render: (text, row) => <>{row.employee.lastName}</>,
     },
   ]);
   const [form] = Form.useForm();
@@ -114,7 +115,7 @@ const Report = () => {
 
   const renderCompValue = (id, record) => {
     console.log("texttext", id, record);
-    let target = record.employeeComponents.find((r) => r.componentId == id);
+    let target = record.employee.employeeComponents.find((r) => r.componentId == id);
     console.log("amount", target);
     return target?.amount;
   };
@@ -154,7 +155,7 @@ const Report = () => {
       render: (text, record) => (
         <>
           {sumBy(
-            getActiveComp(record.employeeComponents),
+            getActiveComp(record.employee.employeeComponents),
             (r) => r.amount
           )?.toFixed(2)}
         </>
@@ -170,7 +171,7 @@ const Report = () => {
   useEffect(() => {
     fetchDepartments();
     fetchComponents();
-    fetchData(moment(new Date()).year(), moment(new Date()).month());
+    // fetchData(moment(new Date()).year(), moment(new Date()).month());
   }, []);
   const executeCalculation = async () => {
     //calculateForDeclaration
@@ -200,6 +201,36 @@ const Report = () => {
     console.log("filter", filter);
 
     fetchData()
+  };
+
+  const [excelLoading, setExcelLoading] = useState(false);
+
+  
+  const handleClickExport = async () => {
+  
+    setExcelLoading(true);
+
+    console.log('filterfilter',filter)
+    let par = {...filter}
+    let response = await axios(
+      constants.API_PREFIX + `/api/Report/downloadReport`,
+      {
+        params: par,
+        responseType: "blob",
+        paramsSerializer: (params) => qs.stringify(params),
+      }
+    );
+
+    console.log("-444444444", response);
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    var currentDate = new Date().toLocaleDateString();
+    link.setAttribute("download", "Export " + currentDate + ".xlsx"); //or any other extension
+    document.body.appendChild(link);
+    link.click();
+
+    setExcelLoading(false);
   };
 
 
@@ -263,6 +294,16 @@ const Report = () => {
         </Col>
       </Row>
       <br />
+      <Button
+              loading={excelLoading}
+              onClick={handleClickExport}
+              icon={<FileExcelOutlined />}
+            >
+              {t(`export`)}
+            </Button>
+
+            <br />
+            <br />
 
       <Table
         loading={tableLoading}

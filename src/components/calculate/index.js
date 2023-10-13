@@ -485,6 +485,37 @@ function Calculate() {
     setExcelLoading(false);
   };
 
+  const handleClickExportCalculations = async() => {
+    if (!calculations.length) {
+      message.error("გაფილტრეთ მონაცემები !");
+      return;
+    }
+    setExcelLoading(true);
+
+    console.log('filterfilter',filter)
+    let par = {...filter}
+    par.notIncludes = notIncluded.map(r => r.key)
+    let response = await axios(
+      constants.API_PREFIX + `/api/Calculation/downloadCalculations`,
+      {
+        params: par,
+        responseType: "blob",
+        paramsSerializer: (params) => qs.stringify(params),
+      }
+    );
+
+    console.log("-444444444", response);
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    var currentDate = new Date().toLocaleDateString();
+    link.setAttribute("download", "Export " + currentDate + ".xlsx"); //or any other extension
+    document.body.appendChild(link);
+    link.click();
+
+    setExcelLoading(false);
+  }
+
   const props = {
     name: "file",
     action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
@@ -771,6 +802,13 @@ function Calculate() {
               icon={<FileExcelOutlined />}
             >
               {t(`export`)}
+            </Button>
+            <Button
+              loading={excelLoading}
+              onClick={handleClickExportCalculations}
+              icon={<FileExcelOutlined />}
+            >
+              {t(`Export Calculations`)}
             </Button>
           </>
         ) : (
