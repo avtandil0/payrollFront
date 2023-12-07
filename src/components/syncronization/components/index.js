@@ -27,7 +27,7 @@ import { Select } from "antd";
 
 const { Option } = Select;
 
-function Humres() {
+function Components() {
   const { t } = useTranslation();
   const [roles, setRoles] = useState([]);
 
@@ -64,8 +64,8 @@ function Humres() {
       ),
     },
     {
-      title: t(`resId`),
-      dataIndex: "resId",
+      title: t(`hid`),
+      dataIndex: "hid",
     },
     {
       title: t(`fieldName`),
@@ -113,7 +113,7 @@ function Humres() {
     let token = localStorage.getItem("payrollAppLogintoken");
     axios.defaults.headers.common = { Authorization: `Bearer ${token}` };
     const result = await axios(
-      constants.API_PREFIX + "/api/audit/getAllHumresAudit"
+      constants.API_PREFIX + "/api/audit/getAllAbsencesAudit"
     );
     console.log("result", result.data);
 
@@ -195,7 +195,7 @@ function Humres() {
   const syncData = async (record) => {
     console.log("record", record);
     const result = await axios.put(
-      constants.API_PREFIX + "/api/audit/updateEmployee",
+      constants.API_PREFIX + "/api/audit/updateComponent",
       record
     );
     console.log("result", result);
@@ -229,4 +229,4 @@ function Humres() {
   );
 }
 
-export default Humres;
+export default Components;

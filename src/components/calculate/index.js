@@ -39,7 +39,9 @@ import { orderBy } from "lodash";
 import { useHistory, useLocation } from "react-router-dom";
 import { HOME_PAGE } from "../../constant";
 import { Checkbox } from 'antd';
+import { Typography } from 'antd';
 
+const { Text } = Typography;
 const { Option } = Select;
 
 function Calculate() {
@@ -182,7 +184,7 @@ function Calculate() {
         );
       },
     },
-   
+
     {
       title: "Gross",
       dataIndex: "gross",
@@ -356,7 +358,7 @@ function Calculate() {
     });
 
     let sumb = sumBy(items, (r) => r.net)?.toFixed(2);
-    console.log("paidspaids,paids",  Number(sumb), paids);
+    console.log("paidspaids,paids", Number(sumb), paids);
     return (Number(sumb) + paids).toFixed(2);
   };
 
@@ -461,8 +463,8 @@ function Calculate() {
     }
     setExcelLoading(true);
 
-    console.log('filterfilter',filter)
-    let par = {...filter}
+    console.log('filterfilter', filter)
+    let par = { ...filter }
     par.notIncludes = notIncluded.map(r => r.key)
     let response = await axios(
       constants.API_PREFIX + `/api/Calculation/generateExcel`,
@@ -485,15 +487,15 @@ function Calculate() {
     setExcelLoading(false);
   };
 
-  const handleClickExportCalculations = async() => {
+  const handleClickExportCalculations = async () => {
     if (!calculations.length) {
       message.error("გაფილტრეთ მონაცემები !");
       return;
     }
     setExcelLoading(true);
 
-    console.log('filterfilter',filter)
-    let par = {...filter}
+    console.log('filterfilter', filter)
+    let par = { ...filter }
     par.notIncludes = notIncluded.map(r => r.key)
     let response = await axios(
       constants.API_PREFIX + `/api/Calculation/downloadCalculations`,
@@ -677,7 +679,7 @@ function Calculate() {
     setFilter({ ...filter, ['calculated']: e.target.checked });
     console.log(`checked = ${e.target.checked}`);
   };
-  
+
   console.log("ught runtime error");
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -686,8 +688,8 @@ function Calculate() {
   const onSelectChange = (newSelectedRowKeys) => {
     console.log('selectedRowKeys changed: ', calculations.filter(r => !newSelectedRowKeys.includes(r.key)));
     let notIn = calculations.filter(r => !newSelectedRowKeys.includes(r.key));
-    let newNotInt = [ ...notIn]
-    console.log('newNotIntnewNotInt',newNotInt)
+    let newNotInt = [...notIn]
+    console.log('newNotIntnewNotInt', newNotInt)
     setNotIncluded(newNotInt)
     setSelectedRowKeys(newSelectedRowKeys);
   };
@@ -749,7 +751,7 @@ function Calculate() {
           <Select
             allowClear
             mode="multiple"
-             maxTagCount={2}
+            maxTagCount={2}
             placeholder={"component"}
             onChange={(e) => setFilter({ ...filter, componentId: e })}
             style={{ width: "100%" }}
@@ -778,7 +780,7 @@ function Calculate() {
           </Button>
         </Col>
 
-        <Checkbox style={{marginLeft: 10}} onChange={onChangeCheckbox}>Only Calculated</Checkbox>
+        <Checkbox style={{ marginLeft: 10 }} onChange={onChangeCheckbox}>Only Calculated</Checkbox>
       </Row>
       <br />
       <Row gutter={[16, 24]}>
@@ -947,7 +949,71 @@ function Calculate() {
           expandedRowRender,
           rowExpandable: (record) => record.childrens?.length,
         }}
-        // scroll={{ x: 200 }}
+        summary={(pageData) => {
+          let totalBorrow = 0;
+          let totalRepayment = 0;
+
+          console.log('pageData', pageData)
+          let gross = 0;
+          let net = 0;
+          let paid = 0;
+          let incomeTax = 0;
+          let pensionTax = 0;
+          let deduction = 0;
+          let totalBalance = 0;
+
+          pageData.forEach(element => {
+            gross += Number(element.gross)
+            net += Number(element.net)
+            paid += Number(element.paid)
+            incomeTax += Number(element.incomeTax)
+            pensionTax += Number(element.pensionTax)
+            deduction += Number(element.deduction)
+            totalBalance += Number(element.totalBalance)
+          });
+          return (
+            <>
+              <Table.Summary.Row>
+                <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
+                <Table.Summary.Cell index={1}>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={2}>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={2}>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={2}>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={2}>
+                  {gross.toFixed(2)}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={2}>
+                  {net.toFixed(2)}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={2}>
+                  {paid.toFixed(2)}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={2}>
+                  {incomeTax.toFixed(2)}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={2}>
+                  {pensionTax.toFixed(2)}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={2}>
+                  {deduction.toFixed(2)}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={2}>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={12}>
+                  {totalBalance.toFixed(2)}
+                </Table.Summary.Cell>
+
+
+              </Table.Summary.Row>
+
+            </>
+          );
+        }}
+      // scroll={{ x: 200 }}
       />
     </div>
   );

@@ -22,6 +22,7 @@ import {
   FundOutlined,
   CalculatorOutlined,
   ProjectOutlined,
+  PicCenterOutlined,
   StrikethroughOutlined,
   SettingOutlined,
   DiffOutlined,
@@ -88,6 +89,7 @@ import DeclarationPension from "../declaration/declarationPension";
 import Report from "../report";
 import CalculateFromFile from "../calculate/calculateFromFile";
 import Humres from "../syncronization/users";
+import Components from "../syncronization/components";
 
 const { Header, Sider, Content } = LayoutAnt;
 
@@ -444,6 +446,13 @@ function Home() {
             >
               {t(`Humres`)}
             </Menu.Item>
+            <Menu.Item
+              key="44"
+              icon={<PicCenterOutlined />}
+              onClick={(e) => ClickGoPage(e, "Syncronization/Components")}
+            >
+              {t(`Components`)}
+            </Menu.Item>
 
           </SubMenu>
           <SubMenu key="sub1" title={t(`setting`)} icon={<SettingOutlined />}>
@@ -628,6 +637,9 @@ function Home() {
             </Route>
             <Route path={`${HOME_PAGE}/Syncronization/Humres`}>
               <Humres />
+            </Route>
+            <Route path={`${HOME_PAGE}/Syncronization/Components`}>
+              <Components />
             </Route>
             <Route path={`${HOME_PAGE}/currency`}>
               <Currency />

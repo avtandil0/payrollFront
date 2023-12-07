@@ -160,8 +160,12 @@ function CalculateFromFile({ next }) {
       )
       .then((res) => res)
       .then((res) => {
-        console.log("res.data.employees", res.data.employees);
+        console.log("res.data.employees", res);
         // setFileList([]);
+        if(!res.data.employees && !res.data.success){
+          message.error(res.data.message);
+          return;
+        }
         if (!res.data.success) {
           setFileIsUploaded (false);
           setNotExist(true);
